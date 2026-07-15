@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>預約拍攝時段｜Hui Chun Photo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1c1b1a;
+    --card:#242220;
+    --card-2:#2c2925;
+    --ivory:#f2ede6;
+    --ivory-dim:#c8c2b8;
+    --gold:#c9a24b;
+    --gold-soft:rgba(201,162,75,0.16);
+    --sage:#7c9473;
+    --sage-soft:rgba(124,148,115,0.16);
+    --rose:#a8674f;
+    --line:rgba(242,237,230,0.12);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,75,0.10), transparent),
+      var(--bg);
+    color:var(--ivory);
+    font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height:100vh;
+    padding:48px 20px 80px;
+    line-height:1.5;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+
+  /* header / signature element: film sprocket rule */
+  .sprockets{
+    display:flex;justify-content:space-between;padding:0 2px;margin-bottom:18px;
+    opacity:0.5;
+  }
+  .sprockets span{width:6px;height:9px;border-radius:2px;background:var(--gold);opacity:0.6;}
+
+  header{margin-bottom:36px;text-align:center;}
+  .eyebrow{
+    font-size:12px;letter-spacing:0.28em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:10px;font-weight:500;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(28px,6vw,38px);
+    margin:0 0 10px;
+    letter-spacing:0.01em;
+  }
+  header p{color:var(--ivory-dim);font-size:14.5px;margin:0;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px 22px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:18px;
+    margin:0 0 4px;
+    display:flex;align-items:baseline;gap:8px;
+  }
+  .card h2 .num{
+    font-size:13px;color:var(--gold);font-family:'Work Sans',sans-serif;font-weight:600;
+    letter-spacing:0.05em;
+  }
+  .card .sub{color:var(--ivory-dim);font-size:13px;margin:0 0 16px;}
+
+  /* calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .cal-head .month-label{font-family:'Fraunces',serif;font-size:16px;font-weight:500;}
+  .cal-nav{display:flex;gap:6px;}
+  .cal-nav button{
+    background:var(--card-2);border:1px solid var(--line);color:var(--ivory);
+    width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease;
+  }
+  .cal-nav button:hover{background:var(--gold-soft);}
+  .weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+  .weekdays span{text-align:center;font-size:11px;color:var(--ivory-dim);letter-spacing:0.05em;}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .day{
+    position:relative;
+    aspect-ratio:1/1;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:8px;
+    font-size:13.5px;
+    background:transparent;
+    border:1px solid transparent;
+    color:var(--ivory-dim);
+    cursor:default;
+  }
+  .day.pad{visibility:hidden;}
+  .day.has-slots{
+    color:var(--ivory);
+    border-color:var(--line);
+    cursor:pointer;
+    background:var(--card-2);
+  }
+  .day.has-slots:hover{border-color:var(--gold);}
+  .day.has-slots::after{
+    content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:var(--sage);
+  }
+  .day.selected{
+    background:var(--gold-soft);border-color:var(--gold);color:var(--ivory);
+    font-weight:600;
+  }
+  .day.today{box-shadow:inset 0 0 0 1px var(--gold);}
+  .day.past{opacity:0.28;}
+
+  /* time slots */
+  .slots{display:flex;flex-wrap:wrap;gap:8px;min-height:40px;}
+  .slot-btn{
+    padding:9px 16px;border-radius:999px;
+    background:var(--card-2);border:1px solid var(--line);
+    color:var(--ivory);font-size:13.5px;cursor:pointer;
+    font-family:'Work Sans',sans-serif;
+    transition:all .15s ease;
+  }
+  .slot-btn:hover{border-color:var(--gold);}
+  .slot-btn.selected{background:var(--gold-soft);border-color:var(--gold);color:var(--gold);font-weight:600;}
+  .slot-btn.full{opacity:0.35;cursor:not-allowed;text-decoration:line-through;}
+  .slot-btn.full:hover{border-color:var(--line);}
+  .placeholder-text{color:var(--ivory-dim);font-size:13.5px;padding:8px 2px;}
+
+  /* guest stepper */
+  .stepper{display:flex;align-items:center;gap:16px;}
+  .stepper button{
+    width:38px;height:38px;border-radius:10px;
+    background:var(--card-2);border:1px solid var(--line);color:var(--ivory);
+    font-size:18px;cursor:pointer;
+  }
+  .stepper button:hover{border-color:var(--gold);}
+  .stepper button:disabled{opacity:0.3;cursor:not-allowed;}
+  .stepper .count{
+    font-family:'Fraunces',serif;font-size:24px;min-width:32px;text-align:center;
+  }
+  .stepper .unit{color:var(--ivory-dim);font-size:13px;}
+  .cap-note{color:var(--ivory-dim);font-size:12px;margin-top:8px;}
+
+  /* summary */
+  .summary{
+    background:var(--card-2);border:1px dashed var(--line);
+    border-radius:10px;padding:14px 16px;font-size:13.5px;color:var(--ivory-dim);
+    margin-bottom:20px;
+  }
+  .summary b{color:var(--ivory);font-weight:600;}
+
+  .submit-btn{
+    width:100%;padding:16px;border-radius:12px;border:none;
+    background:var(--gold);color:#231f18;font-weight:600;font-size:15.5px;
+    cursor:pointer;font-family:'Work Sans',sans-serif;letter-spacing:0.01em;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,162,75,0.25);}
+  .submit-btn:disabled{background:var(--card-2);color:var(--ivory-dim);cursor:not-allowed;transform:none;box-shadow:none;}
+
+  .helper-note{text-align:center;font-size:12px;color:var(--ivory-dim);margin-top:14px;}
+
+  .status-msg{
+    text-align:center;font-size:13px;padding:10px;border-radius:10px;margin-bottom:16px;
+  }
+  .status-msg.loading{background:var(--card-2);color:var(--ivory-dim);}
+  .status-msg.error{background:rgba(168,103,79,0.15);color:#e2a893;}
+
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+    background:var(--ivory);color:#231f18;padding:12px 20px;border-radius:10px;
+    font-size:13.5px;font-weight:500;opacity:0;pointer-events:none;
+    transition:all .25s ease;box-shadow:0 8px 24px rgba(0,0,0,0.35);
+    max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:420px){
+    .card{padding:20px 16px;}
+    .day{font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="sprockets">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <header>
+    <div class="eyebrow">Booking Request</div>
+    <h1>預約拍攝時段</h1>
+    <p>選擇日期與時段，我們會透過 Instagram 私訊與你確認細節。</p>
+  </header>
+
+  <div id="statusMsg" class="status-msg loading">正在讀取可預約時段…</div>
+
+  <!-- Step 1: Date -->
+  <div class="card">
+    <h2><span class="num">01</span> 選擇日期</h2>
+    <p class="sub">灰點代表當日尚有空檔</p>
+    <div class="cal-head">
+      <button class="cal-nav-btn" id="prevMonth" style="background:var(--card-2);border:1px solid var(--line);color:var(--ivory);width:32px;height:32px;border-radius:8px;cursor:pointer;">‹</button>
+      <div class="month-label" id="monthLabel"></div>
+      <button class="cal-nav-btn" id="nextMonth" style="background:var(--card-2);border:1px solid var(--line);color:var(--ivory);width:32px;height:32px;border-radius:8px;cursor:pointer;">›</button>
+    </div>
+    <div class="weekdays">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="days" id="daysGrid"></div>
+  </div>
+
+  <!-- Step 2: Time -->
+  <div class="card">
+    <h2><span class="num">02</span> 選擇可用時段</h2>
+    <p class="sub" id="timeSub">請先選擇日期</p>
+    <div class="slots" id="slotsWrap">
+      <span class="placeholder-text">尚未選擇日期</span>
+    </div>
+  </div>
+
+  <!-- Step 3: Guests -->
+  <div class="card">
+    <h2><span class="num">03</span> 選擇人數</h2>
+    <p class="sub">拍攝人數（含你自己）</p>
+    <div class="stepper">
+      <button id="minusBtn" aria-label="減少人數">−</button>
+      <div class="count" id="guestCount">1</div>
+      <button id="plusBtn" aria-label="增加人數">＋</button>
+      <span class="unit">位</span>
+    </div>
+    <div class="cap-note" id="capNote"></div>
+  </div>
+
+  <div class="summary" id="summaryBox">
+    請完成上方三個步驟以產生預約摘要。
+  </div>
+
+  <button class="submit-btn" id="submitBtn" disabled>送出並私訊確認</button>
+  <p class="helper-note">點擊後會自動複製預約訊息，並開啟 Instagram 個人頁面，請貼上訊息傳送即可。</p>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ====== 設定區 ======
+  var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
+  var SHEET_NAME = "booking"; // 指定讀取的工作表分頁名稱
+  var IG_USERNAME = "hui_chun_photo";
+
+  var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
+                (SHEET_NAME ? "&sheet=" + encodeURIComponent(SHEET_NAME) : "");
+
+  // data model: { "YYYY-MM-DD": [ {time:"10:00", slots:2}, ... ] }
+  var availability = {};
+  var dataLoaded = false;
+
+  var state = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(), // 0-indexed
+    selectedDate: null,   // "YYYY-MM-DD"
+    selectedTime: null,   // "HH:MM"
+    guestCount: 1
+  };
+
+  var statusMsg = document.getElementById('statusMsg');
+  var monthLabel = document.getElementById('monthLabel');
+  var daysGrid = document.getElementById('daysGrid');
+  var slotsWrap = document.getElementById('slotsWrap');
+  var timeSub = document.getElementById('timeSub');
+  var guestCountEl = document.getElementById('guestCount');
+  var capNote = document.getElementById('capNote');
+  var summaryBox = document.getElementById('summaryBox');
+  var submitBtn = document.getElementById('submitBtn');
+  var toast = document.getElementById('toast');
+
+  function pad(n){ return n < 10 ? "0"+n : ""+n; }
+  function dateKey(y,m,d){ return y + "-" + pad(m+1) + "-" + pad(d); }
+  function todayKey(){
+    var t = new Date();
+    return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
+  }
+
+  // ---- 解析 GViz 特殊格式，例如 "Date(2026,6,16)" 或 "Date(1899,11,30,10,0,0)" ----
+  function parseGvizCellRaw(cell){
+    if(!cell) return null;
+    var v = cell.v;
+    if(typeof v === "string"){
+      var m = v.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+      if(m){
+        var y = parseInt(m[1],10);
+        var mo = parseInt(m[2],10); // 0-indexed month from gviz
+        var d = parseInt(m[3],10);
+        if(m[4] !== undefined){
+          // 有時間成分：視為時間格 (H:M)
+          var hh = parseInt(m[4],10);
+          var mm = parseInt(m[5],10);
+          return { kind:"datetime", y:y, mo:mo, d:d, hh:hh, mm:mm };
+        }
+        return { kind:"date", y:y, mo:mo, d:d };
+      }
+    }
+    return { kind:"raw", value: v, formatted: cell.f };
+  }
+
+  function extractDateString(cell){
+    var parsed = parseGvizCellRaw(cell);
+    if(!parsed) return null;
+    if(parsed.kind === "date"){
+      return dateKey(parsed.y, parsed.mo, parsed.d);
+    }
+    if(parsed.kind === "datetime"){
+      return dateKey(parsed.y, parsed.mo, parsed.d);
+    }
+    // raw string, expect "YYYY/MM/DD" or "YYYY-MM-DD"
+    if(parsed.value == null) return null;
+    var s = String(parsed.value).trim();
+    var m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if(m){
+      return m[1] + "-" + pad(parseInt(m[2],10)) + "-" + pad(parseInt(m[3],10));
+    }
+    return null;
+  }
+
+  function extractTimeString(cell){
+    var parsed = parseGvizCellRaw(cell);
+    if(!parsed) return null;
+    if(parsed.kind === "datetime"){
+      return pad(parsed.hh) + ":" + pad(parsed.mm);
+    }
+    if(parsed.kind === "raw" && parsed.value != null){
+      var s = String(parsed.formatted || parsed.value).trim();
+      var m = s.match(/^(\d{1,2}):(\d{2})/);
+      if(m){ return pad(parseInt(m[1],10)) + ":" + m[2]; }
+      return s;
+    }
+    return null;
+  }
+
+  function extractSlotsNumber(cell){
+    if(!cell) return 0;
+    var v = cell.v;
+    if(typeof v === "number") return v;
+    var n = parseInt(v,10);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function loadAvailability(){
+    fetch(gvizUrl)
+      .then(function(res){
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function(text){
+        var match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+        if(!match) throw new Error("無法解析回應格式");
+        var json = JSON.parse(match[1]);
+        if(!json.table || !json.table.rows) throw new Error("試算表格式不符");
+
+        var rows = json.table.rows;
+        var map = {};
+        rows.forEach(function(row){
+          var cells = row.c;
+          if(!cells || !cells[0]) return;
+          var dKey = extractDateString(cells[0]);
+          var tStr = cells[1] ? extractTimeString(cells[1]) : null;
+          var slots = cells[2] ? extractSlotsNumber(cells[2]) : 0;
+          if(!dKey || !tStr) return;
+          if(!map[dKey]) map[dKey] = [];
+          map[dKey].push({ time: tStr, slots: slots });
+        });
+        // 每個日期依時間排序
+        Object.keys(map).forEach(function(k){
+          map[k].sort(function(a,b){ return a.time.localeCompare(b.time); });
+        });
+
+        availability = map;
+        dataLoaded = true;
+        statusMsg.style.display = "none";
+        renderCalendar();
+      })
+      .catch(function(err){
+        statusMsg.className = "status-msg error";
+        statusMsg.textContent = "讀取時段資料失敗，請確認 Google 試算表已設為「知道連結的任何人皆可檢視」。(" + err.message + ")";
+        renderCalendar(); // 仍畫出日曆，但沒有任何可預約日期
+      });
+  }
+
+  // ====== 日曆渲染 ======
+  var monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+
+  function renderCalendar(){
+    monthLabel.textContent = state.year + " · " + monthNames[state.month];
+    daysGrid.innerHTML = "";
+
+    var firstDay = new Date(state.year, state.month, 1).getDay();
+    var daysInMonth = new Date(state.year, state.month+1, 0).getDate();
+    var tKey = todayKey();
+
+    for(var i=0;i<firstDay;i++){
+      var pad_ = document.createElement('div');
+      pad_.className = "day pad";
+      daysGrid.appendChild(pad_);
+    }
+
+    for(var d=1; d<=daysInMonth; d++){
+      var key = dateKey(state.year, state.month, d);
+      var el = document.createElement('div');
+      el.className = "day";
+      el.textContent = d;
+
+      var hasSlots = availability[key] && availability[key].some(function(s){ return s.slots > 0; });
+      var isPast = key < tKey;
+
+      if(isPast){
+        el.classList.add("past");
+      } else if(hasSlots){
+        el.classList.add("has-slots");
+        el.addEventListener('click', (function(k){
+          return function(){ selectDate(k); };
+        })(key));
+      }
+      if(key === tKey) el.classList.add("today");
+      if(key === state.selectedDate) el.classList.add("selected");
+
+      daysGrid.appendChild(el);
+    }
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', function(){
+    state.month--;
+    if(state.month < 0){ state.month = 11; state.year--; }
+    renderCalendar();
+  });
+  document.getElementById('nextMonth').addEventListener('click', function(){
+    state.month++;
+    if(state.month > 11){ state.month = 0; state.year++; }
+    renderCalendar();
+  });
+
+  // ====== 選擇日期 ======
+  function selectDate(key){
+    state.selectedDate = key;
+    state.selectedTime = null;
+    renderCalendar();
+    renderSlots();
+    updateSummary();
+  }
+
+  function formatDateLabel(key){
+    var parts = key.split("-");
+    return parts[0] + "/" + parts[1] + "/" + parts[2];
+  }
+
+  function renderSlots(){
+    slotsWrap.innerHTML = "";
+    if(!state.selectedDate){
+      timeSub.textContent = "請先選擇日期";
+      slotsWrap.innerHTML = '<span class="placeholder-text">尚未選擇日期</span>';
+      return;
+    }
+    timeSub.textContent = formatDateLabel(state.selectedDate) + " 的可選時段";
+    var list = availability[state.selectedDate] || [];
+    if(list.length === 0){
+      slotsWrap.innerHTML = '<span class="placeholder-text">此日期暫無時段資料</span>';
+      return;
+    }
+    list.forEach(function(item){
+      var btn = document.createElement('button');
+      btn.className = "slot-btn";
+      var full = item.slots <= 0;
+      if(full) btn.classList.add("full");
+      btn.textContent = item.time + (full ? "（額滿）" : "");
+      btn.disabled = full;
+      if(item.time === state.selectedTime) btn.classList.add("selected");
+      btn.addEventListener('click', function(){
+        state.selectedTime = item.time;
+        renderSlots();
+        updateGuestCap();
+        updateSummary();
+      });
+      slotsWrap.appendChild(btn);
+    });
+  }
+
+  // ====== 人數 ======
+  function currentMaxGuests(){
+    if(state.selectedDate && state.selectedTime){
+      var list = availability[state.selectedDate] || [];
+      var found = list.filter(function(s){ return s.time === state.selectedTime; })[0];
+      if(found && found.slots > 0) return Math.min(found.slots, 20);
+    }
+    return 20;
+  }
+
+  function updateGuestCap(){
+    var max = currentMaxGuests();
+    if(state.guestCount > max) state.guestCount = max;
+    if(state.guestCount < 1) state.guestCount = 1;
+    guestCountEl.textContent = state.guestCount;
+    document.getElementById('plusBtn').disabled = state.guestCount >= max;
+    document.getElementById('minusBtn').disabled = state.guestCount <= 1;
+    capNote.textContent = (state.selectedDate && state.selectedTime)
+      ? ("此時段最多可預約 " + max + " 位")
+      : "";
+  }
+
+  document.getElementById('plusBtn').addEventListener('click', function(){
+    var max = currentMaxGuests();
+    if(state.guestCount < max) state.guestCount++;
+    updateGuestCap();
+    updateSummary();
+  });
+  document.getElementById('minusBtn').addEventListener('click', function(){
+    if(state.guestCount > 1) state.guestCount--;
+    updateGuestCap();
+    updateSummary();
+  });
+
+  // ====== 摘要 & 送出 ======
+  function updateSummary(){
+    var ready = state.selectedDate && state.selectedTime;
+    if(!ready){
+      summaryBox.innerHTML = "請完成上方三個步驟以產生預約摘要。";
+      submitBtn.disabled = true;
+      return;
+    }
+    summaryBox.innerHTML = "預約摘要：<b>" + formatDateLabel(state.selectedDate) + " " +
+      state.selectedTime + "</b>，共 <b>" + state.guestCount + " 位</b>。";
+    submitBtn.disabled = false;
+  }
+
+  function buildMessage(){
+    return "你好，我想預約 " + formatDateLabel(state.selectedDate) + " " +
+      state.selectedTime + "，共 " + state.guestCount + " 位。";
+  }
+
+  function showToast(text){
+    toast.textContent = text;
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 3200);
+  }
+
+  submitBtn.addEventListener('click', function(){
+    if(!state.selectedDate || !state.selectedTime) return;
+    var message = buildMessage();
+    var encoded = encodeURIComponent(message);
+    var igUrl = "https://www.instagram.com/" + IG_USERNAME + "/";
+    // 附上編碼後訊息作為參考（IG 目前無官方公開方式可預填私訊內容，
+    // 因此改為：複製訊息到剪貼簿 + 開啟你的 IG 個人頁面，讓使用者貼上傳送）
+    void encoded;
+
+    function openIG(){
+      window.open(igUrl, '_blank', 'noopener');
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(message).then(function(){
+        showToast("已複製預約訊息，即將開啟 Instagram，請貼上並傳送");
+        setTimeout(openIG, 600);
+      }).catch(function(){
+        showToast("請手動複製：" + message);
+        setTimeout(openIG, 600);
+      });
+    } else {
+      showToast("請手動複製：" + message);
+      setTimeout(openIG, 600);
+    }
+  });
+
+  // ====== 初始化 ======
+  updateGuestCap();
+  updateSummary();
+  renderCalendar();
+  loadAvailability();
+
+})();
+</script>
+</body>
+</html>
