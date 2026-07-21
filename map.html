@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回春視務所｜交通指引</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#333F2E;
+    --ink-soft:#5C6B54;
+    --paper:#DBDFD5;
+    --paper-raise:#F4F1E6;
+    --jade:#4C5F45;
+    --jade-deep:#374430;
+    --amber:#C79A6E;
+    --mrt-red:#B5715B;
+    --line:rgba(51,64,47,0.22);
+    --line-soft:rgba(51,64,47,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans TC', sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+
+  .eyebrow{
+    font-family:'Roboto Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--jade);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px;height:1px;background:var(--jade);display:inline-block;
+  }
+
+  /* HERO */
+  header.hero{
+    padding:72px 0 48px;
+    border-bottom:1px solid var(--line);
+  }
+  h1.storename{
+    font-family:'Noto Serif TC', serif;
+    font-weight:900;
+    font-size:clamp(40px, 8vw, 64px);
+    margin:18px 0 6px;
+    letter-spacing:.01em;
+    color:var(--ink);
+  }
+  .tagline{
+    font-size:16px;
+    color:var(--ink-soft);
+    margin:0 0 28px;
+  }
+  .addr-block{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    gap:14px;
+    background:var(--paper-raise);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px 20px;
+    margin-bottom:26px;
+  }
+  .addr-block .pin{
+    flex:0 0 auto;
+    width:34px;height:34px;border-radius:50%;
+    background:var(--jade-deep);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:16px;
+  }
+  .addr-text{flex:1;min-width:220px;}
+  .addr-main{
+    font-family:'Roboto Mono', monospace;
+    font-size:15.5px;
+    font-weight:500;
+    color:var(--ink);
+  }
+  .addr-sub{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Noto Sans TC', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:13px 22px;
+    border-radius:3px;
+    text-decoration:none;
+    border:1px solid transparent;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn-primary{background:var(--jade-deep);color:#fff;}
+  .btn-primary:hover{background:var(--jade);transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--ink);transform:translateY(-1px);}
+
+  /* SECTION GENERIC */
+  section{padding:56px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2.section-title{
+    font-family:'Noto Serif TC', serif;
+    font-weight:700;
+    font-size:clamp(24px, 4vw, 30px);
+    margin:6px 0 30px;
+  }
+
+  /* ACCESS NOTE */
+  .access-note{
+    display:flex;gap:16px;align-items:flex-start;
+    background:var(--paper-raise);border:1px solid var(--line);
+    border-left:4px solid var(--amber);
+    border-radius:3px;
+    padding:20px 22px;
+  }
+  .access-note .ico{font-size:22px;line-height:1;flex:0 0 auto;}
+  .access-note p{margin:0;font-size:15px;color:var(--ink-soft);}
+  .access-note strong{color:var(--ink);}
+
+  /* MRT SIGNAGE CARD */
+  .mrt-card{
+    background:var(--ink);
+    color:#F3F1E9;
+    border-radius:6px;
+    padding:30px 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .mrt-top{display:flex;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+  .mrt-badge{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--mrt-red);
+    color:#fff;
+    font-family:'Roboto Mono', monospace;
+    font-weight:700;
+    font-size:20px;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;
+    box-shadow:0 0 0 3px rgba(255,255,255,.15);
+  }
+  .mrt-name{font-family:'Noto Serif TC', serif;font-size:22px;font-weight:700;}
+  .mrt-line{font-family:'Roboto Mono', monospace;font-size:12px;letter-spacing:.08em;color:#E4B98A;text-transform:uppercase;}
+  .route-steps{
+    display:flex;flex-direction:column;gap:0;
+    border-top:1px dashed rgba(255,255,255,.25);
+    padding-top:18px;
+  }
+  .route-step{
+    display:flex;gap:14px;align-items:flex-start;
+    padding:10px 0;
+    font-size:14.5px;
+  }
+  .route-step .step-badge{
+    font-family:'Roboto Mono', monospace;
+    font-size:12px;
+    width:24px;height:24px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.4);
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;
+    color:#F3F1E9;
+  }
+  .route-step .step-text{color:#D9DAD3;}
+  .route-step .step-text b{color:#fff;}
+  .route-arrow{
+    padding-left:38px;
+    color:rgba(255,255,255,.35);
+    font-family:'Roboto Mono', monospace;
+    font-size:13px;
+  }
+
+  /* PARKING LIST */
+  .parking-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .parking-item{
+    background:#fff;
+    padding:18px 20px;
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .parking-item .p-pin{
+    font-family:'Roboto Mono', monospace;
+    font-size:12px;
+    color:#fff;
+    background:var(--jade-deep);
+    width:22px;height:22px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;
+    margin-top:2px;
+  }
+  .parking-item .p-name{font-size:14.5px;color:var(--ink);}
+  .parking-item .p-name .p-note{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px;font-family:'Roboto Mono', monospace;}
+
+  @media (max-width:640px){
+    .parking-grid{grid-template-columns:1fr;}
+  }
+
+  .parking-image-card{
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .parking-image-card img{
+    width:100%;
+    height:auto;
+    display:block;
+  }
+
+  /* MAP EMBED */
+  .map-card{
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+    background:var(--paper-raise);
+  }
+  .map-card iframe{
+    width:100%;
+    height:460px;
+    border:0;
+    display:block;
+  }
+  .map-caption{
+    padding:14px 20px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .map-caption a{color:var(--jade-deep);font-weight:700;text-decoration:none;}
+  .map-caption a:hover{text-decoration:underline;}
+
+  footer{
+    padding:40px 0 60px;
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  footer .fmono{font-family:'Roboto Mono', monospace;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">高雄・前金</div>
+    <h1 class="storename">回春視務所</h1>
+    <p class="tagline">交通指引・導航・停車資訊</p>
+
+    <div class="addr-block">
+      <div class="pin">📍</div>
+      <div class="addr-text">
+        <div class="addr-main">高雄市前金區中山二路533號2樓之4</div>
+        <div class="addr-sub">二樓電梯出來後，左手邊走廊到底，右手邊那一間</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&destination=高雄市前金區中山二路533號" target="_blank" rel="noopener">開始導航 →</a>
+      <a class="btn btn-ghost" href="#transit">大眾運輸方式</a>
+    </div>
+  </header>
+
+  <section id="access">
+    <div class="eyebrow">樓層指引</div>
+    <h2 class="section-title">怎麼進門</h2>
+    <div class="access-note">
+      <div class="ico">🛗</div>
+      <p><strong>攝影室位於二樓，僅能搭乘電梯上樓。</strong>電梯出來後，走廊走到底，右手邊那一間就是回春視務所。</p>
+    </div>
+  </section>
+
+  <section id="transit">
+    <div class="eyebrow">大眾運輸</div>
+    <h2 class="section-title">搭捷運過來</h2>
+    <div class="mrt-card">
+      <div class="mrt-top">
+        <div class="mrt-badge">R9</div>
+        <div>
+          <div class="mrt-name">中央公園站</div>
+          <div class="mrt-line">高雄捷運・紅線・2號出口</div>
+        </div>
+      </div>
+      <div class="route-steps">
+        <div class="route-step">
+          <div class="step-badge">A</div>
+          <div class="step-text">從 <b>中央公園站 2號出口</b> 出站（中山一路11號）</div>
+        </div>
+        <div class="route-arrow">┊ 沿中山二路步行</div>
+        <div class="route-step">
+          <div class="step-badge">B</div>
+          <div class="step-text">抵達 <b>中山二路533號</b>，即為回春視務所所在大樓</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="map">
+    <div class="eyebrow">完整地圖</div>
+    <h2 class="section-title">交通指引地圖</h2>
+    <div class="map-card">
+      <iframe src="https://www.google.com/maps/d/embed?mid=1HxRFjl6GiolWfNiYSBEIGqntbA_txjI" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen title="回春視務所交通指引地圖"></iframe>
+      <div class="map-caption">
+        <span>包含全部停車場位置與捷運步行路線</span>
+        <a href="https://www.google.com/maps/d/viewer?mid=1HxRFjl6GiolWfNiYSBEIGqntbA_txjI" target="_blank" rel="noopener">用 Google 地圖開啟 ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="fmono">回春視務所</span>
+    <span class="fmono">高雄市前金區中山二路533號2樓之4</span>
+  </footer>
+</div>
+
+</body>
+</html>
