@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>預約總覽｜Hui Chun Photo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050b1a;
+    --bg-2:#0a1530;
+    --yellow:#FFD542;
+    --yellow-soft:rgba(255,213,66,0.14);
+    --yellow-line:rgba(255,213,66,0.22);
+    --yellow-dim:rgba(255,213,66,0.45);
+    --black-block:rgba(0,0,0,0.55);
+    --text-dim:rgba(255,255,255,0.28);
+    --today-bg:rgba(255,213,66,0.055);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0;padding:0;height:100%;overflow:hidden;
+    background:var(--bg);color:var(--yellow);
+    font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .wrap{
+    height:100vh;height:100dvh;
+    display:flex;flex-direction:column;
+    padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+  }
+
+  .topbar{
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 14px;
+    border-bottom:1px solid var(--yellow-line);
+    background:var(--bg-2);
+  }
+  .topbar .title{
+    font-weight:700;font-size:clamp(11px,2.6vh,14px);letter-spacing:0.03em;color:var(--yellow);
+  }
+  .topbar .status{
+    font-size:clamp(9px,2vh,11px);color:var(--yellow-dim);display:flex;align-items:center;gap:6px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--yellow-dim);}
+  .dot.live{background:#5CD97A;box-shadow:0 0 6px rgba(92,217,122,0.8);}
+  .dot.err{background:#E05A4E;}
+
+  .days-list{
+    flex:1 1 auto;
+    display:flex;flex-direction:column;
+    min-height:0;
+  }
+  .day-row{
+    flex:1 1 0;
+    min-height:0;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:2px 14px;
+    border-bottom:1px solid var(--yellow-line);
+    position:relative;
+  }
+  .day-row:last-child{border-bottom:none;}
+  .day-row.today{background:var(--today-bg);}
+  .day-row.today::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--yellow);
+  }
+
+  .date-line{
+    display:flex;align-items:baseline;gap:8px;
+    margin-bottom:clamp(3px,0.9vh,7px);
+  }
+  .date-line .date-text{
+    font-family:'Work Sans',sans-serif;font-weight:700;
+    font-size:clamp(12px,2.6vh,17px);color:var(--yellow);letter-spacing:0.01em;
+  }
+  .date-line .weekday-text{
+    font-size:clamp(11px,2.3vh,14px);color:var(--yellow-dim);font-weight:500;
+  }
+  .date-line .today-tag{
+    font-size:clamp(9px,1.8vh,11px);color:var(--bg);background:var(--yellow);
+    padding:1px 7px;border-radius:999px;font-weight:700;letter-spacing:0.05em;
+  }
+
+  .slots-line{
+    display:flex;gap:clamp(4px,1vw,8px);
+    flex:1 1 auto;min-height:0;
+  }
+  .slot{
+    flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:7px;
+    font-size:clamp(10px,2.1vh,13px);
+    line-height:1.15;
+    border:1.3px solid var(--yellow);
+    color:var(--yellow);
+    font-weight:600;
+    background:var(--yellow-soft);
+  }
+  .slot .t{white-space:nowrap;}
+  .slot .tag{
+    font-size:clamp(7.5px,1.4vh,9.5px);
+    font-weight:500;letter-spacing:0.02em;
+    margin-top:1px;
+  }
+  .slot.blocked{
+    background:var(--black-block);
+    border:1.3px solid rgba(255,213,66,0.12);
+    color:var(--text-dim);
+    font-weight:500;
+  }
+  .slot.blocked .t{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.2);}
+  .slot.blocked .tag{color:rgba(255,255,255,0.32);}
+
+  @media (max-width:340px){
+    .topbar{padding:6px 10px;}
+    .day-row{padding:2px 10px;}
+    .slots-line{gap:3px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="title">預約總覽・今天起 8 天</span>
+    <span class="status" id="statusLine"><span class="dot" id="statusDot"></span><span id="statusText">讀取中…</span></span>
+  </div>
+
+  <div class="days-list" id="daysList"></div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ====== 設定區（與預約頁共用同一份資料來源）======
+  var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
+  var SHEET_NAME = "booking";
+  var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
+                (SHEET_NAME ? "&sheet=" + encodeURIComponent(SHEET_NAME) : "");
+
+  var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
+  var DAYS_TO_SHOW = 8; // 含今天共 8 天
+
+  var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
+
+  var daysList = document.getElementById('daysList');
+  var statusDot = document.getElementById('statusDot');
+  var statusText = document.getElementById('statusText');
+
+  var weekdayNames = ["日","一","二","三","四","五","六"];
+
+  function pad(n){ return n < 10 ? "0"+n : ""+n; }
+  function dateKey(y,m,d){ return y + "-" + pad(m+1) + "-" + pad(d); }
+  function todayKey(){
+    var t = new Date();
+    return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
+  }
+  function timeToMinutes(t){
+    var p = t.split(':');
+    return parseInt(p[0],10) * 60 + parseInt(p[1],10);
+  }
+  function nowMinutes(){
+    var d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  }
+  function isSlotTimePassed(timeStr){
+    return nowMinutes() > timeToMinutes(timeStr);
+  }
+
+  // ---- 解析 GViz 特殊格式 ----
+  function parseGvizCellRaw(cell){
+    if(!cell) return null;
+    var v = cell.v;
+    if(typeof v === "string"){
+      var m = v.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+      if(m){
+        return { kind:"date", y:parseInt(m[1],10), mo:parseInt(m[2],10), d:parseInt(m[3],10) };
+      }
+    }
+    return { kind:"raw", value: v };
+  }
+  function extractDateString(cell){
+    var parsed = parseGvizCellRaw(cell);
+    if(!parsed) return null;
+    if(parsed.kind === "date") return dateKey(parsed.y, parsed.mo, parsed.d);
+    if(parsed.value == null) return null;
+    var s = String(parsed.value).trim();
+    var m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if(m) return m[1] + "-" + pad(parseInt(m[2],10)) + "-" + pad(parseInt(m[3],10));
+    return null;
+  }
+  function cellHasValue(cell){
+    if(!cell) return false;
+    var v = cell.v;
+    return v !== null && v !== undefined && v !== "";
+  }
+
+  function loadAvailability(){
+    statusText.textContent = "讀取中…";
+    statusDot.className = "dot";
+    fetch(gvizUrl)
+      .then(function(res){
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function(text){
+        var match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+        if(!match) throw new Error("格式解析失敗");
+        var json = JSON.parse(match[1]);
+        if(!json.table || !json.table.rows) throw new Error("試算表格式不符");
+
+        var rows = json.table.rows;
+        var map = {};
+        rows.forEach(function(row){
+          var cells = row.c;
+          if(!cells || !cells[0]) return;
+          var dKey = extractDateString(cells[0]);
+          if(!dKey) return;
+          var dayBooked = map[dKey] || {};
+          SLOT_TIMES.forEach(function(time, idx){
+            var cell = cells[idx + 1];
+            if(cellHasValue(cell)) dayBooked[time] = true;
+          });
+          map[dKey] = dayBooked;
+        });
+        bookedMap = map;
+        statusDot.className = "dot live";
+        var now = new Date();
+        statusText.textContent = "已更新 " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+        render();
+      })
+      .catch(function(err){
+        statusDot.className = "dot err";
+        statusText.textContent = "讀取失敗";
+        render();
+      });
+  }
+
+  function formatDateLine(y, m, d){
+    return y + "/" + pad(m+1) + "/" + pad(d);
+  }
+
+  function render(){
+    daysList.innerHTML = "";
+    var base = new Date();
+    var tKey = todayKey();
+
+    for(var i=0; i<DAYS_TO_SHOW; i++){
+      var d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+      var key = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+      var isToday = key === tKey;
+      var booked = bookedMap[key] || {};
+
+      var row = document.createElement('div');
+      row.className = "day-row" + (isToday ? " today" : "");
+
+      var dateLine = document.createElement('div');
+      dateLine.className = "date-line";
+      dateLine.innerHTML =
+        '<span class="date-text">' + formatDateLine(d.getFullYear(), d.getMonth(), d.getDate()) + '</span>' +
+        '<span class="weekday-text">星期' + weekdayNames[d.getDay()] + '</span>' +
+        (isToday ? '<span class="today-tag">今天</span>' : '');
+      row.appendChild(dateLine);
+
+      var slotsLine = document.createElement('div');
+      slotsLine.className = "slots-line";
+
+      SLOT_TIMES.forEach(function(time){
+        var timePassed = isToday && isSlotTimePassed(time);
+        var isBooked = !!booked[time];
+        var blocked = timePassed || isBooked;
+
+        var slot = document.createElement('div');
+        slot.className = "slot" + (blocked ? " blocked" : "");
+        var html = '<span class="t">' + time + '</span>';
+        if(blocked){
+          html += '<span class="tag">不可預約</span>';
+        }
+        slot.innerHTML = html;
+        slotsLine.appendChild(slot);
+      });
+
+      row.appendChild(slotsLine);
+      daysList.appendChild(row);
+    }
+  }
+
+  // 初始渲染 + 讀取資料
+  render();
+  loadAvailability();
+
+  // 每 30 秒重新檢查「今天」是否有時段過期；每 60 秒重新抓一次試算表資料
+  setInterval(render, 30000);
+  setInterval(loadAvailability, 60000);
+
+})();
+</script>
+</body>
+</html>
