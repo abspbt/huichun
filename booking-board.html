@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>預約時段總覽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #060b1f;
+    --bg-card: #0c1330;
+    --bg-blocked: #030509;
+    --yellow: #ffd23f;
+    --yellow-soft: #ffe792;
+    --yellow-dim: #7a6a2e;
+    --yellow-line: rgba(255, 210, 63, 0.22);
+    --yellow-glow: rgba(255, 210, 63, 0.35);
+    --muted: #5c5637;
+    --muted-2: #7a745a;
+    --danger-glow: rgba(255, 210, 63, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Noto Sans TC', 'Space Mono', monospace;
+    color: var(--yellow);
+    background:
+      radial-gradient(ellipse at top, rgba(255,210,63,0.05), transparent 60%),
+      var(--bg);
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    width: 100%;
+    padding: 10px 12px 8px;
+  }
+
+  /* header */
+  .topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--yellow-line);
+    margin-bottom: 4px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .brand-title {
+    font-size: clamp(13px, 3.6vw, 16px);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .brand-sub {
+    font-size: clamp(9px, 2.4vw, 10.5px);
+    color: var(--yellow-dim);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .clock-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .clock {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(12px, 3.2vw, 15px);
+    color: var(--yellow-soft);
+    text-shadow: 0 0 8px var(--yellow-glow);
+    letter-spacing: 1px;
+    min-width: 4.5em;
+    text-align: right;
+  }
+
+  .refresh-btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--yellow-dim);
+    color: var(--yellow);
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+  .refresh-btn:active { transform: scale(0.9); }
+  .refresh-btn.spinning svg { animation: spin 0.7s linear; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* days grid */
+  .days {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px;
+  }
+
+  .day-row {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    border-bottom: 1px dashed var(--yellow-line);
+    padding: 2px 0;
+  }
+  .day-row:last-child { border-bottom: none; }
+
+  .day-head {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    flex: 0 0 auto;
+  }
+
+  .day-date {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(11px, 3vw, 14px);
+    letter-spacing: 0.5px;
+    color: var(--yellow-soft);
+    text-shadow: 0 0 6px var(--yellow-glow);
+  }
+
+  .day-week {
+    font-size: clamp(9.5px, 2.6vw, 12px);
+    color: var(--yellow-dim);
+    font-weight: 500;
+  }
+
+  .today-badge {
+    font-size: clamp(8px, 2.1vw, 9.5px);
+    background: var(--yellow);
+    color: #1a1300;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.72; }
+  }
+
+  .day-past-tag {
+    font-size: clamp(8px, 2.1vw, 9.5px);
+    color: var(--muted-2);
+    letter-spacing: 0.5px;
+  }
+
+  .slots-row {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    gap: 4px;
+  }
+
+  .slot {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Space Mono', monospace;
+    line-height: 1.15;
+    border: 1px solid transparent;
+  }
+
+  .slot .t {
+    font-size: clamp(10px, 2.9vw, 13px);
+    font-weight: 700;
+  }
+
+  .slot .label {
+    font-size: clamp(7.5px, 2vw, 9px);
+    margin-top: 1px;
+    letter-spacing: 0.5px;
+  }
+
+  .slot.open {
+    background: rgba(255, 210, 63, 0.09);
+    border-color: var(--yellow-dim);
+  }
+  .slot.open .t {
+    color: var(--yellow);
+    text-shadow: 0 0 5px var(--yellow-glow);
+  }
+  .slot.open::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 8%; right: 8%;
+    height: 1px;
+    background: rgba(255, 231, 146, 0.55);
+  }
+
+  .slot.blocked {
+    background: var(--bg-blocked);
+    border-color: rgba(255, 210, 63, 0.12);
+  }
+  .slot.blocked .t {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--muted-2);
+  }
+  .slot.blocked .label {
+    color: var(--muted-2);
+  }
+
+  /* status / error states */
+  .status-screen {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--yellow-dim);
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+  }
+  .status-screen .big {
+    font-family: 'Space Mono', monospace;
+    color: var(--yellow);
+    font-size: 15px;
+  }
+  .status-screen button {
+    margin-top: 6px;
+    background: transparent;
+    border: 1px solid var(--yellow-dim);
+    color: var(--yellow);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
+  }
+
+  .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 0 6px var(--yellow-glow);
+    margin-right: 5px;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+</style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-title">預約時段總覽</div>
+        <div class="brand-sub" id="rangeLabel">—</div>
+      </div>
+      <div class="clock-wrap">
+        <div class="clock" id="clock">--:--</div>
+        <button class="refresh-btn" id="refreshBtn" title="重新整理">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M21 12a9 9 0 1 1-3-6.7"/>
+            <path d="M21 3v6h-6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="content">
+      <div class="status-screen">
+        <div class="big"><span class="dot"></span>讀取試算表中…</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const SHEET_ID = '1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0';
+  const DAYS_TO_SHOW = 8;
+  const WEEKDAYS = ['日','一','二','三','四','五','六'];
+
+  const contentEl = document.getElementById('content');
+  const clockEl = document.getElementById('clock');
+  const rangeLabelEl = document.getElementById('rangeLabel');
+  const refreshBtn = document.getElementById('refreshBtn');
+
+  let latestSchedule = null; // cached, rebuilt on fetch, re-rendered on tick
+
+  function startOfDay(d){
+    const x = new Date(d);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  async function fetchSheet(){
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&_=${Date.now()}`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if(!res.ok) throw new Error('無法連線到試算表（狀態碼 ' + res.status + '）');
+    const text = await res.text();
+    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+    if(!match) throw new Error('試算表回應格式無法解析');
+    const json = JSON.parse(match[1]);
+    if(!json.table) throw new Error('試算表沒有資料');
+    return json.table;
+  }
+
+  function parseTable(table){
+    const cols = table.cols || [];
+    const rows = table.rows || [];
+
+    // find slot columns from header labels, e.g. "B欄（10:00）" -> "10:00"
+    const slotCols = [];
+    for(let i=1;i<cols.length;i++){
+      const label = (cols[i] && cols[i].label) ? String(cols[i].label) : '';
+      const m = label.match(/([0-9]{1,2}:[0-9]{2})/);
+      if(m) slotCols.push({ index: i, time: m[1] });
+    }
+    if(slotCols.length === 0){
+      throw new Error('找不到時段欄位，請確認表頭格式（例如 10:00）');
+    }
+
+    const dayRows = [];
+    for(const r of rows){
+      const c = r.c;
+      if(!c || !c[0] || c[0].v === null || c[0].v === undefined || String(c[0].v).trim() === '') continue;
+      const dateStr = String(c[0].v).trim();
+      const dm = dateStr.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+      if(!dm) continue;
+      const month = parseInt(dm[1],10);
+      const day = parseInt(dm[2],10);
+      const slots = {};
+      for(const sc of slotCols){
+        const cell = c[sc.index];
+        const val = cell ? cell.v : null;
+        const isBooked = !(val === null || val === undefined || String(val).trim() === '');
+        slots[sc.time] = { booked: isBooked };
+      }
+      dayRows.push({ month, day, slots });
+    }
+    if(dayRows.length === 0) throw new Error('試算表中沒有可用的日期資料');
+
+    return { dayRows, slotOrder: slotCols.map(s => s.time) };
+  }
+
+  function attachRealDates(dayRows){
+    const now = new Date();
+    const year = now.getFullYear();
+    let base = new Date(year, dayRows[0].month - 1, dayRows[0].day);
+    const diffDays = Math.round((startOfDay(base) - startOfDay(now)) / 86400000);
+    if(diffDays < -200) base.setFullYear(year + 1);
+    else if(diffDays > 200) base.setFullYear(year - 1);
+
+    return dayRows.map((d, i) => {
+      const dt = new Date(base);
+      dt.setDate(base.getDate() + i);
+      return Object.assign({}, d, { date: dt });
+    });
+  }
+
+  function isPastSlot(dayDate, timeStr){
+    const today0 = startOfDay(new Date()).getTime();
+    const day0 = startOfDay(dayDate).getTime();
+    if(day0 !== today0) return day0 < today0; // whole day in the past
+    const [h, m] = timeStr.split(':').map(Number);
+    const slotDate = new Date(dayDate);
+    slotDate.setHours(h, m, 0, 0);
+    return slotDate.getTime() <= Date.now();
+  }
+
+  async function loadData(){
+    contentEl.innerHTML = '<div class="status-screen"><div class="big"><span class="dot"></span>讀取試算表中…</div></div>';
+    try {
+      const table = await fetchSheet();
+      const { dayRows, slotOrder } = parseTable(table);
+      const scheduleAll = attachRealDates(dayRows);
+
+      const today0 = startOfDay(new Date()).getTime();
+      let idx = scheduleAll.findIndex(d => startOfDay(d.date).getTime() === today0);
+      if(idx === -1) idx = scheduleAll.findIndex(d => d.date.getTime() >= today0);
+      if(idx === -1) idx = 0;
+
+      const display = scheduleAll.slice(idx, idx + DAYS_TO_SHOW);
+      latestSchedule = { display, slotOrder };
+      render(latestSchedule);
+    } catch(err){
+      contentEl.innerHTML =
+        '<div class="status-screen">' +
+        '<div class="big">讀取失敗</div>' +
+        '<div>' + (err && err.message ? err.message : '請確認試算表已設為「知道連結的任何人」可檢視') + '</div>' +
+        '<button id="retryBtn">重試</button>' +
+        '</div>';
+      const rb = document.getElementById('retryBtn');
+      if(rb) rb.addEventListener('click', loadData);
+    }
+  }
+
+  function render(schedule){
+    const { display, slotOrder } = schedule;
+    if(!display || display.length === 0){
+      contentEl.innerHTML = '<div class="status-screen"><div class="big">沒有可顯示的日期</div></div>';
+      return;
+    }
+
+    const first = display[0].date;
+    const last = display[display.length - 1].date;
+    rangeLabelEl.textContent = `${pad2(first.getMonth()+1)}/${pad2(first.getDate())} – ${pad2(last.getMonth()+1)}/${pad2(last.getDate())}`;
+
+    let html = '<div class="days">';
+    display.forEach((d, i) => {
+      const isToday = i === 0 && startOfDay(d.date).getTime() === startOfDay(new Date()).getTime();
+      const wk = WEEKDAYS[d.date.getDay()];
+      const dateLabel = `${d.date.getFullYear()}/${pad2(d.date.getMonth()+1)}/${pad2(d.date.getDate())}`;
+
+      html += `<div class="day-row">
+        <div class="day-head">
+          <span class="day-date">${dateLabel}</span>
+          <span class="day-week">週${wk}</span>
+          ${isToday ? '<span class="today-badge">今天</span>' : ''}
+        </div>
+        <div class="slots-row">`;
+
+      slotOrder.forEach(time => {
+        const slotInfo = d.slots[time];
+        const booked = slotInfo ? slotInfo.booked : false;
+        const past = isPastSlot(d.date, time);
+        const blocked = booked || past;
+        const label = booked ? '已預約' : (past ? '已截止' : '');
+        html += `<div class="slot ${blocked ? 'blocked' : 'open'}">
+          <div class="t">${time}</div>
+          ${blocked ? `<div class="label">${label}</div>` : ''}
+        </div>`;
+      });
+
+      html += `</div></div>`;
+    });
+    html += '</div>';
+
+    contentEl.innerHTML = html;
+  }
+
+  function tickClock(){
+    const now = new Date();
+    clockEl.textContent = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  }
+
+  // clock + re-render every 30s so "已截止" flips automatically as time passes
+  tickClock();
+  setInterval(() => {
+    tickClock();
+    if(latestSchedule) render(latestSchedule);
+  }, 30000);
+
+  // refetch sheet every 5 minutes to pick up new bookings
+  setInterval(loadData, 5 * 60 * 1000);
+
+  refreshBtn.addEventListener('click', () => {
+    refreshBtn.classList.add('spinning');
+    loadData().finally(() => {
+      setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
+    });
+  });
+
+  loadData();
+})();
+</script>
+</body>
+</html>
