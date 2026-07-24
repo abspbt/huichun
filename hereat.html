@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Her呷 雞蛋糕 奶酥厚片 - 每日菜單產生器</title>
+
+  <!-- iPhone 主畫面 App 專屬圖示與標題設定 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Her呷菜單">
+  
+  <!-- iPhone 桌面捷徑 Logo 圖示 (Base64 高畫質圖示) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' rx='28' fill='%23FAF0E6'/><circle cx='60' cy='60' r='52' fill='%234A2E2B'/><circle cx='60' cy='60' r='48' fill='%23FFFDF9'/><path d='M 32 32 A 38 38 0 0 1 88 32' fill='none' id='textPath'/><text font-family='sans-serif' font-weight='900' font-size='12' fill='%233E2723' text-anchor='middle'><textPath href='%23textPath' startOffset='50%'>Hereat</textPath></text><text x='60' y='34' font-family='sans-serif' font-weight='700' font-size='6' fill='%237A5C52' text-anchor='middle'>. since 2019 .</text><g transform='translate(0, 5)'><path d='M 32 55 Q 60 25 88 55 Q 92 80 80 98 Q 60 108 40 98 Z' fill='%237A4B3A'/><circle cx='60' cy='65' r='22' fill='%23FADBD8'/><path d='M 42 58 Q 60 38 78 58 Q 72 45 60 45 Q 48 45 42 58' fill='%234A2E2B'/><circle cx='53' cy='64' r='2' fill='%233E2723'/><circle cx='67' cy='64' r='2' fill='%233E2723'/><ellipse cx='48' cy='68' rx='3.5' ry='2' fill='%23F5A9A9'/><ellipse cx='72' cy='68' rx='3.5' ry='2' fill='%23F5A9A9'/><path d='M 57 71 Q 60 74 63 71' stroke='%233E2723' stroke-width='1.5' fill='none'/><path d='M 42 87 Q 60 78 78 87 L 73 115 L 47 115 Z' fill='%23E8A0A0'/><path d='M 45 87 L 45 115 L 75 115 L 75 87' fill='%23FFFFFF' opacity='0.9'/><path d='M 38 90 Q 48 82 52 95' stroke='%234A2E2B' stroke-width='2' fill='none'/><circle cx='53' cy='98' r='7' fill='%23D6D6D6' stroke='%234A2E2B' stroke-width='1.5'/><line x1='68' y1='82' x2='57' y2='94' stroke='%238A7B75' stroke-width='2' stroke-linecap='round'/></g></svg>">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2canvas 用於將網頁區塊轉換為高清圖片 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Google Fonts 可愛手寫風格中文與數字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Mali:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif, system-ui;
+      background-color: #EFECE6;
+      color: #3E2723;
+    }
+
+    .number-font {
+      font-family: 'Mali', 'Zen Maru Gothic', cursive;
+    }
+
+    /* 菜單卡片主體 */
+    .menu-card {
+      background-color: #FAF5EE;
+      color: #382119;
+      box-shadow: 0 20px 40px -15px rgba(80, 50, 30, 0.2);
+    }
+
+    /* 原版手繪雙線復古邊框 */
+    .card-border-outer {
+      border: 3.5px solid #4A2E2B;
+      border-radius: 28px;
+      position: relative;
+      background-color: #FAF5EE;
+    }
+
+    .card-border-inner {
+      border: 1.5px solid #9C7A6B;
+      border-radius: 22px;
+      margin: 4px;
+      height: calc(100% - 8px);
+      position: relative;
+    }
+
+    /* 四角小點綴 */
+    .corner-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #4A2E2B;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    /* 紅褐色標題膠囊徽章 */
+    .section-badge {
+      background-color: #C85342;
+      color: #FFFFFF;
+      box-shadow: 0 3px 0px #8C3225;
+    }
+
+    /* 點狀分隔線 */
+    .dotted-divider {
+      border-bottom: 2px dotted #D1C2B0;
+    }
+
+    /* 資訊區塊微調 */
+    .info-box {
+      background-color: #F4EBE1;
+      border: 1px solid #D8C3B0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C8B29B;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+
+  <!-- 頂部標題區 -->
+  <header class="bg-[#4A2E2B] text-[#FAF5EE] p-4 shadow-md sticky top-0 z-40 text-center">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🥞</span>
+        <div class="text-left">
+          <h1 class="text-base font-black tracking-wide leading-tight">Her呷 雞蛋糕 奶酥厚片</h1>
+          <p class="text-[11px] text-[#D8C3B5]">每日 IG 菜單圖片產生器</p>
+        </div>
+      </div>
+      <button onclick="resetDefaults()" class="text-xs bg-[#633E3A] hover:bg-[#7A4E49] text-[#FAF5EE] px-3 py-1.5 rounded-full border border-[#8C5D57] transition font-bold">
+        🔄 恢復預設
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto p-4 space-y-6">
+
+    <!-- 編輯面板卡片 -->
+    <div class="bg-white rounded-3xl p-5 shadow-sm border border-amber-950/10 space-y-5">
+      
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h2 class="font-black text-gray-800 text-base flex items-center gap-2">
+          ✏️ 編輯今日菜單與公告
+        </h2>
+        <span class="text-[11px] bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+          自動存於手機
+        </span>
+      </div>
+
+      <!-- 1. 店家資訊設定區 -->
+      <div class="space-y-3 bg-[#FAF6F0] p-3.5 rounded-2xl border border-amber-900/10">
+        <div class="text-xs font-bold text-amber-950 flex items-center justify-between">
+          <span>🏪 店面公告與資訊</span>
+          <span class="text-[10px] text-amber-800">(可每日調整休假日)</span>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block text-[11px] font-bold text-amber-900 mb-0.5">🗓️ 本期店休日</label>
+            <input type="text" id="offDays" class="w-full border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none bg-white" value="店休日：7/27、31、8/5、6" oninput="updateTextData()">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-amber-900 mb-0.5">🕒 營業時間</label>
+            <input type="text" id="hours" class="w-full border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none bg-white" value="平日 15:00-19:00 | 假日 14:30-17:30" oninput="updateTextData()">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-amber-900 mb-0.5">📍 店面地址</label>
+            <input type="text" id="address" class="w-full border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none bg-white" value="【店面】苓雅區四維二路165號" oninput="updateTextData()">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-amber-900 mb-0.5">🛵 服務項目</label>
+            <input type="text" id="services" class="w-full border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none bg-white" value="外送 | 包車 | 活動邀約 | 團體訂購" oninput="updateTextData()">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 上傳自訂 Logo / 右下角插圖 -->
+      <div class="bg-[#FAF6F0] p-3.5 rounded-2xl border border-amber-900/10 space-y-2">
+        <div class="text-xs font-bold text-amber-950 flex items-center justify-between">
+          <span>🖼️ 自訂 Logo / 圖片</span>
+          <span class="text-[10px] text-gray-500 font-normal">(選填，已有預設Logo)</span>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <label class="flex flex-col items-center justify-center p-2 bg-white rounded-xl border border-dashed border-amber-900/30 cursor-pointer hover:bg-amber-50/50 transition text-center">
+            <span class="font-bold text-amber-900 text-[11px]">替換頂部 Logo</span>
+            <span class="text-[10px] text-gray-400 mt-0.5">點擊選擇照片</span>
+            <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo')">
+          </label>
+
+          <label class="flex flex-col items-center justify-center p-2 bg-white rounded-xl border border-dashed border-amber-900/30 cursor-pointer hover:bg-amber-50/50 transition text-center">
+            <span class="font-bold text-amber-900 text-[11px]">替換右下角插圖</span>
+            <span class="text-[10px] text-gray-400 mt-0.5">點擊選擇照片</span>
+            <input type="file" id="girl-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'girl')">
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. 告示提醒語 -->
+      <div class="space-y-2">
+        <label class="text-xs font-bold text-amber-950 block">頂部告示提醒</label>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">💖</span>
+          <input type="text" id="notice1" class="flex-1 text-xs border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none" value="雞蛋糕 請趁熱吃 最美味" oninput="updateTextData()">
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">⭐</span>
+          <input type="text" id="notice2" class="flex-1 text-xs border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none" value="雞蛋糕 每份5顆 不能混搭" oninput="updateTextData()">
+        </div>
+      </div>
+
+      <!-- 4. 雞蛋糕品項 -->
+      <div class="space-y-3 pt-2 border-t border-gray-100">
+        <div class="flex justify-between items-center">
+          <label class="text-xs font-bold text-amber-950 flex items-center gap-1">
+            <span>🔴</span> 雞蛋糕口味
+          </label>
+          <button onclick="addItem('cakes')" class="text-xs bg-[#C85342] hover:bg-[#A84233] text-white px-2.5 py-1 rounded-full font-bold shadow-sm transition">
+            + 新增口味
+          </button>
+        </div>
+        <div id="cakes-editor" class="space-y-2"></div>
+      </div>
+
+      <!-- 5. 飲品品項 -->
+      <div class="space-y-3 pt-2 border-t border-gray-100">
+        <div class="flex justify-between items-center">
+          <label class="text-xs font-bold text-amber-950 flex items-center gap-1">
+            <span>🥤</span> 解渴飲品 / 其它品項
+          </label>
+          <button onclick="addItem('drinks')" class="text-xs bg-[#C85342] hover:bg-[#A84233] text-white px-2.5 py-1 rounded-full font-bold shadow-sm transition">
+            + 新增飲品
+          </button>
+        </div>
+        <div id="drinks-editor" class="space-y-2"></div>
+      </div>
+
+      <!-- 頁尾提醒標語 -->
+      <div class="space-y-2 pt-2 border-t border-gray-100">
+        <label class="text-xs font-bold text-amber-950 block">底部提醒標語</label>
+        <input type="text" id="footerText" class="w-full text-xs border rounded-xl p-2 border-amber-900/20 focus:ring-2 focus:ring-amber-700 outline-none" value="現點現烤，請耐心等候" oninput="updateTextData()">
+      </div>
+
+      <!-- 產生圖片按鈕 -->
+      <button onclick="generateImage()" class="w-full py-3.5 bg-[#4A2E2B] hover:bg-[#382119] active:scale-[0.99] text-[#FAF5EE] font-bold rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 text-base">
+        <span>📸</span> 產生 IG 限時動態圖片
+      </button>
+
+    </div>
+
+    <!-- 即時預覽區標籤 -->
+    <div class="text-center text-xs font-bold text-amber-900/60 pt-2">
+      👇 即時菜單卡片預覽
+    </div>
+
+    <!-- 菜單卡片整體 (html2canvas 拍攝區域) -->
+    <div class="flex justify-center overflow-x-auto pb-4">
+      
+      <div id="menu-card-element" class="menu-card card-border-outer w-[390px] p-2 relative select-none">
+        <div class="card-border-inner p-4 flex flex-col justify-between relative overflow-hidden min-h-[710px]">
+          
+          <!-- 四角經典飾點 -->
+          <div class="corner-dot top-2 left-2"></div>
+          <div class="corner-dot top-2 right-2"></div>
+          <div class="corner-dot bottom-2 left-2"></div>
+          <div class="corner-dot bottom-2 right-2"></div>
+
+          <div>
+            <!-- 店標 Logo 與 品牌名 -->
+            <div class="text-center space-y-1.5">
+              
+              <!-- 經典 Her呷 Logo 圓圖 -->
+              <div class="w-20 h-20 mx-auto relative flex items-center justify-center">
+                <img id="prev-logo-img" src="" alt="Her呷 Logo" class="w-full h-full object-contain rounded-full shadow-sm">
+              </div>
+
+              <!-- 店名主標題 -->
+              <h2 id="prev-storeTitle" class="text-xl font-black tracking-widest text-[#382119] mt-0.5">【 Her呷 雞蛋糕 】</h2>
+
+              <!-- 告示提醒 (趁熱吃/5顆) -->
+              <div class="text-[11.5px] font-bold text-[#4A2E2B] space-y-0.5">
+                <p class="flex items-center justify-center gap-1">
+                  <span class="text-red-500 text-xs">💖</span>
+                  <span id="prev-notice1">雞蛋糕 請趁熱吃 最美味</span>
+                </p>
+                <p class="flex items-center justify-center gap-1">
+                  <span class="text-amber-500 text-xs">⭐</span>
+                  <span id="prev-notice2">雞蛋糕 每份5顆 不能混搭</span>
+                </p>
+              </div>
+
+            </div>
+
+            <!-- 店面資訊公告卡 (完全置中) -->
+            <div class="mt-3 info-box p-2.5 rounded-xl text-center text-[11px] font-bold text-[#4A2E2B] space-y-1 shadow-inner">
+              <p class="text-red-700 font-extrabold flex items-center justify-center gap-1 text-center" id="prev-offDays">
+                🗓️ 店休日：7/27、31、8/5、6
+              </p>
+              <div class="flex items-center justify-center text-[10.5px] text-[#5A3E39] pt-0.5 border-t border-amber-900/10">
+                <span id="prev-hours" class="text-center">🕒 平日 15:00-19:00 | 假日 14:30-17:30</span>
+              </div>
+              <p class="text-[10.5px] text-[#5A3E39] text-center" id="prev-address">【店面】苓雅區四維二路165號</p>
+            </div>
+
+            <!-- 虛線分隔線 -->
+            <div class="my-3.5 dotted-divider"></div>
+
+            <!-- 分類 1：雞蛋糕口味 -->
+            <div class="mb-4">
+              <div class="text-center mb-3 relative">
+                <span class="inline-block px-4 py-1 rounded-full text-xs font-black tracking-widest section-badge relative">
+                  <span class="absolute -left-3 top-0.5 text-xs text-[#C85342]">ヾ</span>
+                  雞蛋糕口味
+                  <span class="absolute -right-3 top-0.5 text-xs text-[#C85342]">ﾉ</span>
+                </span>
+              </div>
+
+              <!-- 品項列表 -->
+              <div id="prev-cakes" class="space-y-2.5 px-1"></div>
+            </div>
+
+            <!-- 分類 2：解渴飲品 -->
+            <div class="mb-2">
+              <div class="my-3 dotted-divider"></div>
+              <div class="text-center mb-3">
+                <span class="inline-block px-4 py-1 rounded-full text-xs font-black tracking-widest section-badge">
+                  解渴飲品
+                </span>
+              </div>
+
+              <!-- 飲品列表 (留右下角插圖空間) -->
+              <div id="prev-drinks" class="space-y-2.5 px-1 pr-22"></div>
+            </div>
+
+          </div>
+
+          <!-- 右下角可愛女孩手持雞蛋糕插圖 -->
+          <div class="absolute right-2 bottom-12 w-22 h-26 pointer-events-none flex items-end justify-end">
+            <img id="prev-girl-img" src="" alt="Her呷小妹插圖" class="w-full h-full object-contain">
+          </div>
+
+          <!-- 頁尾資訊 (服務項目與年分) -->
+          <div class="mt-3 pt-2.5 border-t border-[#D5C6B5] text-center relative z-10 space-y-0.5">
+            <p id="prev-services" class="text-[10px] font-bold text-[#6E4F42] tracking-wider text-center">
+              外送 | 包車 | 活動邀約 | 團體訂購
+            </p>
+            <div class="flex items-center justify-center gap-2 text-[10.5px] font-bold text-[#4A2E2B]">
+              <span>🌿</span>
+              <span id="prev-footerText">現點現烤，請耐心等候</span>
+              <span>🌿</span>
+            </div>
+            <p class="text-[9.5px] font-bold text-[#8C7365] tracking-widest number-font text-center">
+              ★ Since 2019 ★
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- 圖片生成結果彈窗 -->
+  <div id="image-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex flex-col items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-4 max-w-sm w-full text-center space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-2 px-1">
+        <h3 class="font-black text-gray-800 text-sm flex items-center gap-1">
+          <span>✨</span> 菜單圖片生成完畢！
+        </h3>
+        <button onclick="closeModal()" class="text-gray-400 font-bold text-lg px-2">✕</button>
+      </div>
+
+      <p class="text-[11px] text-gray-500">
+        👇請按住下方圖片選取<b>「加入照片」</b>或<b>「儲存圖片」</b>即可發布至 IG！
+      </p>
+      
+      <div id="generated-image-container" class="my-2 border rounded-2xl overflow-hidden max-h-[60vh] overflow-y-auto bg-gray-50"></div>
+
+      <button onclick="closeModal()" class="w-full py-2.5 bg-[#4A2E2B] text-white font-bold rounded-xl text-xs">
+        完成並關閉
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'hereat_menu_v4_data';
+
+    // 精確複製 IG 頭像專屬 Logo SVG
+    const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="%234A2E2B"/><circle cx="60" cy="60" r="52" fill="%23FAF0E6"/><circle cx="60" cy="60" r="48" fill="%23FFFDF9" stroke="%23E8D8C8" stroke-width="1.5"/><path d="M 32 32 A 38 38 0 0 1 88 32" fill="none" id="textPath"/><text font-family="sans-serif" font-weight="900" font-size="12" fill="%233E2723" text-anchor="middle"><textPath href="%23textPath" startOffset="50%">Hereat</textPath></text><text x="60" y="34" font-family="sans-serif" font-weight="700" font-size="6" fill="%237A5C52" text-anchor="middle">. since 2019 .</text><g transform="translate(0, 5)"><path d="M 32 55 Q 60 25 88 55 Q 92 80 80 98 Q 60 108 40 98 Z" fill="%237A4B3A"/><circle cx="60" cy="65" r="22" fill="%23FADBD8"/><path d="M 42 58 Q 60 38 78 58 Q 72 45 60 45 Q 48 45 42 58" fill="%234A2E2B"/><circle cx="53" cy="64" r="2" fill="%233E2723"/><circle cx="67" cy="64" r="2" fill="%233E2723"/><ellipse cx="48" cy="68" rx="3.5" ry="2" fill="%23F5A9A9"/><ellipse cx="72" cy="68" rx="3.5" ry="2" fill="%23F5A9A9"/><path d="M 57 71 Q 60 74 63 71" stroke="%233E2723" stroke-width="1.5" fill="none"/><path d="M 42 87 Q 60 78 78 87 L 73 115 L 47 115 Z" fill="%23E8A0A0"/><path d="M 45 87 L 45 115 L 75 115 L 75 87" fill="%23FFFFFF" opacity="0.9"/><path d="M 38 90 Q 48 82 52 95" stroke="%234A2E2B" stroke-width="2" fill="none"/><circle cx="53" cy="98" r="7" fill="%23D6D6D6" stroke="%234A2E2B" stroke-width="1.5"/><line x1="68" y1="82" x2="57" y2="94" stroke="%238A7B75" stroke-width="2" stroke-linecap="round"/></g></svg>`;
+
+    const DEFAULT_GIRL_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><path d="M 30 40 Q 60 10 90 40 Q 95 70 85 90 Q 60 110 35 90 Z" fill="%237A4B3A"/><circle cx="60" cy="55" r="26" fill="%23FADBD8"/><path d="M 40 45 Q 60 25 80 45 Q 75 32 60 32 Q 45 32 40 45" fill="%234A2E2B"/><circle cx="52" cy="54" r="2.5" fill="%233E2723"/><circle cx="68" cy="54" r="2.5" fill="%233E2723"/><path d="M 57 62 Q 60 65 63 62" stroke="%233E2723" stroke-width="2" fill="none"/><path d="M 40 80 Q 60 70 80 80 L 75 125 L 45 125 Z" fill="%23E8A0A0"/><ellipse cx="60" cy="115" rx="30" ry="12" fill="%23D35400" stroke="%234A2E2B" stroke-width="2"/><circle cx="48" cy="113" r="5" fill="%23E59866"/><circle cx="60" cy="112" r="5" fill="%23E59866"/><circle cx="72" cy="113" r="5" fill="%23E59866"/></svg>`;
+
+    const itemIcons = {
+      custard: `🍮`,
+      cranberry: `🥐`,
+      taro: `🍠`,
+      coffee: `☕`,
+      cheese: `🧀`,
+      oreo: `🍪`,
+      sausage: `🌭`,
+      yuzu: `🍊`,
+      rose: `🌹`,
+      milkTea: `🥛`,
+      appleTea: `🍎`
+    };
+
+    const defaultData = {
+      storeTitle: "【 Her呷 雞蛋糕 】",
+      offDays: "店休日：7/27、31、8/5、6",
+      hours: "平日 15:00-19:00 | 假日 14:30-17:30",
+      address: "【店面】苓雅區四維二路165號",
+      services: "外送 | 包車 | 活動邀約 | 團體訂購",
+      notice1: "雞蛋糕 請趁熱吃 最美味",
+      notice2: "雞蛋糕 每份5顆 不能混搭",
+      footerText: "現點現烤，請耐心等候",
+      logoImg: DEFAULT_LOGO_SVG,
+      girlImg: DEFAULT_GIRL_SVG,
+      cakes: [
+        { icon: itemIcons.custard, name: "牛奶卡士達", price: "85" },
+        { icon: itemIcons.cranberry, name: "蔓越莓乳酪", price: "85" },
+        { icon: itemIcons.taro, name: "手作奶香芋頭", price: "85" },
+        { icon: itemIcons.coffee, name: "咖啡拿鐵奶酥", price: "85" },
+        { icon: itemIcons.cheese, name: "雙倍牽絲起司", price: "80" },
+        { icon: itemIcons.oreo, name: "OREO夾心餅乾", price: "75" },
+        { icon: itemIcons.sausage, name: "經典德式香腸", price: "85" }
+      ],
+      drinks: [
+        { icon: itemIcons.yuzu, name: "韓國柚子氣泡", price: "65" },
+        { icon: itemIcons.rose, name: "無糖玫瑰烏龍", price: "55" },
+        { icon: itemIcons.milkTea, name: "Her呷鮮奶茶", price: "75" },
+        { icon: itemIcons.appleTea, name: "蜜香蘋果紅茶", price: "70" }
+      ]
+    };
+
+    let menuData;
+
+    const iconSelects = ["🍮", "🥐", "🍠", "☕", "🧀", "🍪", "🌭", "🍊", "🌹", "🥛", "🍎", "🥤", "✨", "🍞", "🧀"];
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          menuData = JSON.parse(saved);
+        } catch(e) {
+          menuData = JSON.parse(JSON.stringify(defaultData));
+        }
+      } else {
+        menuData = JSON.parse(JSON.stringify(defaultData));
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(menuData));
+    }
+
+    function init() {
+      loadData();
+      renderEditors();
+      updatePreview();
+    }
+
+    function handleImageUpload(event, type) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Img = e.target.result;
+        if (type === 'logo') {
+          menuData.logoImg = base64Img;
+        } else if (type === 'girl') {
+          menuData.girlImg = base64Img;
+        }
+        saveData();
+        updatePreview();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderEditors() {
+      document.getElementById('offDays').value = menuData.offDays || defaultData.offDays;
+      document.getElementById('hours').value = menuData.hours || defaultData.hours;
+      document.getElementById('address').value = menuData.address || defaultData.address;
+      document.getElementById('services').value = menuData.services || defaultData.services;
+
+      document.getElementById('notice1').value = menuData.notice1;
+      document.getElementById('notice2').value = menuData.notice2;
+      document.getElementById('footerText').value = menuData.footerText;
+
+      renderCategoryEditor('cakes', menuData.cakes);
+      renderCategoryEditor('drinks', menuData.drinks);
+    }
+
+    function renderCategoryEditor(type, list) {
+      const container = document.getElementById(`${type}-editor`);
+      container.innerHTML = '';
+
+      list.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-1.5 bg-amber-50/50 p-2 rounded-xl border border-amber-900/10';
+        
+        row.innerHTML = `
+          <select onchange="updateItem('${type}', ${index}, 'icon', this.value)" class="text-xs bg-white border border-amber-900/20 rounded-lg p-1.5 focus:outline-none">
+            ${iconSelects.map(opt => `<option value="${opt}" ${opt === item.icon ? 'selected' : ''}>${opt}</option>`).join('')}
+          </select>
+          <input type="text" value="${item.name}" placeholder="品名" oninput="updateItem('${type}', ${index}, 'name', this.value)" class="flex-1 text-xs border border-amber-900/20 rounded-lg p-1.5 focus:ring-1 focus:ring-amber-700 outline-none">
+          <span class="text-xs font-bold text-amber-900">$</span>
+          <input type="number" value="${item.price}" placeholder="價格" oninput="updateItem('${type}', ${index}, 'price', this.value)" class="w-12 text-xs border border-amber-900/20 rounded-lg p-1.5 focus:ring-1 focus:ring-amber-700 outline-none text-center font-bold">
+          <button onclick="removeItem('${type}', ${index})" class="text-red-500 font-bold px-1 text-sm hover:scale-110 transition">✕</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function updateTextData() {
+      menuData.offDays = document.getElementById('offDays').value;
+      menuData.hours = document.getElementById('hours').value;
+      menuData.address = document.getElementById('address').value;
+      menuData.services = document.getElementById('services').value;
+
+      menuData.notice1 = document.getElementById('notice1').value;
+      menuData.notice2 = document.getElementById('notice2').value;
+      menuData.footerText = document.getElementById('footerText').value;
+
+      saveData();
+      updatePreview();
+    }
+
+    function updateItem(type, index, field, value) {
+      menuData[type][index][field] = value;
+      saveData();
+      updatePreview();
+    }
+
+    function addItem(type) {
+      const defaultIcon = type === 'cakes' ? '🍮' : '🥤';
+      menuData[type].push({ icon: defaultIcon, name: '新品項', price: '80' });
+      saveData();
+      renderEditors();
+      updatePreview();
+    }
+
+    function removeItem(type, index) {
+      menuData[type].splice(index, 1);
+      saveData();
+      renderEditors();
+      updatePreview();
+    }
+
+    function resetDefaults() {
+      if (confirm('確定要還原成 Her呷 的預設菜單與店面資訊嗎？')) {
+        menuData = JSON.parse(JSON.stringify(defaultData));
+        saveData();
+        renderEditors();
+        updatePreview();
+      }
+    }
+
+    function updatePreview() {
+      document.getElementById('prev-logo-img').src = menuData.logoImg || DEFAULT_LOGO_SVG;
+      document.getElementById('prev-girl-img').src = menuData.girlImg || DEFAULT_GIRL_SVG;
+
+      document.getElementById('prev-offDays').innerText = `🗓️ ${menuData.offDays || '店休日：公休請關注粉專'}`;
+      document.getElementById('prev-hours').innerText = `🕒 ${menuData.hours || ''}`;
+      document.getElementById('prev-address').innerText = menuData.address || '';
+      document.getElementById('prev-services').innerText = menuData.services || '';
+
+      document.getElementById('prev-notice1').innerText = menuData.notice1;
+      document.getElementById('prev-notice2').innerText = menuData.notice2;
+      document.getElementById('prev-footerText').innerText = menuData.footerText;
+
+      renderPreviewList('prev-cakes', menuData.cakes);
+      renderPreviewList('prev-drinks', menuData.drinks);
+    }
+
+    function renderPreviewList(containerId, list) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      list.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'flex items-center justify-between text-[13px] font-bold text-[#382119] leading-snug';
+        itemEl.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm">${item.icon}</span>
+            <span class="tracking-wide">${item.name}</span>
+          </div>
+          <div class="flex-1 border-b border-dotted border-[#CBB8A3] mx-2 mb-1 opacity-80"></div>
+          <div class="text-[#382119] font-black tracking-wider number-font text-base">$${item.price}</div>
+        `;
+        container.appendChild(itemEl);
+      });
+    }
+
+    function generateImage() {
+      const target = document.getElementById('menu-card-element');
+      
+      html2canvas(target, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: "#FAF5EE"
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgContainer = document.getElementById('generated-image-container');
+        imgContainer.innerHTML = `<img src="${imgData}" class="w-full h-auto rounded-xl shadow-md" alt="Her呷每日菜單">`;
+        document.getElementById('image-modal').classList.remove('hidden');
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('image-modal').classList.add('hidden');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
+
