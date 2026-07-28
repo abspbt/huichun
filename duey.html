@@ -418,13 +418,15 @@
     }
 
     /* 輸入框上下兩框均隨主題變色 */
+    .ifield, .repeat-select, .btn-add { height: 42px; box-sizing: border-box; }
+    .btn-add, .repeat-select { width: 108px; text-align: center; }
     .ifield {
       background: var(--input-bg);
       border: 1px solid var(--input-border);
       border-radius: 11px;
       color: var(--text-primary);
       font-size: 16px;
-      padding: 9px 12px;
+      padding: 0 12px;
       outline: none;
       transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
       font-family: inherit;
@@ -444,7 +446,7 @@
       border-radius: 11px;
       color: var(--text-primary);
       font-size: 0.82rem;
-      padding: 9px 10px;
+      padding: 0 10px;
       outline: none;
       cursor: pointer;
       font-family: inherit;
@@ -486,7 +488,7 @@
       color: var(--text-primary);
       font-size: 16px;
       font-weight: 600;
-      padding: 9px 16px;
+      padding: 0 16px;
       cursor: pointer;
       transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
       white-space: nowrap;
@@ -720,7 +722,7 @@
    ║           D U E Y  v2.4               ║
    ╚═══════════════════════════════════════╝ */
 
-const APP_VERSION = '2026.07.28-6';
+const APP_VERSION = '2026.07.28-5';
 const STORAGE_KEY = 'duey_tasks_v2';
 const THEME_KEY   = 'duey_theme_v1';
 const WEEKDAYS    = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
