@@ -372,16 +372,18 @@
     /* ══════════════════════════
        底部輸入列
     ══════════════════════════ */
-    #input-bar {
+#input-bar {
   flex-shrink: 0;
   background: rgba(0,0,0,0.30);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--divider);
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
   margin-bottom: 0;
   position: relative;
   z-index: 10;
+  /* 用偽元素把背景色延伸到螢幕最底 */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
 }
     .input-row {
       display: flex;
@@ -565,6 +567,18 @@
     .modal-btn-cancel:hover { background: rgba(255,255,255,0.12); }
     .modal-btn-confirm { background: rgba(255,255,255,0.18); color: var(--text-primary); border-color: rgba(255,255,255,0.28); }
     .modal-btn-confirm:hover { background: rgba(255,255,255,0.26); }
+
+    #input-bar::after {
+  content: '';
+  display: block;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: rgba(0,0,0,0.30);
+  z-index: 9;
+}
   </style>
 </head>
 <body data-theme="navy">
