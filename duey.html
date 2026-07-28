@@ -24,10 +24,7 @@
   overflow: hidden;
   transition: background-color 0.4s ease;
   margin: 0;
-  padding: env(safe-area-inset-top, 0px)
-           env(safe-area-inset-right, 0px)
-           env(safe-area-inset-bottom, 0px)
-           env(safe-area-inset-left, 0px);
+  padding: padding: 0;
   background: linear-gradient(150deg, var(--bg-a) 0%, var(--bg-b) 50%, var(--bg-c) 100%);
 }
 
@@ -124,14 +121,14 @@
     /* ══════════════════════════
        Banner
     ══════════════════════════ */
-    #today-banner {
-      flex-shrink: 0;
-      background: rgba(0,0,0,0.25);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--divider);
-      padding-top: env(safe-area-inset-top, 0px);
-    }
+#today-banner {
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--divider);
+  padding-top: env(safe-area-inset-top, 0px);
+}
     .banner-inner {
       padding: 10px 16px 12px;
     }
@@ -383,12 +380,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--divider);
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
-  margin-bottom: 0;
-  position: relative;
-  z-index: 10;
-  /* 用偽元素把背景色延伸到螢幕最底 */
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
     .input-row {
       display: flex;
