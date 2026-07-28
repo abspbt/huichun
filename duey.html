@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" data-theme="navy">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -14,15 +14,13 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
 
-    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    :root { 
-      --app-height: 100dvh; 
-      --safe-area-bottom: env(safe-area-inset-bottom, 0px); 
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ══════════════════════════
-       主題變數
+       主題變數定義
     ══════════════════════════ */
     [data-theme="navy"] {
       --bg-a: #1e2d3d; --bg-b: #2c3e52; --bg-c: #3a516a;
@@ -38,7 +36,6 @@
       --input-focus: rgba(255,255,255,0.28);
       --divider: rgba(255,255,255,0.08);
       --accent: #5b8fa8;
-      --theme-dot: #2c3e52;
     }
     [data-theme="forest"] {
       --bg-a: #1a2e22; --bg-b: #2e4a3a; --bg-c: #3d6050;
@@ -54,7 +51,6 @@
       --input-focus: rgba(255,255,255,0.28);
       --divider: rgba(255,255,255,0.08);
       --accent: #5a9e78;
-      --theme-dot: #2e4a3a;
     }
     [data-theme="plum"] {
       --bg-a: #28203a; --bg-b: #3e3050; --bg-c: #524265;
@@ -70,7 +66,6 @@
       --input-focus: rgba(255,255,255,0.28);
       --divider: rgba(255,255,255,0.08);
       --accent: #8870aa;
-      --theme-dot: #3e3050;
     }
     [data-theme="mocha"] {
       --bg-a: #2e2018; --bg-b: #4a3728; --bg-c: #604a38;
@@ -86,7 +81,6 @@
       --input-focus: rgba(255,255,255,0.28);
       --divider: rgba(255,255,255,0.08);
       --accent: #9a7a5a;
-      --theme-dot: #4a3728;
     }
     [data-theme="burgundy"] {
       --bg-a: #2e1620; --bg-b: #4a2430; --bg-c: #603040;
@@ -102,36 +96,40 @@
       --input-focus: rgba(255,255,255,0.28);
       --divider: rgba(255,255,255,0.08);
       --accent: #9a5060;
-      --theme-dot: #4a2430;
     }
 
-    /* 全域根節點背景色修正 */
-    html {
+    /* ══════════════════════════
+       滿版全螢幕防範露白 CSS
+    ══════════════════════════ */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
       height: 100%;
-      height: 100dvh;
-      background-color: var(--bg-a, #1e2d3d);
-      background: linear-gradient(150deg, var(--bg-a) 0%, var(--bg-b) 50%, var(--bg-c) 100%);
-      background-attachment: fixed;
-    }
-
-    body {
+      overflow: hidden;
+      background-color: var(--bg-b, #2c3e52);
       font-family: 'Noto Sans TC', sans-serif;
       overscroll-behavior: none;
-      overflow-x: hidden;
-      min-height: 100%;
-      height: 100%;
+    }
+
+    /* 主 App 容器：直接固定錨定至視埠四個角落，解決 iOS PWA 啟動算錯高度問題 */
+    #app-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
       height: 100dvh;
-      height: -webkit-fill-available;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: background-color 0.4s ease;
-      margin: 0;
       background: linear-gradient(150deg, var(--bg-a) 0%, var(--bg-b) 50%, var(--bg-c) 100%);
     }
 
     /* ══════════════════════════
-       Banner
+       頂部 Banner
     ══════════════════════════ */
     #today-banner {
       flex-shrink: 0;
@@ -170,7 +168,7 @@
       color: var(--text-muted);
     }
 
-    /* 主題色點 */
+    /* 主題切換鈕 */
     .theme-dots { display: flex; gap: 7px; align-items: center; }
     .theme-btn {
       width: 20px; height: 20px;
@@ -191,7 +189,7 @@
     .theme-btn[data-t="burgundy"] { background: #4a2430; }
 
     /* ══════════════════════════
-       滾動區
+       任務清單滾動區
     ══════════════════════════ */
     #task-list-wrapper {
       flex: 1 1 0;
@@ -201,9 +199,6 @@
     }
     #task-list-wrapper::-webkit-scrollbar { display: none; }
 
-    /* ══════════════════════════
-       分組標題
-    ══════════════════════════ */
     .section-label {
       font-size: 0.68rem;
       font-weight: 600;
@@ -215,7 +210,7 @@
     .section-label:first-child { padding-top: 2px; }
 
     /* ══════════════════════════
-       卡片
+       任務卡片
     ══════════════════════════ */
     .task-card {
       background: var(--card-bg);
@@ -236,7 +231,6 @@
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* 狀態色 */
     .card-expired {
       background: rgba(160, 45, 58, 0.38) !important;
       border-color: rgba(200, 70, 85, 0.45) !important;
@@ -257,7 +251,6 @@
       50%      { box-shadow: 0 0 14px 3px rgba(200,70,85,0.32); }
     }
 
-    /* 卡片內部 */
     .card-body {
       display: flex;
       align-items: center;
@@ -265,9 +258,6 @@
       padding: 13px 14px;
     }
 
-    /* ══════════════════════════
-       Checkbox
-    ══════════════════════════ */
     .task-check {
       width: 24px; height: 24px;
       border-radius: 50%;
@@ -283,9 +273,6 @@
     .task-check:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.45); }
     .task-check.checked { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.5); }
 
-    /* ══════════════════════════
-       任務文字區
-    ══════════════════════════ */
     .task-content { flex: 1; min-width: 0; }
     .task-name {
       font-size: 0.93rem;
@@ -321,9 +308,6 @@
       white-space: nowrap;
     }
 
-    /* ══════════════════════════
-       右側：徽章 + 刪除
-    ══════════════════════════ */
     .card-right {
       display: flex;
       flex-direction: column;
@@ -357,7 +341,6 @@
     }
     .btn-delete:hover { color: var(--text-secondary); background: rgba(255,255,255,0.08); }
 
-    /* 匯出/匯入按鈕 */
     .io-actions { display: flex; gap: 4px; align-items: center; margin-left: auto; }
     .btn-io {
       background: none; border: none; cursor: pointer;
@@ -371,7 +354,6 @@
     }
     .btn-io:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); }
 
-    /* 刪除動畫 */
     .card-removing {
       animation: cardOut 0.22s ease forwards !important;
     }
@@ -379,9 +361,6 @@
       to { opacity: 0; transform: translateX(24px); max-height: 0; margin-bottom: 0; padding: 0; }
     }
 
-    /* ══════════════════════════
-       空白提示
-    ══════════════════════════ */
     #empty-hint {
       text-align: center;
       color: var(--text-muted);
@@ -391,15 +370,15 @@
     }
 
     /* ══════════════════════════
-       底部輸入列
+       底部輸入列（滿版延伸至底部 Home Indicator）
     ══════════════════════════ */
     #input-bar {
       flex-shrink: 0;
-      background: rgba(0,0,0,0.30);
+      background: rgba(0, 0, 0, 0.35);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid var(--divider);
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
     }
     .input-row {
       display: flex;
@@ -433,7 +412,6 @@
     input[type="date"] { color-scheme: dark; }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
 
-    /* 週期選擇器 */
     .repeat-select {
       background: var(--input-bg);
       border: 1px solid var(--input-border);
@@ -456,7 +434,6 @@
     .repeat-select option { background: #2a2a3a; color: #eee; }
     .repeat-select:focus { border-color: var(--input-focus); }
 
-    /* 週期數量輸入 */
     #repeat-num-wrap {
       display: flex;
       align-items: center;
@@ -492,13 +469,13 @@
     .btn-add:active { transform: scale(0.96); }
 
     .input-hint {
-      padding: 0 16px 2px;
+      padding: 4px 16px 2px;
       font-size: 0.68rem;
       color: var(--text-muted);
     }
 
     /* ══════════════════════════
-       Toast
+       Toast 浮動訊息
     ══════════════════════════ */
     #toast {
       position: fixed;
@@ -520,7 +497,6 @@
     }
     #toast.show { opacity: 1; }
 
-    /* 版本更新提示條 */
     #update-banner {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -550,7 +526,7 @@
     }
 
     /* ══════════════════════════
-       Modal（完成確認提示）
+       Modal 對話框
     ══════════════════════════ */
     #modal-overlay {
       position: fixed; inset: 0;
@@ -614,79 +590,81 @@
     .modal-btn-confirm:hover { background: rgba(255,255,255,0.26); }
   </style>
 </head>
-<body data-theme="navy">
+<body>
 
-<!-- ══════════════════════════════════
-     TOP BANNER
-══════════════════════════════════ -->
-<header id="today-banner">
-  <div class="banner-inner">
-    <div class="banner-row1">
-      <!-- 主題色點 -->
-      <div class="theme-dots">
-        <button class="theme-btn active" data-t="navy"     title="深藍"></button>
-        <button class="theme-btn"        data-t="forest"   title="深綠"></button>
-        <button class="theme-btn"        data-t="plum"     title="深紫"></button>
-        <button class="theme-btn"        data-t="mocha"    title="咖啡"></button>
-        <button class="theme-btn"        data-t="burgundy" title="深紅"></button>
+<div id="app-container">
+  <!-- ══════════════════════════════════
+       TOP BANNER
+  ══════════════════════════════════ -->
+  <header id="today-banner">
+    <div class="banner-inner">
+      <div class="banner-row1">
+        <!-- 主題色點 -->
+        <div class="theme-dots">
+          <button class="theme-btn active" data-t="navy"     title="深藍"></button>
+          <button class="theme-btn"        data-t="forest"   title="深綠"></button>
+          <button class="theme-btn"        data-t="plum"     title="深紫"></button>
+          <button class="theme-btn"        data-t="mocha"    title="咖啡"></button>
+          <button class="theme-btn"        data-t="burgundy" title="深紅"></button>
+        </div>
+        <div class="io-actions">
+          <button class="btn-io" id="btn-export" title="匯出備份">📤</button>
+          <button class="btn-io" id="btn-import" title="匯入備份">📥</button>
+          <input type="file" id="input-import-file" accept="application/json" style="display:none">
+        </div>
       </div>
-      <div class="io-actions">
-        <button class="btn-io" id="btn-export" title="匯出備份">📤</button>
-        <button class="btn-io" id="btn-import" title="匯入備份">📥</button>
-        <input type="file" id="input-import-file" accept="application/json" style="display:none">
+      <div class="banner-row2">
+        <span id="date-text"></span>
+        <span id="weekday-text"></span>
+        <span id="task-count"></span>
       </div>
     </div>
-    <div class="banner-row2">
-      <span id="date-text"></span>
-      <span id="weekday-text"></span>
-      <span id="task-count"></span>
-    </div>
-  </div>
-</header>
+  </header>
 
-<!-- ══════════════════════════════════
-     TASK LIST
-══════════════════════════════════ -->
-<main id="task-list-wrapper">
-  <div id="task-list"></div>
-  <div id="empty-hint" style="display:none;">
-    ✦ 目前沒有任何任務<br>
-    <span style="font-size:0.8rem;">在下方輸入框新增你的第一件事</span>
-  </div>
-</main>
-
-<!-- ══════════════════════════════════
-     BOTTOM INPUT BAR
-══════════════════════════════════ -->
-<footer id="input-bar">
-  <!-- 第一列：名稱 + 新增 -->
-  <div class="input-row">
-    <input id="input-name" class="ifield" type="text"
-      placeholder="任務名稱…" style="flex:1; min-width:0;" maxlength="40" />
-    <button id="btn-add" class="btn-add">＋ 新增</button>
-  </div>
-  <!-- 第二列：日期 + 週期 -->
-  <div class="input-row2">
-    <input id="input-date" class="ifield" type="date" style="flex:1; min-width:0;" />
-    <select id="input-repeat" class="repeat-select">
-      <option value="none">不重複</option>
-      <option value="day">每隔 N 天</option>
-      <option value="week">每隔 N 週</option>
-      <option value="month">每隔 N 月</option>
-      <option value="year">每隔 N 年</option>
-    </select>
-    <div id="repeat-num-wrap" style="display:none;">
-      <input id="input-repeat-num" class="ifield" type="number"
-        min="1" max="999" value="1" style="width:52px; text-align:center; padding:9px 6px;" />
-      <span class="repeat-unit-label" id="repeat-unit-label">天</span>
+  <!-- ══════════════════════════════════
+       TASK LIST
+  ══════════════════════════════════ -->
+  <main id="task-list-wrapper">
+    <div id="task-list"></div>
+    <div id="empty-hint" style="display:none;">
+      ✦ 目前沒有任何任務<br>
+      <span style="font-size:0.8rem;">在下方輸入框新增你的第一件事</span>
     </div>
-  </div>
-  <div class="input-hint">提示：名稱開頭可寫時間描述，如「19:30 補習班接小孩」</div>
-</footer>
+  </main>
+
+  <!-- ══════════════════════════════════
+       BOTTOM INPUT BAR
+  ══════════════════════════════════ -->
+  <footer id="input-bar">
+    <!-- 第一列：名稱 + 新增 -->
+    <div class="input-row">
+      <input id="input-name" class="ifield" type="text"
+        placeholder="任務名稱…" style="flex:1; min-width:0;" maxlength="40" />
+      <button id="btn-add" class="btn-add">＋ 新增</button>
+    </div>
+    <!-- 第二列：日期 + 週期 -->
+    <div class="input-row2">
+      <input id="input-date" class="ifield" type="date" style="flex:1; min-width:0;" />
+      <select id="input-repeat" class="repeat-select">
+        <option value="none">不重複</option>
+        <option value="day">每隔 N 天</option>
+        <option value="week">每隔 N 週</option>
+        <option value="month">每隔 N 月</option>
+        <option value="year">每隔 N 年</option>
+      </select>
+      <div id="repeat-num-wrap" style="display:none;">
+        <input id="input-repeat-num" class="ifield" type="number"
+          min="1" max="999" value="1" style="width:52px; text-align:center; padding:9px 6px;" />
+        <span class="repeat-unit-label" id="repeat-unit-label">天</span>
+      </div>
+    </div>
+    <div class="input-hint">提示：名稱開頭可寫時間描述，如「19:30 補習班接小孩」</div>
+  </footer>
+</div>
 
 <!-- ══════════════════════════════════
      MODAL（重複任務完成確認）
-══════════════════════════════════ -->
+══════════════════════════════ -->
 <div id="modal-overlay">
   <div class="modal-box">
     <div class="modal-title" id="modal-title">完成任務</div>
@@ -710,25 +688,10 @@
 
 <script>
 /* ╔═══════════════════════════════════════╗
-   ║           D U E Y  v2.1               ║
+   ║           D U E Y  v2.2               ║
    ╚═══════════════════════════════════════╝ */
 
-/* ════════════════════════════════
-   iOS PWA 高度動態校正
-════════════════════════════════ */
-function setAppHeight() {
-  const h = window.innerHeight;
-  document.documentElement.style.setProperty('--app-height', h + 'px');
-}
-setAppHeight();
-window.addEventListener('resize', setAppHeight);
-window.addEventListener('orientationchange', setAppHeight);
-window.addEventListener('DOMContentLoaded', setAppHeight);
-window.addEventListener('load', setAppHeight);
-window.addEventListener('pageshow', setAppHeight);
-setTimeout(setAppHeight, 300);
-
-const APP_VERSION = '2026.07.28-2';
+const APP_VERSION = '2026.07.28-3';
 const STORAGE_KEY = 'duey_tasks_v2';
 const THEME_KEY   = 'duey_theme_v1';
 const WEEKDAYS    = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
@@ -782,19 +745,29 @@ function loadTasks() {
 function saveTasks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
 
 /* ════════════════════════════════
-   主題
+   主題與底色防護
 ════════════════════════════════ */
 const THEME_COLORS = {
   navy:'#2c3e52', forest:'#2e4a3a', plum:'#3e3050', mocha:'#4a3728', burgundy:'#4a2430'
 };
 
 function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  document.body.setAttribute('data-theme', t);
-  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+  const theme = THEME_COLORS[t] ? t : 'navy';
+  const color = THEME_COLORS[theme];
+  
+  document.documentElement.setAttribute('data-theme', theme);
+  document.body.setAttribute('data-theme', theme);
+  
+  /* 同步修改根節點背景色，防止任何情況露白 */
+  document.documentElement.style.backgroundColor = color;
+  document.body.style.backgroundColor = color;
+  
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === theme));
+  
   const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) metaTheme.setAttribute('content', THEME_COLORS[t] || THEME_COLORS.navy);
-  localStorage.setItem(THEME_KEY, t);
+  if (metaTheme) metaTheme.setAttribute('content', color);
+  
+  localStorage.setItem(THEME_KEY, theme);
 }
 
 /* ════════════════════════════════
