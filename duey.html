@@ -127,7 +127,6 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--divider);
-  padding-top: env(safe-area-inset-top, 0px);
 }
     .banner-inner {
       padding: 10px 16px 12px;
@@ -380,7 +379,8 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--divider);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* 使用 calc 確保底部至少有 8px 間距，在 PWA 全螢幕時追加 home indicator 高度 */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
 }
     .input-row {
       display: flex;
@@ -389,11 +389,11 @@
       padding: 10px 14px 4px;
     }
     .input-row2 {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      padding: 0 14px 8px;
-    }
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 0 14px 0;   /* 底部移到 #input-bar 統一處理 */
+}
 
     .ifield {
       background: var(--input-bg);
@@ -564,18 +564,6 @@
     .modal-btn-cancel:hover { background: rgba(255,255,255,0.12); }
     .modal-btn-confirm { background: rgba(255,255,255,0.18); color: var(--text-primary); border-color: rgba(255,255,255,0.28); }
     .modal-btn-confirm:hover { background: rgba(255,255,255,0.26); }
-
-    body::after {
-  content: '';
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: env(safe-area-inset-bottom, 0px);
-  background: rgba(0,0,0,0.30);
-  z-index: 999;
-  pointer-events: none;
-}
     
   </style>
 </head>
@@ -726,10 +714,16 @@ function saveTasks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 const THEME_COLORS = {
   navy:'#2c3e52', forest:'#2e4a3a', plum:'#3e3050', mocha:'#4a3728', burgundy:'#4a2430'
 };
+const THEME_BG = {
+  navy:'#1e2d3d', forest:'#1a2e22', plum:'#28203a', mocha:'#2e2018', burgundy:'#2e1620'
+};
+
 function applyTheme(t) {
   document.body.setAttribute('data-theme', t);
   document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
   document.querySelector('meta[name="theme-color"]').setAttribute('content', THEME_COLORS[t] || THEME_COLORS.navy);
+  /* 同步更新 html 背景，避免 Safari 上下彈跳露白 */
+  document.documentElement.style.background = THEME_BG[t] || THEME_BG.navy;
   localStorage.setItem(THEME_KEY, t);
 }
 
@@ -936,6 +930,7 @@ function removeTask(id) {
 /* ════════════════════════════════
    操作：新增
 ════════════════════════════════ */
+/* 修改後 */
 function addTask() {
   const nameEl   = document.getElementById('input-name');
   const dateEl   = document.getElementById('input-date');
@@ -950,19 +945,44 @@ function addTask() {
   if (!name) { shake(nameEl); showToast('請輸入任務名稱'); return; }
   if (!date) { shake(dateEl); showToast('請選擇日期');     return; }
 
-  tasks.push({
-    id: uid(),
-    name,
-    date,
-    done: false,
-    repeatType: repeatType === 'none' ? null : repeatType,
-    repeatNum:  repeatType === 'none' ? null : repeatNum,
-    createdAt: Date.now()
-  });
+  const rType = repeatType === 'none' ? null : repeatType;
+  const rNum  = repeatType === 'none' ? null : repeatNum;
+
+  /* ── 新增：若為週期任務且日期已過期，保留原始那筆，
+     同時往後推算出第一個 > 今天的日期，自動新增未來那筆 ── */
+  let autoAddedFuture = false;
+  if (rType && diffDays(date) < 0) {
+    /* 先儲存原始過期那筆 */
+    tasks.push({
+      id: uid(), name, date, done: false,
+      repeatType: rType, repeatNum: rNum, createdAt: Date.now()
+    });
+
+    /* 往後推算，直到找到第一個 > 今天的日期 */
+    let futureDate = date;
+    while (diffDays(futureDate) <= 0) {
+      futureDate = nextDate(futureDate, rType, rNum);
+    }
+
+    /* 新增未來那筆 */
+    tasks.push({
+      id: uid(), name, date: futureDate, done: false,
+      repeatType: rType, repeatNum: rNum, createdAt: Date.now()
+    });
+    autoAddedFuture = true;
+
+  } else {
+    /* 正常新增（未過期，或非週期任務） */
+    tasks.push({
+      id: uid(), name, date, done: false,
+      repeatType: rType, repeatNum: rNum, createdAt: Date.now()
+    });
+  }
+
   saveTasks(); renderList();
   nameEl.value = '';
   nameEl.focus();
-  showToast('已新增 ✓');
+  showToast(autoAddedFuture ? '已新增（含下一筆未來任務）✓' : '已新增 ✓');
 }
 
 /* ════════════════════════════════
