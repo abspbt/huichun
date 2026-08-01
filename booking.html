@@ -27,13 +27,16 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
     margin:0;padding:0;height:100%;overflow:hidden;
-    background:var(--bg);color:var(--white);
+    background:#12151b;color:var(--white);
     font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     overscroll-behavior:none;
     touch-action:pan-y;
   }
   .wrap{
     height:100vh;height:100dvh;
+    max-width:520px;margin:0 auto;
+    background:var(--bg);
+    box-shadow:0 0 40px rgba(0,0,0,0.35);
     display:flex;flex-direction:column;
     padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
   }
@@ -62,7 +65,7 @@
 
   .today-wrap{
     flex:0 0 auto;
-    padding:clamp(8px,1.6vh,14px) clamp(14px,3.5vw,22px) 0;
+    padding:clamp(8px,1.6vh,14px) clamp(14px,3.5vw,22px) clamp(10px,2vh,16px);
   }
   .days-list{
     flex:1 1 auto;
@@ -182,11 +185,12 @@
     text-decoration:none;
     -webkit-user-select:none;user-select:none;
     transition:transform 0.12s ease, opacity 0.12s ease;
-    border:1px solid transparent;
+    border:none;
+    overflow:hidden;
   }
   .contact-btn:active{transform:scale(0.97);opacity:0.88;}
   .contact-btn svg{flex:0 0 auto;width:16px;height:16px;}
-  .contact-btn.line{background:#FFFFFF;color:#06C755;border-color:rgba(6,199,85,0.35);}
+  .contact-btn.line{background:#FFFFFF;color:#06C755;border:1px solid rgba(6,199,85,0.35);}
   .contact-btn.ig{
     background:linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%);
     color:#FFFFFF;
