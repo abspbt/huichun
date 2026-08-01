@@ -33,6 +33,7 @@
     touch-action:pan-y;
   }
   .wrap{
+    position:relative;
     height:100vh;height:100dvh;
     max-width:520px;margin:0 auto;
     background:var(--bg);
@@ -131,7 +132,11 @@
     color:var(--blue);
     font-weight:600;
     padding:clamp(4px,1vh,8px) 2px;
+    cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+    transition:transform 0.1s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
+  .slot:not(.blocked):active{transform:scale(0.93);}
   .slot .t{white-space:nowrap;}
   .slot .tag{
     font-size:clamp(6.5px,1.15vh,8px);
@@ -143,8 +148,15 @@
     border:1.4px solid rgba(255,255,255,0.09);
     color:var(--gray-dim);
     font-weight:500;
+    cursor:default;
   }
   .slot.blocked .t{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.18);}
+  .slot.selected{
+    background:var(--gold-bg);
+    border:1.6px solid var(--gold);
+    color:var(--gold);
+  }
+  .slot.selected .tag{color:var(--gold);font-weight:700;}
 
   .legend{
     flex:0 0 auto;
@@ -171,6 +183,15 @@
     margin:0 0 clamp(7px,1.3vh,10px);
   }
   .contact-hint-phone{color:var(--gold);font-weight:700;text-decoration:none;}
+  .selection-status{
+    text-align:center;
+    font-size:clamp(11px,2vh,13.5px);
+    font-weight:700;
+    color:var(--gold);
+    min-height:1.3em;
+    margin:0 0 clamp(7px,1.3vh,10px);
+    transition:color 0.15s ease;
+  }
   .contact-buttons{
     display:flex;
     gap:clamp(8px,2.2vw,14px);
@@ -196,6 +217,47 @@
     color:#FFFFFF;
   }
   .contact-btn .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .modal-overlay{
+    position:absolute;inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
+    align-items:center;justify-content:center;
+    z-index:50;
+    padding:24px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:22px 20px;
+    max-width:300px;width:100%;
+    text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+  }
+  .modal-box p{
+    color:var(--white);
+    font-size:clamp(12.5px,2vh,14.5px);
+    line-height:1.6;
+    margin:0 0 18px;
+  }
+  .modal-actions{display:flex;gap:10px;}
+  .modal-btn{
+    flex:1 1 0;
+    padding:10px 6px;
+    border-radius:10px;
+    font-size:clamp(11.5px,2vh,13px);
+    font-weight:700;
+    text-decoration:none;
+    border:none;
+    cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+    transition:transform 0.12s ease, opacity 0.12s ease;
+  }
+  .modal-btn:active{transform:scale(0.96);opacity:0.88;}
+  .modal-btn.confirm{background:#06C755;color:#fff;}
+  .modal-btn.cancel{background:rgba(255,255,255,0.08);color:var(--white);}
 
   @media (max-width:340px){
     .topbar{padding:8px 10px 6px;}
@@ -231,10 +293,11 @@
 
   <div class="contact-section">
     <p class="contact-hint">請參考預約檔期後，打開對話並提出預約需求<br>一位拍攝需要一個時段，兩位拍攝需要兩個時段<br><a class="contact-hint-phone" href="tel:0971080406">預約今天的檔期請直接電洽 0971-080-406</a></p>
+    <p class="selection-status" id="selectionStatus">請先點選時段</p>
     <div class="contact-buttons">
-      <a class="contact-btn line" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">
+      <a class="contact-btn line" id="lineBtn" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-        <span class="label">加入 LINE 官方帳號</span>
+        <span class="label">前往 LINE 送出預約</span>
       </a>
       <a class="contact-btn ig" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
@@ -244,6 +307,16 @@
   </div>
 
   <div class="days-list" id="daysList"></div>
+
+  <div class="modal-overlay" id="limitModal">
+    <div class="modal-box">
+      <p>預約三位以上請直接洽詢老闆</p>
+      <div class="modal-actions">
+        <a class="modal-btn confirm" id="modalLineBtn" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">前往 LINE</a>
+        <button type="button" class="modal-btn cancel" id="modalCancelBtn">取消/關閉</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
@@ -268,6 +341,100 @@
   var statusText = document.getElementById('statusText');
   var statusTime = document.getElementById('statusTime');
   var statusTrigger = document.getElementById('statusTrigger');
+  var lineBtn = document.getElementById('lineBtn');
+  var selectionStatus = document.getElementById('selectionStatus');
+  var limitModal = document.getElementById('limitModal');
+  var modalLineBtn = document.getElementById('modalLineBtn');
+  var modalCancelBtn = document.getElementById('modalCancelBtn');
+
+  var MAX_SELECTABLE = 2;
+  var selectedSlots = []; // [{ sKey, dKey, time, label }]
+
+  function slotKey(dKey, time){ return dKey + '_' + time; }
+  function formatSelectionLabel(dKey, time){
+    var parts = dKey.split('-');
+    return parts[1] + '/' + parts[2] + ' ' + time;
+  }
+  function isSlotSelected(dKey, time){
+    var sKey = slotKey(dKey, time);
+    for(var i=0;i<selectedSlots.length;i++){
+      if(selectedSlots[i].sKey === sKey) return true;
+    }
+    return false;
+  }
+  function buildLineUrl(){
+    var lines = ["您好，我想預約證件照拍攝"];
+    if(selectedSlots.length){
+      selectedSlots.forEach(function(s, i){
+        lines.push('時段' + (i+1) + '：' + s.label);
+      });
+      lines.push('人數：' + selectedSlots.length);
+    } else {
+      lines.push('日期：');
+      lines.push('時段：');
+      lines.push('人數：');
+    }
+    return "https://line.me/R/oaMessage/@128mtxwg/?" + encodeURIComponent(lines.join('\n'));
+  }
+  function updateSelectionUI(){
+    if(selectedSlots.length === 0){
+      selectionStatus.textContent = "請先點選時段";
+    } else {
+      selectionStatus.textContent = "已勾選：" + selectedSlots.map(function(s){ return s.label; }).join('、');
+    }
+    lineBtn.href = buildLineUrl();
+  }
+  function toggleSlot(dKey, time){
+    var sKey = slotKey(dKey, time);
+    for(var i=0;i<selectedSlots.length;i++){
+      if(selectedSlots[i].sKey === sKey){
+        selectedSlots.splice(i,1);
+        updateSelectionUI();
+        render();
+        return;
+      }
+    }
+    if(selectedSlots.length >= MAX_SELECTABLE){
+      modalLineBtn.href = buildLineUrl();
+      limitModal.classList.add('show');
+      return;
+    }
+    selectedSlots.push({ sKey:sKey, dKey:dKey, time:time, label:formatSelectionLabel(dKey, time) });
+    updateSelectionUI();
+    render();
+  }
+  function cleanupSelections(){
+    var tKey = todayKey();
+    var changed = false;
+    selectedSlots = selectedSlots.filter(function(s){
+      var isToday = s.dKey === tKey;
+      var timePassed = isToday && isSlotTimePassed(s.time);
+      var isBooked = !!(bookedMap[s.dKey] && bookedMap[s.dKey][s.time]);
+      var valid = !timePassed && !isBooked;
+      if(!valid) changed = true;
+      return valid;
+    });
+    if(changed) updateSelectionUI();
+  }
+  function hideLimitModal(){
+    limitModal.classList.remove('show');
+  }
+  modalCancelBtn.addEventListener('click', hideLimitModal);
+  limitModal.addEventListener('click', function(e){
+    if(e.target === limitModal) hideLimitModal();
+  });
+  function handleSlotClick(e){
+    var slotEl = e.target.closest ? e.target.closest('.slot') : null;
+    if(!slotEl || slotEl.classList.contains('blocked')) return;
+    var dKey = slotEl.getAttribute('data-date');
+    var time = slotEl.getAttribute('data-time');
+    if(!dKey || !time) return;
+    toggleSlot(dKey, time);
+  }
+  daysList.addEventListener('click', handleSlotClick);
+  todayWrap.addEventListener('click', handleSlotClick);
+
+  updateSelectionUI();
 
   // ====== 七色莫蘭迪主題（深底淺字，維持一致風格）======
   var THEMES = [
@@ -452,16 +619,25 @@
     var slotsLine = document.createElement('div');
     slotsLine.className = "slots-line";
 
+    var dKey = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+
     SLOT_TIMES.forEach(function(time){
       var timePassed = isToday && isSlotTimePassed(time);
       var isBooked = !!booked[time];
       var blocked = timePassed || isBooked;
+      var selected = !blocked && isSlotSelected(dKey, time);
 
       var slot = document.createElement('div');
-      slot.className = "slot" + (blocked ? " blocked" : "");
+      slot.className = "slot" + (blocked ? " blocked" : "") + (selected ? " selected" : "");
+      if(!blocked){
+        slot.setAttribute('data-date', dKey);
+        slot.setAttribute('data-time', time);
+      }
       var html = '<span class="t">' + time + '</span>';
       if(blocked){
         html += '<span class="tag">不可預約</span>';
+      } else if(selected){
+        html += '<span class="tag">已勾選</span>';
       }
       slot.innerHTML = html;
       slotsLine.appendChild(slot);
@@ -490,6 +666,8 @@
         daysList.appendChild(card);
       }
     }
+
+    cleanupSelections();
   }
 
   // 點擊右上角狀態區塊：換下一個顏色 + 立即重新整理資料
