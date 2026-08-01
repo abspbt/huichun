@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>預約時段｜Hui Chun Photo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1D2D44;
+    --card-bg:#243A5A;
+    --card-border:rgba(141,160,183,0.20);
+    --white:#E6E9EE;
+    --gray:#8DA0B7;
+    --gray-dim:rgba(141,160,183,0.42);
+    --gold:#D4BA8A;
+    --gold-bg:rgba(212,186,138,0.10);
+    --gold-border:rgba(212,186,138,0.45);
+    --blue:#AEBFD1;
+    --blue-bg:rgba(141,160,183,0.10);
+    --blue-border:rgba(141,160,183,0.55);
+    --green:#8FBFA0;
+    --red:#C97B6E;
+    --tag-text:#1D2D44;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0;padding:0;height:100%;overflow:hidden;
+    background:#12151b;color:var(--white);
+    font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    overscroll-behavior:none;
+    touch-action:pan-y;
+  }
+  .wrap{
+    position:relative;
+    height:100vh;height:100dvh;
+    max-width:520px;margin:0 auto;
+    background:var(--bg);
+    box-shadow:0 0 40px rgba(0,0,0,0.35);
+    display:flex;flex-direction:column;
+    padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+  }
+
+  .topbar{
+    flex:0 0 auto;
+    display:flex;align-items:baseline;justify-content:space-between;
+    padding:clamp(10px,2.4vh,18px) clamp(14px,3.5vw,22px) clamp(6px,1.4vh,10px);
+  }
+  .topbar .left{display:flex;align-items:baseline;gap:10px;}
+  .topbar .title{
+    font-weight:700;font-size:clamp(13px,2.5vh,17px);letter-spacing:0.01em;color:var(--white);
+  }
+  .topbar .subtitle{font-size:clamp(9.5px,1.8vh,12px);color:var(--gray);font-weight:500;}
+  .topbar .right{
+    display:flex;align-items:center;gap:7px;font-size:clamp(8.5px,1.6vh,11px);color:var(--gray);
+    cursor:pointer;padding:4px 8px;margin:-4px -8px;border-radius:8px;
+    transition:background 0.15s ease, opacity 0.15s ease;
+    -webkit-user-select:none;user-select:none;
+  }
+  .topbar .right:active{background:rgba(255,255,255,0.06);opacity:0.7;}
+  .topbar .right .time{color:var(--white);font-weight:600;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--gray-dim);flex-shrink:0;}
+  .dot.live{background:var(--green);box-shadow:0 0 6px rgba(62,217,138,0.7);}
+  .dot.err{background:var(--red);}
+
+  .today-wrap{
+    flex:0 0 auto;
+    padding:clamp(8px,1.6vh,14px) clamp(14px,3.5vw,22px) clamp(10px,2vh,16px);
+  }
+  .days-list{
+    flex:1 1 auto;
+    display:flex;flex-direction:column;
+    gap:clamp(6px,1.3vh,12px);
+    min-height:0;
+    padding:clamp(8px,1.6vh,12px) clamp(14px,3.5vw,22px) clamp(8px,1.6vh,14px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+  }
+  .day-card{
+    flex:0 0 auto;min-height:0;
+    display:flex;align-items:center;gap:clamp(8px,2vw,18px);
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:clamp(10px,1.6vh,16px);
+    padding:clamp(10px,1.8vh,14px) clamp(10px,2.2vw,18px);
+    position:relative;
+    overflow:hidden;
+  }
+  .day-card.today{
+    background:linear-gradient(180deg, var(--gold-bg), var(--card-bg) 70%);
+    border-color:rgba(240,185,74,0.25);
+  }
+  .day-card.today::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--gold);
+  }
+
+  .date-block{
+    flex:0 0 auto;
+    width:clamp(60px,15vw,92px);
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    text-align:center;
+  }
+  .date-block .date-text{
+    font-weight:700;font-size:clamp(12px,2.7vh,17px);color:var(--white);letter-spacing:0.01em;white-space:nowrap;
+  }
+  .day-card.today .date-block .date-text{color:var(--gold);}
+  .date-block .weekday-row{
+    display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:3px;
+  }
+  .date-block .weekday-text{font-size:clamp(9px,1.75vh,11px);color:var(--gray);font-weight:500;white-space:nowrap;}
+  .date-block .today-tag{
+    font-size:clamp(7.5px,1.4vh,9px);color:var(--tag-text);background:var(--gold);
+    padding:1px 5px;border-radius:999px;font-weight:700;white-space:nowrap;
+  }
+
+  .slots-line{
+    flex:1 1 auto;min-width:0;
+    display:flex;gap:clamp(4px,1.1vw,10px);
+  }
+  .slot{
+    flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:clamp(6px,1vh,9px);
+    font-size:clamp(9px,1.85vh,11.5px);
+    line-height:1.15;
+    border:1.3px solid var(--blue-border);
+    background:var(--blue-bg);
+    color:var(--blue);
+    font-weight:600;
+    padding:clamp(4px,1vh,8px) 2px;
+    cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+    transition:transform 0.1s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .slot:not(.blocked):active{transform:scale(0.93);}
+  .slot .t{white-space:nowrap;}
+  .slot .tag{
+    font-size:clamp(6.5px,1.15vh,8px);
+    font-weight:500;letter-spacing:0.01em;
+    margin-top:2px;color:var(--gray-dim);
+  }
+  .slot.blocked{
+    background:rgba(255,255,255,0.02);
+    border:1.4px solid rgba(255,255,255,0.09);
+    color:var(--gray-dim);
+    font-weight:500;
+    cursor:default;
+  }
+  .slot.blocked .t{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.18);}
+  .slot.selected{
+    background:var(--gold-bg);
+    border:1.6px solid var(--gold);
+    color:var(--gold);
+  }
+  .slot.selected .tag{color:var(--gold);font-weight:700;}
+
+  .legend{
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;gap:clamp(14px,3.5vw,26px);
+    padding:clamp(6px,1.4vh,10px) 10px;
+    border-top:1px solid var(--card-border);
+    font-size:clamp(8.5px,1.6vh,10.5px);color:var(--gray);
+  }
+  .legend .item{display:flex;align-items:center;gap:5px;}
+  .legend .sq{width:10px;height:10px;border-radius:3px;border:1.3px solid var(--blue-border);background:var(--blue-bg);}
+  .legend .sq.off{border-color:rgba(255,255,255,0.16);background:rgba(255,255,255,0.02);}
+  .legend .dot-legend{width:9px;height:9px;border-radius:50%;background:var(--gold);}
+
+  .contact-section{
+    flex:0 0 auto;
+    border-top:1px solid var(--card-border);
+    padding:clamp(8px,1.6vh,12px) clamp(14px,3.5vw,22px) calc(clamp(8px,1.6vh,12px) + env(safe-area-inset-bottom,0));
+  }
+  .contact-hint{
+    text-align:center;
+    font-size:clamp(9.5px,1.65vh,11.5px);
+    line-height:1.5;
+    color:var(--gray);
+    margin:0 0 clamp(7px,1.3vh,10px);
+  }
+  .contact-hint-phone{color:var(--gold);font-weight:700;text-decoration:none;}
+  .selection-status{
+    text-align:center;
+    font-size:clamp(11px,2vh,13.5px);
+    font-weight:700;
+    color:var(--gold);
+    min-height:1.3em;
+    margin:0 0 clamp(7px,1.3vh,10px);
+    transition:color 0.15s ease;
+  }
+  .contact-buttons{
+    display:flex;
+    gap:clamp(8px,2.2vw,14px);
+  }
+  .contact-btn{
+    flex:1 1 0;min-width:0;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:clamp(9px,1.7vh,12px) 6px;
+    border-radius:clamp(10px,1.6vh,14px);
+    font-size:clamp(11.5px,2.1vh,13.5px);
+    font-weight:700;letter-spacing:0.01em;
+    text-decoration:none;
+    -webkit-user-select:none;user-select:none;
+    transition:transform 0.12s ease, opacity 0.12s ease;
+    border:none;
+    overflow:hidden;
+  }
+  .contact-btn:active{transform:scale(0.97);opacity:0.88;}
+  .contact-btn svg{flex:0 0 auto;width:16px;height:16px;}
+  .contact-btn.line{background:#FFFFFF;color:#06C755;border:1px solid rgba(6,199,85,0.35);}
+  .contact-btn.ig{
+    background:linear-gradient(45deg,#FEDA75 0%,#FA7E1E 25%,#D62976 50%,#962FBF 75%,#4F5BD5 100%);
+    color:#FFFFFF;
+  }
+  .contact-btn .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .modal-overlay{
+    position:absolute;inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
+    align-items:center;justify-content:center;
+    z-index:50;
+    padding:24px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:22px 20px;
+    max-width:300px;width:100%;
+    text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+  }
+  .modal-box p{
+    color:var(--white);
+    font-size:clamp(12.5px,2vh,14.5px);
+    line-height:1.6;
+    margin:0 0 18px;
+  }
+  .modal-actions{display:flex;gap:10px;}
+  .modal-btn{
+    flex:1 1 0;
+    padding:10px 6px;
+    border-radius:10px;
+    font-size:clamp(11.5px,2vh,13px);
+    font-weight:700;
+    text-decoration:none;
+    border:none;
+    cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+    transition:transform 0.12s ease, opacity 0.12s ease;
+  }
+  .modal-btn:active{transform:scale(0.96);opacity:0.88;}
+  .modal-btn.confirm{background:#06C755;color:#fff;}
+  .modal-btn.cancel{background:rgba(255,255,255,0.08);color:var(--white);}
+
+  @media (max-width:340px){
+    .topbar{padding:8px 10px 6px;}
+    .days-list{padding:0 10px 8px;gap:5px;}
+    .day-card{padding:8px;gap:6px;}
+    .date-block{width:56px;}
+    .contact-section{padding:8px 10px calc(8px + env(safe-area-inset-bottom,0));}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="left">
+      <span class="title">回春視務所 證件照 預約時段</span>
+      <span class="subtitle">未來15天</span>
+    </div>
+    <div class="right" id="statusTrigger" title="點一下重新整理並換色">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">讀取中</span>
+      <span class="time" id="statusTime"></span>
+    </div>
+  </div>
+
+  <div class="today-wrap" id="todayWrap"></div>
+
+  <div class="legend">
+    <span class="item"><span class="sq"></span>可預約</span>
+    <span class="item"><span class="sq off"></span>不可預約</span>
+    <span class="item"><span class="dot-legend"></span>今天</span>
+  </div>
+
+  <div class="contact-section">
+    <p class="contact-hint">請參考預約檔期後，打開對話並提出預約需求<br>一位拍攝需要一個時段，兩位拍攝需要兩個時段<br><a class="contact-hint-phone" href="tel:0971080406">預約今天的檔期請直接電洽 0971-080-406</a></p>
+    <p class="selection-status" id="selectionStatus">請先點選時段</p>
+    <div class="contact-buttons">
+      <a class="contact-btn line" id="lineBtn" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+        <span class="label">加入 LINE 官方帳號</span>
+      </a>
+      <a class="contact-btn ig" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
+        <span class="label">追蹤 Instagram</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="days-list" id="daysList"></div>
+
+  <div class="modal-overlay" id="limitModal">
+    <div class="modal-box">
+      <p>預約三位以上請直接洽詢老闆</p>
+      <div class="modal-actions">
+        <a class="modal-btn confirm" id="modalLineBtn" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">前往 LINE</a>
+        <button type="button" class="modal-btn cancel" id="modalCancelBtn">取消/關閉</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ====== 設定區（與預約頁共用同一份資料來源）======
+  var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
+  var SHEET_NAME = "booking";
+  var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
+                (SHEET_NAME ? "&sheet=" + encodeURIComponent(SHEET_NAME) : "");
+
+  var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
+  var DAYS_TO_SHOW = 15; // 含今天共 15 天
+
+  var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
+
+  var daysList = document.getElementById('daysList');
+  var todayWrap = document.getElementById('todayWrap');
+  var statusDot = document.getElementById('statusDot');
+  var statusText = document.getElementById('statusText');
+  var statusTime = document.getElementById('statusTime');
+  var statusTrigger = document.getElementById('statusTrigger');
+  var lineBtn = document.getElementById('lineBtn');
+  var selectionStatus = document.getElementById('selectionStatus');
+  var limitModal = document.getElementById('limitModal');
+  var modalLineBtn = document.getElementById('modalLineBtn');
+  var modalCancelBtn = document.getElementById('modalCancelBtn');
+
+  var MAX_SELECTABLE = 2;
+  var selectedSlots = []; // [{ sKey, dKey, time, label }]
+
+  function slotKey(dKey, time){ return dKey + '_' + time; }
+  function formatSelectionLabel(dKey, time){
+    var parts = dKey.split('-');
+    return parts[1] + '/' + parts[2] + ' ' + time;
+  }
+  function isSlotSelected(dKey, time){
+    var sKey = slotKey(dKey, time);
+    for(var i=0;i<selectedSlots.length;i++){
+      if(selectedSlots[i].sKey === sKey) return true;
+    }
+    return false;
+  }
+  function buildLineUrl(){
+    var lines = ["您好，我想預約證件照拍攝"];
+    if(selectedSlots.length){
+      selectedSlots.forEach(function(s, i){
+        lines.push('時段' + (i+1) + '：' + s.label);
+      });
+      lines.push('人數：' + selectedSlots.length);
+    } else {
+      lines.push('日期：');
+      lines.push('時段：');
+      lines.push('人數：');
+    }
+    return "https://line.me/R/oaMessage/@128mtxwg/?" + encodeURIComponent(lines.join('\n'));
+  }
+  function updateSelectionUI(){
+    if(selectedSlots.length === 0){
+      selectionStatus.textContent = "請先點選時段";
+    } else {
+      selectionStatus.textContent = "已勾選：" + selectedSlots.map(function(s){ return s.label; }).join('、');
+    }
+    lineBtn.href = buildLineUrl();
+  }
+  function toggleSlot(dKey, time){
+    var sKey = slotKey(dKey, time);
+    for(var i=0;i<selectedSlots.length;i++){
+      if(selectedSlots[i].sKey === sKey){
+        selectedSlots.splice(i,1);
+        updateSelectionUI();
+        render();
+        return;
+      }
+    }
+    if(selectedSlots.length >= MAX_SELECTABLE){
+      modalLineBtn.href = buildLineUrl();
+      limitModal.classList.add('show');
+      return;
+    }
+    selectedSlots.push({ sKey:sKey, dKey:dKey, time:time, label:formatSelectionLabel(dKey, time) });
+    updateSelectionUI();
+    render();
+  }
+  function cleanupSelections(){
+    var tKey = todayKey();
+    var changed = false;
+    selectedSlots = selectedSlots.filter(function(s){
+      var isToday = s.dKey === tKey;
+      var timePassed = isToday && isSlotTimePassed(s.time);
+      var isBooked = !!(bookedMap[s.dKey] && bookedMap[s.dKey][s.time]);
+      var valid = !timePassed && !isBooked;
+      if(!valid) changed = true;
+      return valid;
+    });
+    if(changed) updateSelectionUI();
+  }
+  function hideLimitModal(){
+    limitModal.classList.remove('show');
+  }
+  modalCancelBtn.addEventListener('click', hideLimitModal);
+  limitModal.addEventListener('click', function(e){
+    if(e.target === limitModal) hideLimitModal();
+  });
+  function handleSlotClick(e){
+    var slotEl = e.target.closest ? e.target.closest('.slot') : null;
+    if(!slotEl || slotEl.classList.contains('blocked')) return;
+    var dKey = slotEl.getAttribute('data-date');
+    var time = slotEl.getAttribute('data-time');
+    if(!dKey || !time) return;
+    toggleSlot(dKey, time);
+  }
+  daysList.addEventListener('click', handleSlotClick);
+  todayWrap.addEventListener('click', handleSlotClick);
+
+  updateSelectionUI();
+
+  // ====== 七色莫蘭迪主題（深底淺字，維持一致風格）======
+  var THEMES = [
+    { name:"深藍", vars:{
+      bg:"#1D2D44", "card-bg":"#243A5A", "card-border":"rgba(141,160,183,0.20)",
+      white:"#E6E9EE", gray:"#8DA0B7", "gray-dim":"rgba(141,160,183,0.42)",
+      gold:"#D4BA8A", "gold-bg":"rgba(212,186,138,0.10)", "gold-border":"rgba(212,186,138,0.45)",
+      blue:"#AEBFD1", "blue-bg":"rgba(141,160,183,0.10)", "blue-border":"rgba(141,160,183,0.55)",
+      green:"#8FBFA0", red:"#C97B6E", "tag-text":"#1D2D44"
+    }},
+    { name:"桃紅", vars:{
+      bg:"#3A2B2C", "card-bg":"#4A3638", "card-border":"rgba(199,151,140,0.22)",
+      white:"#F0E2DE", gray:"#C79E93", "gray-dim":"rgba(199,151,140,0.40)",
+      gold:"#E0A467", "gold-bg":"rgba(224,164,103,0.12)", "gold-border":"rgba(224,164,103,0.45)",
+      blue:"#DDB2A3", "blue-bg":"rgba(221,178,163,0.12)", "blue-border":"rgba(221,178,163,0.55)",
+      green:"#93BE99", red:"#D2867A", "tag-text":"#3A2B2C"
+    }},
+    { name:"深綠", vars:{
+      bg:"#212E28", "card-bg":"#2B3B33", "card-border":"rgba(150,178,160,0.20)",
+      white:"#E4EBE5", gray:"#9AB6A4", "gray-dim":"rgba(150,178,160,0.42)",
+      gold:"#CDB981", "gold-bg":"rgba(205,185,129,0.10)", "gold-border":"rgba(205,185,129,0.45)",
+      blue:"#A9C4B0", "blue-bg":"rgba(150,178,160,0.10)", "blue-border":"rgba(150,178,160,0.55)",
+      green:"#8FBF9E", red:"#D48A7D", "tag-text":"#212E28"
+    }},
+    { name:"咖啡", vars:{
+      bg:"#2E2620", "card-bg":"#3B3128", "card-border":"rgba(184,158,130,0.22)",
+      white:"#EDE3D6", gray:"#B79E85", "gray-dim":"rgba(184,158,130,0.40)",
+      gold:"#D0A25C", "gold-bg":"rgba(208,162,92,0.12)", "gold-border":"rgba(208,162,92,0.45)",
+      blue:"#C9AD8D", "blue-bg":"rgba(201,173,141,0.12)", "blue-border":"rgba(201,173,141,0.55)",
+      green:"#9BB98A", red:"#C97F6A", "tag-text":"#2E2620"
+    }},
+    { name:"米白", vars:{
+      bg:"#F0EBE1", "card-bg":"#F8F6F0", "card-border":"rgba(120,110,95,0.18)",
+      white:"#3A3630", gray:"#8B8375", "gray-dim":"rgba(139,131,117,0.45)",
+      gold:"#A9865C", "gold-bg":"rgba(169,134,92,0.14)", "gold-border":"rgba(169,134,92,0.45)",
+      blue:"#7C8D86", "blue-bg":"rgba(124,141,134,0.14)", "blue-border":"rgba(124,141,134,0.50)",
+      green:"#6E8F72", red:"#B5695A", "tag-text":"#2E2A24"
+    }},
+    { name:"粉紅", vars:{
+      bg:"#332830", "card-bg":"#413441", "card-border":"rgba(196,150,175,0.22)",
+      white:"#F0E1EA", gray:"#C79AB4", "gray-dim":"rgba(196,150,175,0.40)",
+      gold:"#D9A48F", "gold-bg":"rgba(217,164,143,0.12)", "gold-border":"rgba(217,164,143,0.45)",
+      blue:"#D8AFC4", "blue-bg":"rgba(216,175,196,0.12)", "blue-border":"rgba(216,175,196,0.55)",
+      green:"#96BFA3", red:"#CB7E8C", "tag-text":"#332830"
+    }},
+    { name:"岩石灰", vars:{
+      bg:"#2A2B2C", "card-bg":"#363839", "card-border":"rgba(170,172,175,0.22)",
+      white:"#E7E8E9", gray:"#A8ACAF", "gray-dim":"rgba(170,172,175,0.42)",
+      gold:"#C7B98E", "gold-bg":"rgba(199,185,142,0.10)", "gold-border":"rgba(199,185,142,0.45)",
+      blue:"#B7BEC4", "blue-bg":"rgba(170,172,175,0.10)", "blue-border":"rgba(170,172,175,0.55)",
+      green:"#93B79E", red:"#C4837A", "tag-text":"#2A2B2C"
+    }}
+  ];
+
+  function applyTheme(idx){
+    var t = THEMES[(idx % THEMES.length + THEMES.length) % THEMES.length];
+    var root = document.documentElement.style;
+    Object.keys(t.vars).forEach(function(k){
+      root.setProperty('--' + k, t.vars[k]);
+    });
+  }
+
+  function daysSinceEpoch(d){
+    return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+  }
+
+  var currentThemeIndex = daysSinceEpoch(new Date()) % THEMES.length;
+  if(currentThemeIndex < 0) currentThemeIndex += THEMES.length;
+  applyTheme(currentThemeIndex);
+
+  var weekdayNames = ["日","一","二","三","四","五","六"];
+
+  function pad(n){ return n < 10 ? "0"+n : ""+n; }
+  function dateKey(y,m,d){ return y + "-" + pad(m+1) + "-" + pad(d); }
+  function todayKey(){
+    var t = new Date();
+    return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
+  }
+  function timeToMinutes(t){
+    var p = t.split(':');
+    return parseInt(p[0],10) * 60 + parseInt(p[1],10);
+  }
+  function nowMinutes(){
+    var d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  }
+  function isSlotTimePassed(timeStr){
+    return nowMinutes() > timeToMinutes(timeStr);
+  }
+  function nowHHMM(){
+    var d = new Date();
+    return pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+
+  // ---- 解析 GViz 特殊格式 ----
+  function parseGvizCellRaw(cell){
+    if(!cell) return null;
+    var v = cell.v;
+    if(typeof v === "string"){
+      var m = v.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+      if(m){
+        return { kind:"date", y:parseInt(m[1],10), mo:parseInt(m[2],10), d:parseInt(m[3],10) };
+      }
+    }
+    return { kind:"raw", value: v };
+  }
+  function extractDateString(cell){
+    var parsed = parseGvizCellRaw(cell);
+    if(!parsed) return null;
+    if(parsed.kind === "date") return dateKey(parsed.y, parsed.mo, parsed.d);
+    if(parsed.value == null) return null;
+    var s = String(parsed.value).trim();
+    var m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if(m) return m[1] + "-" + pad(parseInt(m[2],10)) + "-" + pad(parseInt(m[3],10));
+    return null;
+  }
+  function cellHasValue(cell){
+    if(!cell) return false;
+    var v = cell.v;
+    return v !== null && v !== undefined && v !== "";
+  }
+
+  function loadAvailability(){
+    statusText.textContent = "讀取中";
+    statusTime.textContent = "";
+    statusDot.className = "dot";
+    fetch(gvizUrl)
+      .then(function(res){
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function(text){
+        var match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+        if(!match) throw new Error("格式解析失敗");
+        var json = JSON.parse(match[1]);
+        if(!json.table || !json.table.rows) throw new Error("試算表格式不符");
+
+        var rows = json.table.rows;
+        var map = {};
+        rows.forEach(function(row){
+          var cells = row.c;
+          if(!cells || !cells[0]) return;
+          var dKey = extractDateString(cells[0]);
+          if(!dKey) return;
+          var dayBooked = map[dKey] || {};
+          SLOT_TIMES.forEach(function(time, idx){
+            var cell = cells[idx + 1];
+            if(cellHasValue(cell)) dayBooked[time] = true;
+          });
+          map[dKey] = dayBooked;
+        });
+        bookedMap = map;
+        statusDot.className = "dot live";
+        statusText.textContent = "已同步";
+        statusTime.textContent = nowHHMM();
+        render();
+      })
+      .catch(function(err){
+        statusDot.className = "dot err";
+        statusText.textContent = "讀取失敗";
+        statusTime.textContent = nowHHMM();
+        render();
+      });
+  }
+
+  function formatDateLine(y, m, d){
+    return pad(m+1) + "/" + pad(d);
+  }
+
+  function buildDayCard(d, isToday, booked){
+    var card = document.createElement('div');
+    card.className = "day-card" + (isToday ? " today" : "");
+
+    var dateBlock = document.createElement('div');
+    dateBlock.className = "date-block";
+    dateBlock.innerHTML =
+      '<span class="date-text">' + formatDateLine(d.getFullYear(), d.getMonth(), d.getDate()) + '</span>' +
+      '<span class="weekday-row"><span class="weekday-text">星期' + weekdayNames[d.getDay()] + '</span>' +
+      (isToday ? '<span class="today-tag">今天</span>' : '') + '</span>';
+    card.appendChild(dateBlock);
+
+    var slotsLine = document.createElement('div');
+    slotsLine.className = "slots-line";
+
+    var dKey = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+
+    SLOT_TIMES.forEach(function(time){
+      var timePassed = isToday && isSlotTimePassed(time);
+      var isBooked = !!booked[time];
+      var blocked = timePassed || isBooked;
+      var selected = !blocked && isSlotSelected(dKey, time);
+
+      var slot = document.createElement('div');
+      slot.className = "slot" + (blocked ? " blocked" : "") + (selected ? " selected" : "");
+      if(!blocked){
+        slot.setAttribute('data-date', dKey);
+        slot.setAttribute('data-time', time);
+      }
+      var html = '<span class="t">' + time + '</span>';
+      if(blocked){
+        html += '<span class="tag">不可預約</span>';
+      } else if(selected){
+        html += '<span class="tag">已勾選</span>';
+      }
+      slot.innerHTML = html;
+      slotsLine.appendChild(slot);
+    });
+
+    card.appendChild(slotsLine);
+    return card;
+  }
+
+  function render(){
+    todayWrap.innerHTML = "";
+    daysList.innerHTML = "";
+    var base = new Date();
+    var tKey = todayKey();
+
+    for(var i=0; i<DAYS_TO_SHOW; i++){
+      var d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+      var key = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+      var isToday = key === tKey;
+      var booked = bookedMap[key] || {};
+      var card = buildDayCard(d, isToday, booked);
+
+      if(isToday){
+        todayWrap.appendChild(card);
+      } else {
+        daysList.appendChild(card);
+      }
+    }
+
+    cleanupSelections();
+  }
+
+  // 點擊右上角狀態區塊：換下一個顏色 + 立即重新整理資料
+  statusTrigger.addEventListener('click', function(){
+    currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+    applyTheme(currentThemeIndex);
+    loadAvailability();
+  });
+
+  // 初始渲染 + 讀取資料
+  render();
+  loadAvailability();
+
+  // 每 30 秒重新檢查「今天」是否有時段過期；每 60 秒重新抓一次試算表資料
+  setInterval(render, 30000);
+  setInterval(loadAvailability, 60000);
+
+})();
+</script>
+</body>
+</html>
