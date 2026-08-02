@@ -9,6 +9,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* ================================================================
+     色彩變數
+     這裡的變數「名稱」與 booking.html 保持一致，方便對照，但數值不同：
+     本頁支援可切換的 7 色主題（見下方 JS 的 THEMES 陣列 + applyTheme()），
+     這裡列出的只是預設值，實際顯示的顏色會被 applyTheme() 動態覆寫。
+     booking.html 固定使用「岩石灰」配色（等同 THEMES 陣列最後一組）。
+     ================================================================ */
   :root{
     --bg:#1D2D44;
     --card-bg:#243A5A;
@@ -61,6 +68,13 @@
   .dot.live{background:var(--green);box-shadow:0 0 6px rgba(62,217,138,0.7);}
   .dot.err{background:var(--red);}
 
+  /* ================================================================
+     日期卡片／時段格／圖例
+     以下這組樣式（.days-list ~ .legend）與 booking.html 對應段落
+     幾乎逐字相同，只有少數顏色細節因主題機制而不同。
+     若要調整版面外觀（間距、圓角、字級等），請同步修改 booking.html，
+     以維持兩頁視覺一致。
+     ================================================================ */
   .days-list{
     flex:1 1 auto;
     display:flex;flex-direction:column;
@@ -142,7 +156,12 @@
   .slot.clickable:active{transform:scale(0.94);opacity:0.75;}
   .slot.passed{cursor:default;}
 
-  /* ---- 確認彈窗 ---- */
+  /* ================================================================
+     確認彈窗（本頁專屬：鎖定／解除時段用）
+     注意：booking.html 也有 class 名稱同為 .modal-overlay/.modal-box 的
+     彈窗，但用途不同（人數超過限制提示、時段不相鄰確認），內容結構也不同，
+     兩邊並非共用同一組樣式，請勿假設改一邊會影響另一邊。
+     ================================================================ */
   .modal-overlay{
     position:fixed;inset:0;
     background:rgba(0,0,0,0.55);
@@ -245,7 +264,13 @@
 (function(){
   "use strict";
 
-  // ====== 設定區（與預約頁共用同一份資料來源）======
+  // ================================================================
+  // 設定區
+  // SHEET_ID / SHEET_NAME / SLOT_TIMES / DAYS_TO_SHOW 這幾項必須跟
+  // booking.html 裡的對應設定完全一致（同一份試算表、同樣的時段定義），
+  // 也必須跟 Code.gs 裡的 SHEET_ID / SHEET_NAME / SLOT_TIMES 一致。
+  // 若要換試算表、加時段、改天數，記得三個檔案都要同步修改。
+  // ================================================================
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
   var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
@@ -253,13 +278,15 @@
 
   // 每次更新這個檔案，把版本號改成新的（例如當天日期），
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
-  var BUILD_VERSION = "2026-08-02-02";
+  // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
+  // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
+  var BUILD_VERSION = "2026-08-02-03";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
 
   // 部署好 Apps Script 網頁應用程式後，把網址貼在這裡（結尾是 /exec）
-  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyd5F3Ev1FjQSa6kGC6xrVEPk37ecpssmoce4QjSV7l0NTbzmlBoPswMOb3FhsMXsY-/exec";
+  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzqZdOBXl5LUoGTHw3hIgZYJSOFOl4JR286Ug1J2FQKy1us8KPjJoBZYceTwd0vZPtEZw/exec";
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
   var pending = null; // { dateKey, time, action, label }
@@ -277,7 +304,11 @@
   var modalCancel = document.getElementById('modalCancel');
   var modalConfirm = document.getElementById('modalConfirm');
 
-  // ====== 七色莫蘭迪主題（深底淺字，維持一致風格）======
+  // ================================================================
+  // 七色莫蘭迪主題（深底淺字，維持一致風格）
+  // 本頁專屬功能，booking.html 沒有主題切換，固定使用「岩石灰」配色
+  // （對應下面陣列最後一組「岩石灰」）。
+  // ================================================================
   var THEMES = [
     { name:"深藍", vars:{
       bg:"#1D2D44", "card-bg":"#243A5A", "card-border":"rgba(141,160,183,0.20)",
@@ -346,6 +377,12 @@
   if(currentThemeIndex < 0) currentThemeIndex += THEMES.length;
   applyTheme(currentThemeIndex);
 
+  // ================================================================
+  // 共用工具函式（日期／時間／GViz 解析）
+  // 這一整塊（weekdayNames ~ cellHasValue）與 booking.html 逐字相同。
+  // 若要修改這些函式的行為，請同步修改兩個檔案，保持內容一致，
+  // 避免兩頁對「今天」「時段是否過期」「試算表格式」的判斷產生落差。
+  // ================================================================
   var weekdayNames = ["日","一","二","三","四","五","六"];
 
   function pad(n){ return n < 10 ? "0"+n : ""+n; }
@@ -397,7 +434,14 @@
     var v = cell.v;
     return v !== null && v !== undefined && v !== "";
   }
+  // ==================== 共用工具函式結束 ====================
 
+  // ================================================================
+  // 資料讀取：抓取並解析 GViz 回應，建立 bookedMap
+  // 解析試算表回傳格式的核心邏輯與 booking.html 相同。
+  // 差異：booking.html 多了 isLoading 防重入、強制 no-store 不快取、
+  // 以及重新整理圖示旋轉動畫；本頁沒有這些，是既有的設計差異，非遺漏。
+  // ================================================================
   function loadAvailability(){
     statusText.textContent = "讀取中";
     statusTime.textContent = "";
@@ -445,6 +489,9 @@
     return pad(m+1) + "/" + pad(d);
   }
 
+  // ================================================================
+  // 畫面渲染：組出 15 天 × 5 時段的卡片列表
+  // ================================================================
   function render(){
     daysList.innerHTML = "";
     var base = new Date();
@@ -496,6 +543,9 @@
     }
   }
 
+  // ================================================================
+  // 鎖定／解除確認彈窗（本頁專屬流程）
+  // ================================================================
   function formatDetailLine(dateKey, time){
     var p = dateKey.split('-');
     var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));

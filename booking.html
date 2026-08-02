@@ -7,6 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* ================================================================
+     色彩變數
+     這裡的變數「名稱」與 booking-board.html 保持一致，方便對照。
+     本頁固定使用「岩石灰」配色（不像管理端有 7 色主題可切換）。
+     ================================================================ */
   :root{
     /* 固定配色：岩石灰 */
     --bg:#2A2B2C;
@@ -83,7 +88,10 @@
 
   .today-wrap.locked .slot{pointer-events:none;opacity:.55;}
 
-  /* ===== 引導式步驟容器 ===== */
+  /* ================================================================
+     引導式步驟容器（本頁專屬：選人數 → 選時段 → 確認聯絡方式）
+     booking-board.html 沒有這套流程，是客人端才有的精靈式介面。
+     ================================================================ */
   .step-container{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
   .step{display:none;flex-direction:column;min-height:0;flex:1 1 auto;}
   .step.active{display:flex;}
@@ -116,6 +124,13 @@
     flex:0 0 auto;
     padding:clamp(8px,1.6vh,14px) clamp(14px,3.5vw,22px) clamp(10px,2vh,16px);
   }
+  /* ================================================================
+     日期卡片／時段格／圖例
+     以下這組樣式（.days-list ~ .legend）與 booking-board.html 對應
+     段落幾乎逐字相同，只有少數顏色細節不同（本頁固定岩石灰配色）。
+     若要調整版面外觀（間距、圓角、字級等），請同步修改
+     booking-board.html，以維持兩頁視覺一致。
+     ================================================================ */
   .days-list{
     flex:1 1 auto;
     display:flex;flex-direction:column;
@@ -262,7 +277,10 @@
   }
   .contact-btn .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  /* ===== 底部導覽（上一步 / 下一步）===== */
+  /* ================================================================
+     底部導覽（上一步 / 下一步）
+     本頁專屬：引導式步驟切換用，booking-board.html 沒有這個元件。
+     ================================================================ */
   .wizard-nav{
     flex:0 0 auto;
     display:flex;gap:10px;
@@ -287,6 +305,13 @@
   .nav-btn[disabled]{opacity:.35;pointer-events:none;}
   .nav-btn.hidden{display:none;}
 
+  /* ================================================================
+     彈窗（本頁專屬：人數超過限制提示、時段不相鄰確認）
+     注意：booking-board.html 也有 class 名稱同為
+     .modal-overlay/.modal-box 的彈窗，但用途不同（鎖定/解除確認），
+     內容結構也不同，兩邊並非共用同一組樣式，請勿假設改一邊會
+     影響另一邊。
+     ================================================================ */
   .modal-overlay{
     position:absolute;inset:0;
     background:rgba(0,0,0,0.55);
@@ -436,7 +461,16 @@
 (function(){
   "use strict";
 
-  // ====== 設定區 ======
+  // ================================================================
+  // 設定區
+  // SHEET_ID / SHEET_NAME / SLOT_TIMES / DAYS_TO_SHOW 這幾項必須跟
+  // booking-board.html 裡的對應設定完全一致（同一份試算表、同樣的
+  // 時段定義），也必須跟 Code.gs 裡的 SHEET_ID / SHEET_NAME /
+  // SLOT_TIMES 一致。若要換試算表、加時段、改天數，記得三個檔案
+  // 都要同步修改。
+  // 本頁沒有 booking-board.html 的 BUILD_VERSION + checkForUpdate
+  // 版本偵測機制，這是既有的設計差異（客人端目前不需要這個機制）。
+  // ================================================================
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
   var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
@@ -509,7 +543,10 @@
     lineBtn.href = buildLineUrl();
   }
 
-  // ====== 引導式步驟（人數 -> 時段 -> 確認）======
+  // ================================================================
+  // 引導式步驟（人數 -> 時段 -> 確認）
+  // 本頁專屬流程，booking-board.html 沒有這套邏輯。
+  // ================================================================
   function updateSlotsHint(){
     if(peopleCount === 1){
       slotsHint.innerHTML = '請選擇 <b>1 個 </b>時段';
@@ -656,6 +693,13 @@
 
   updateSelectionUI();
 
+  // ================================================================
+  // 共用工具函式（日期／時間／GViz 解析）
+  // 這一整塊（weekdayNames ~ cellHasValue）與 booking-board.html
+  // 逐字相同。若要修改這些函式的行為，請同步修改兩個檔案，保持
+  // 內容一致，避免兩頁對「今天」「時段是否過期」「試算表格式」的
+  // 判斷產生落差。
+  // ================================================================
   var weekdayNames = ["日","一","二","三","四","五","六"];
 
   function pad(n){ return n < 10 ? "0"+n : ""+n; }
@@ -707,7 +751,14 @@
     var v = cell.v;
     return v !== null && v !== undefined && v !== "";
   }
+  // ==================== 共用工具函式結束 ====================
 
+  // ================================================================
+  // 資料讀取：抓取並解析 GViz 回應，建立 bookedMap
+  // 解析試算表回傳格式的核心邏輯與 booking-board.html 相同。
+  // 本頁多了 isLoading 防重入、強制 no-store 不快取、以及重新整理
+  // 圖示旋轉動畫；booking-board.html 沒有這些，是既有的設計差異。
+  // ================================================================
   var isLoading = false;
   function loadAvailability(){
     if(isLoading) return;
@@ -765,6 +816,9 @@
     return pad(m+1) + "/" + pad(d);
   }
 
+  // ================================================================
+  // 畫面渲染：組出 15 天 × 5 時段的卡片列表（今天獨立顯示在最上方）
+  // ================================================================
   function buildDayCard(d, isToday, booked){
     var card = document.createElement('div');
     card.className = "day-card" + (isToday ? " today" : "");
