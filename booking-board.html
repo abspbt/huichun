@@ -41,17 +41,17 @@
 
   .topbar{
     flex:0 0 auto;
-    display:flex;align-items:baseline;justify-content:space-between;
+    display:flex;flex-direction:column;gap:5px;
     padding:clamp(10px,2.4vh,18px) clamp(14px,3.5vw,22px) clamp(6px,1.4vh,10px);
   }
-  .topbar .left{display:flex;align-items:baseline;gap:10px;}
+  .topbar .row1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
   .topbar .title{
-    font-weight:700;font-size:clamp(13px,2.5vh,17px);letter-spacing:0.01em;color:var(--white);
+    font-weight:700;font-size:clamp(13px,2.5vh,17px);letter-spacing:0.01em;color:var(--white);line-height:1.3;
   }
-  .topbar .subtitle{font-size:clamp(9.5px,1.8vh,12px);color:var(--gray);font-weight:500;}
+  .topbar .subtitle{font-size:clamp(9.5px,1.7vh,11.5px);color:var(--gray);font-weight:500;}
   .topbar .right{
     display:flex;align-items:center;gap:7px;font-size:clamp(8.5px,1.6vh,11px);color:var(--gray);
-    cursor:pointer;padding:4px 8px;margin:-4px -8px;border-radius:8px;
+    cursor:pointer;padding:4px 8px;margin:-4px -8px;border-radius:8px;flex-shrink:0;
     transition:background 0.15s ease, opacity 0.15s ease;
     -webkit-user-select:none;user-select:none;
   }
@@ -208,15 +208,15 @@
 <div class="wrap">
 
   <div class="topbar">
-    <div class="left">
+    <div class="row1">
       <span class="title">回春視務所 證件照 預約時段</span>
-      <span class="subtitle">未來15天・點擊時段可鎖定/解除</span>
+      <div class="right" id="statusTrigger" title="點一下重新整理並換色">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">讀取中</span>
+        <span class="time" id="statusTime"></span>
+      </div>
     </div>
-    <div class="right" id="statusTrigger" title="點一下重新整理並換色">
-      <span class="dot" id="statusDot"></span>
-      <span id="statusText">讀取中</span>
-      <span class="time" id="statusTime"></span>
-    </div>
+    <span class="subtitle">未來15天・點時段可鎖定/解除</span>
   </div>
 
   <div class="days-list" id="daysList"></div>
@@ -255,7 +255,7 @@
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
 
   // 部署好 Apps Script 網頁應用程式後，把網址貼在這裡（結尾是 /exec）
-  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyd5F3Ev1FjQSa6kGC6xrVEPk37ecpssmoce4QjSV7l0NTbzmlBoPswMOb3FhsMXsY-/exec";
+  var WEBAPP_URL = "請貼上你的Apps_Script網頁應用程式網址";
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
   var pending = null; // { dateKey, time, action, label }
