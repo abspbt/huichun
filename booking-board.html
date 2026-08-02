@@ -31,6 +31,7 @@
     margin:0;padding:0;height:100%;overflow:hidden;
     background:var(--bg);color:var(--white);
     font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    overscroll-behavior:none;
   }
   .wrap{
     height:100vh;height:100dvh;
@@ -66,14 +67,17 @@
     gap:clamp(6px,1.3vh,12px);
     min-height:0;
     padding:0 clamp(14px,3.5vw,22px) clamp(8px,1.6vh,14px);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
   }
   .day-card{
-    flex:1 1 0;min-height:0;
+    flex:0 0 auto;min-height:64px;
     display:flex;align-items:center;gap:clamp(8px,2vw,18px);
     background:var(--card-bg);
     border:1px solid var(--card-border);
     border-radius:clamp(10px,1.6vh,16px);
-    padding:0 clamp(10px,2.2vw,18px);
+    padding:clamp(10px,1.8vh,14px) clamp(10px,2.2vw,18px);
     position:relative;
     overflow:hidden;
   }
@@ -134,6 +138,52 @@
   }
   .slot.blocked .t{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.18);}
 
+  .slot.clickable{cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform 0.12s ease, opacity 0.12s ease;}
+  .slot.clickable:active{transform:scale(0.94);opacity:0.75;}
+  .slot.passed{cursor:default;}
+
+  /* ---- 確認彈窗 ---- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.55);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    z-index:100;
+    opacity:0;pointer-events:none;
+    transition:opacity 0.15s ease;
+  }
+  .modal-overlay.show{opacity:1;pointer-events:auto;}
+  .modal-box{
+    width:100%;max-width:320px;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:22px 20px 16px;
+    text-align:center;
+    transform:translateY(8px);
+    transition:transform 0.15s ease;
+  }
+  .modal-overlay.show .modal-box{transform:translateY(0);}
+  .modal-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px;}
+  .modal-detail{font-size:13px;color:var(--gray);margin-bottom:18px;line-height:1.5;}
+  .modal-error{font-size:12px;color:var(--red);margin:-10px 0 14px;min-height:14px;}
+  .modal-buttons{display:flex;gap:10px;}
+  .modal-btn{
+    flex:1 1 0;
+    padding:11px 8px;
+    border-radius:10px;
+    font-size:14px;font-weight:600;
+    border:1px solid var(--card-border);
+    background:transparent;color:var(--gray);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .modal-btn.confirm{
+    background:var(--gold);border-color:var(--gold-border);color:var(--tag-text);
+  }
+  .modal-btn:disabled{opacity:0.5;}
+  .modal-btn.confirm.unlock{background:var(--red);border-color:var(--red);color:#fff;}
+
   .legend{
     flex:0 0 auto;
     display:flex;align-items:center;justify-content:center;gap:clamp(14px,3.5vw,26px);
@@ -160,7 +210,7 @@
   <div class="topbar">
     <div class="left">
       <span class="title">回春視務所 證件照 預約時段</span>
-      <span class="subtitle">未來一週</span>
+      <span class="subtitle">未來15天・點擊時段可鎖定/解除</span>
     </div>
     <div class="right" id="statusTrigger" title="點一下重新整理並換色">
       <span class="dot" id="statusDot"></span>
@@ -179,6 +229,18 @@
 
 </div>
 
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">確定要鎖定這個時段嗎？</div>
+    <div class="modal-detail" id="modalDetail"></div>
+    <div class="modal-error" id="modalError"></div>
+    <div class="modal-buttons">
+      <button class="modal-btn" id="modalCancel">取消</button>
+      <button class="modal-btn confirm" id="modalConfirm">確定</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -190,15 +252,26 @@
                 (SHEET_NAME ? "&sheet=" + encodeURIComponent(SHEET_NAME) : "");
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
-  var DAYS_TO_SHOW = 8; // 含今天共 8 天
+  var DAYS_TO_SHOW = 15; // 含今天共 15 天
+
+  // 部署好 Apps Script 網頁應用程式後，把網址貼在這裡（結尾是 /exec）
+  var WEBAPP_URL = "請貼上你的Apps_Script網頁應用程式網址";
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
+  var pending = null; // { dateKey, time, action, label }
+  var isSubmitting = false;
 
   var daysList = document.getElementById('daysList');
   var statusDot = document.getElementById('statusDot');
   var statusText = document.getElementById('statusText');
   var statusTime = document.getElementById('statusTime');
   var statusTrigger = document.getElementById('statusTrigger');
+  var modalOverlay = document.getElementById('modalOverlay');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalDetail = document.getElementById('modalDetail');
+  var modalError = document.getElementById('modalError');
+  var modalCancel = document.getElementById('modalCancel');
+  var modalConfirm = document.getElementById('modalConfirm');
 
   // ====== 七色莫蘭迪主題（深底淺字，維持一致風格）======
   var THEMES = [
@@ -397,9 +470,15 @@
         var timePassed = isToday && isSlotTimePassed(time);
         var isBooked = !!booked[time];
         var blocked = timePassed || isBooked;
+        // 已過期且尚未鎖定的時段：不能操作（過去的時段不能預約）
+        // 已鎖定的時段：無論是否過期，都能點擊解除（避免按錯無法復原）
+        var clickable = isBooked || !timePassed;
 
         var slot = document.createElement('div');
-        slot.className = "slot" + (blocked ? " blocked" : "");
+        slot.className = "slot" + (blocked ? " blocked" : "") + (clickable ? " clickable" : " passed");
+        slot.dataset.date = key;
+        slot.dataset.time = time;
+        slot.dataset.action = isBooked ? "unlock" : "lock";
         var html = '<span class="t">' + time + '</span>';
         if(blocked){
           html += '<span class="tag">不可預約</span>';
@@ -412,6 +491,104 @@
       daysList.appendChild(card);
     }
   }
+
+  function formatDetailLine(dateKey, time){
+    var p = dateKey.split('-');
+    var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+    return p[0] + "/" + p[1] + "/" + p[2] + "（" + weekdayNames[d.getDay()] + "）" + time;
+  }
+
+  function openModal(dateKey, time, action){
+    pending = { dateKey: dateKey, time: time, action: action };
+    modalError.textContent = "";
+    modalDetail.textContent = formatDetailLine(dateKey, time);
+    if(action === "lock"){
+      modalTitle.textContent = "確定要鎖定這個時段嗎？";
+      modalConfirm.textContent = "確定鎖定";
+      modalConfirm.classList.remove("unlock");
+    } else {
+      modalTitle.textContent = "確定要解除這個時段的鎖定嗎？";
+      modalConfirm.textContent = "確定解除";
+      modalConfirm.classList.add("unlock");
+    }
+    modalConfirm.disabled = false;
+    modalCancel.disabled = false;
+    modalOverlay.classList.add("show");
+  }
+
+  function closeModal(){
+    modalOverlay.classList.remove("show");
+    pending = null;
+    isSubmitting = false;
+  }
+
+  // 時段點擊（事件委派，效能較好）
+  daysList.addEventListener('click', function(e){
+    var slot = e.target.closest ? e.target.closest('.slot.clickable') : null;
+    if(!slot) return;
+    openModal(slot.dataset.date, slot.dataset.time, slot.dataset.action);
+  });
+
+  modalCancel.addEventListener('click', function(){
+    if(isSubmitting) return;
+    closeModal();
+  });
+
+  modalOverlay.addEventListener('click', function(e){
+    if(e.target === modalOverlay && !isSubmitting) closeModal();
+  });
+
+  modalConfirm.addEventListener('click', function(){
+    if(!pending || isSubmitting) return;
+    isSubmitting = true;
+    modalConfirm.disabled = true;
+    modalCancel.disabled = true;
+    var originalText = modalConfirm.textContent;
+    modalConfirm.textContent = "處理中…";
+    modalError.textContent = "";
+
+    var current = pending;
+
+    if(!WEBAPP_URL || WEBAPP_URL.indexOf("http") !== 0){
+      modalError.textContent = "尚未設定 Apps Script 網址，無法寫入試算表";
+      modalConfirm.disabled = false;
+      modalCancel.disabled = false;
+      modalConfirm.textContent = originalText;
+      isSubmitting = false;
+      return;
+    }
+
+    fetch(WEBAPP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // 避免CORS預檢請求
+      body: JSON.stringify({ date: current.dateKey, time: current.time, action: current.action })
+    })
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        if(!data || !data.ok){
+          throw new Error((data && data.message) || "寫入失敗");
+        }
+        // 樂觀更新本地資料，畫面立即反映
+        var dayBooked = bookedMap[current.dateKey] || {};
+        if(current.action === "lock"){
+          dayBooked[current.time] = true;
+        } else {
+          delete dayBooked[current.time];
+        }
+        bookedMap[current.dateKey] = dayBooked;
+        render();
+        closeModal();
+        // 背景重新抓一次試算表，確保跟雲端資料一致
+        setTimeout(loadAvailability, 1200);
+      })
+      .catch(function(err){
+        modalError.textContent = "操作失敗：" + err.message + "，請重試";
+        modalConfirm.disabled = false;
+        modalCancel.disabled = false;
+        modalConfirm.textContent = originalText;
+        isSubmitting = false;
+      });
+  });
 
   // 點擊右上角狀態區塊：換下一個顏色 + 立即重新整理資料
   statusTrigger.addEventListener('click', function(){
