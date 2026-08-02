@@ -251,11 +251,15 @@
   var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
                 (SHEET_NAME ? "&sheet=" + encodeURIComponent(SHEET_NAME) : "");
 
+  // 每次更新這個檔案，把版本號改成新的（例如當天日期），
+  // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
+  var BUILD_VERSION = "2026-08-02-02";
+
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
 
   // 部署好 Apps Script 網頁應用程式後，把網址貼在這裡（結尾是 /exec）
-  var WEBAPP_URL = "請貼上你的Apps_Script網頁應用程式網址";
+  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyd5F3Ev1FjQSa6kGC6xrVEPk37ecpssmoce4QjSV7l0NTbzmlBoPswMOb3FhsMXsY-/exec";
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
   var pending = null; // { dateKey, time, action, label }
@@ -604,6 +608,36 @@
   // 每 30 秒重新檢查「今天」是否有時段過期；每 60 秒重新抓一次試算表資料
   setInterval(render, 30000);
   setInterval(loadAvailability, 60000);
+
+  // ---- 自動版本偵測：避免瀏覽器/主畫面PWA卡住舊版內容 ----
+  // 原理：定期用不快取的方式重新抓自己的原始碼，比對裡面的版本號，
+  // 發現不一樣就強制導向一個帶新版本號的網址，逼瀏覽器重新載入最新內容
+  var isCheckingUpdate = false;
+  function checkForUpdate(){
+    if(isCheckingUpdate) return;
+    isCheckingUpdate = true;
+    fetch(location.pathname + '?_vc=' + Date.now(), { cache: 'no-store' })
+      .then(function(res){
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(html){
+        var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
+        if(m && m[1] && m[1] !== BUILD_VERSION){
+          location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
+        }
+      })
+      .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
+      .finally(function(){ isCheckingUpdate = false; });
+  }
+  checkForUpdate();
+  setInterval(checkForUpdate, 5 * 60 * 1000); // 每 5 分鐘背景檢查一次
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') checkForUpdate();
+  });
+  window.addEventListener('pageshow', function(e){
+    if(e.persisted) checkForUpdate();
+  });
 
 })();
 </script>
