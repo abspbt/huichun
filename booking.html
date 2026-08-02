@@ -8,21 +8,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#1D2D44;
-    --card-bg:#243A5A;
-    --card-border:rgba(141,160,183,0.20);
-    --white:#E6E9EE;
-    --gray:#8DA0B7;
-    --gray-dim:rgba(141,160,183,0.42);
-    --gold:#D4BA8A;
-    --gold-bg:rgba(212,186,138,0.10);
-    --gold-border:rgba(212,186,138,0.45);
-    --blue:#AEBFD1;
-    --blue-bg:rgba(141,160,183,0.10);
-    --blue-border:rgba(141,160,183,0.55);
-    --green:#8FBFA0;
-    --red:#C97B6E;
-    --tag-text:#1D2D44;
+    /* 固定配色：岩石灰 */
+    --bg:#2A2B2C;
+    --card-bg:#363839;
+    --card-border:rgba(170,172,175,0.22);
+    --white:#E7E8E9;
+    --gray:#A8ACAF;
+    --gray-dim:rgba(170,172,175,0.42);
+    --gold:#C7B98E;
+    --gold-bg:rgba(199,185,142,0.10);
+    --gold-border:rgba(199,185,142,0.45);
+    --blue:#B7BEC4;
+    --blue-bg:rgba(170,172,175,0.10);
+    --blue-border:rgba(170,172,175,0.55);
+    --green:#93B79E;
+    --red:#C4837A;
+    --tag-text:#2A2B2C;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
@@ -60,9 +61,56 @@
   }
   .topbar .right:active{background:rgba(255,255,255,0.06);opacity:0.7;}
   .topbar .right .time{color:var(--white);font-weight:600;}
+  .topbar .right .refresh-icon{width:12px;height:12px;flex-shrink:0;transition:transform .4s ease;}
+  .topbar .right.spinning .refresh-icon{transform:rotate(360deg);}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--gray-dim);flex-shrink:0;}
   .dot.live{background:var(--green);box-shadow:0 0 6px rgba(62,217,138,0.7);}
   .dot.err{background:var(--red);}
+
+  .pinned-notice{
+    flex:0 0 auto;
+    display:flex;align-items:baseline;justify-content:center;gap:5px;flex-wrap:wrap;
+    background:var(--gold-bg);
+    border-top:1px solid var(--gold-border);
+    border-bottom:1px solid var(--gold-border);
+    padding:clamp(6px,1.3vh,9px) clamp(14px,3.5vw,22px);
+    font-size:clamp(9.5px,1.7vh,11.5px);
+    color:var(--gray);
+    text-align:center;
+  }
+  .pinned-notice-text b{color:var(--gold);}
+  .pinned-notice-phone{color:var(--gold);font-weight:700;text-decoration:none;}
+
+  .today-wrap.locked .slot{pointer-events:none;opacity:.55;}
+
+  /* ===== 引導式步驟容器 ===== */
+  .step-container{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+  .step{display:none;flex-direction:column;min-height:0;flex:1 1 auto;}
+  .step.active{display:flex;}
+
+  .step-people{align-items:center;justify-content:center;gap:18px;padding:24px;}
+  .step-title{font-size:clamp(14px,2.4vh,18px);font-weight:700;color:var(--white);text-align:center;margin:0;}
+  .step-subtitle{font-size:clamp(10px,1.8vh,12.5px);color:var(--gray);text-align:center;margin:-8px 0 4px;}
+  .people-buttons{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;}
+  .people-btn{
+    padding:16px;border-radius:14px;
+    border:1.4px solid var(--blue-border);background:var(--blue-bg);color:var(--blue);
+    font-size:clamp(14px,2.4vh,17px);font-weight:700;
+    cursor:pointer;-webkit-user-select:none;user-select:none;
+    transition:transform .12s ease, opacity .12s ease;
+    font-family:inherit;
+  }
+  .people-btn:active{transform:scale(.97);opacity:.85;}
+  .people-btn.emphasis{border-color:var(--gold-border);background:var(--gold-bg);color:var(--gold);}
+
+  .step-slots{overflow:hidden;}
+  .slots-hint{
+    flex:0 0 auto;
+    padding:clamp(8px,1.6vh,12px) clamp(14px,3.5vw,22px) 0;
+    font-size:clamp(10px,1.8vh,12.5px);color:var(--gray);line-height:1.5;text-align:center;
+  }
+  .slots-hint b{color:var(--gold);font-weight:700;}
+  .slots-hint.warn{color:var(--red);}
 
   .today-wrap{
     flex:0 0 auto;
@@ -92,7 +140,7 @@
   }
   .day-card.today{
     background:linear-gradient(180deg, var(--gold-bg), var(--card-bg) 70%);
-    border-color:rgba(240,185,74,0.25);
+    border-color:rgba(199,185,142,0.35);
   }
   .day-card.today::before{
     content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--gold);
@@ -170,11 +218,7 @@
   .legend .sq.off{border-color:rgba(255,255,255,0.16);background:rgba(255,255,255,0.02);}
   .legend .dot-legend{width:9px;height:9px;border-radius:50%;background:var(--gold);}
 
-  .contact-section{
-    flex:0 0 auto;
-    border-top:1px solid var(--card-border);
-    padding:clamp(8px,1.6vh,12px) clamp(14px,3.5vw,22px) calc(clamp(8px,1.6vh,12px) + env(safe-area-inset-bottom,0));
-  }
+  .step-confirm{padding:clamp(14px,3vh,24px) clamp(14px,3.5vw,22px);gap:0;justify-content:center;}
   .contact-hint{
     text-align:center;
     font-size:clamp(9.5px,1.65vh,11.5px);
@@ -218,6 +262,31 @@
   }
   .contact-btn .label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
+  /* ===== 底部導覽（上一步 / 下一步）===== */
+  .wizard-nav{
+    flex:0 0 auto;
+    display:flex;gap:10px;
+    padding:clamp(8px,1.6vh,12px) clamp(14px,3.5vw,22px) calc(clamp(8px,1.6vh,12px) + env(safe-area-inset-bottom,0));
+    border-top:1px solid var(--card-border);
+  }
+  .wizard-nav.hidden{display:none;}
+  .nav-btn{
+    flex:1 1 0;
+    padding:clamp(10px,1.8vh,13px) 6px;
+    border-radius:12px;
+    font-size:clamp(12px,2.1vh,14px);
+    font-weight:700;
+    border:none;cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+    transition:transform .12s ease, opacity .12s ease;
+    font-family:inherit;
+  }
+  .nav-btn:active{transform:scale(.96);}
+  .nav-btn.prev{background:rgba(255,255,255,.08);color:var(--white);}
+  .nav-btn.next{background:var(--gold);color:var(--tag-text);}
+  .nav-btn[disabled]{opacity:.35;pointer-events:none;}
+  .nav-btn.hidden{display:none;}
+
   .modal-overlay{
     position:absolute;inset:0;
     background:rgba(0,0,0,0.55);
@@ -254,6 +323,7 @@
     cursor:pointer;
     -webkit-user-select:none;user-select:none;
     transition:transform 0.12s ease, opacity 0.12s ease;
+    font-family:inherit;
   }
   .modal-btn:active{transform:scale(0.96);opacity:0.88;}
   .modal-btn.confirm{background:#06C755;color:#fff;}
@@ -264,7 +334,7 @@
     .days-list{padding:0 10px 8px;gap:5px;}
     .day-card{padding:8px;gap:6px;}
     .date-block{width:56px;}
-    .contact-section{padding:8px 10px calc(8px + env(safe-area-inset-bottom,0));}
+    .step-confirm{padding:8px 10px;}
   }
 </style>
 </head>
@@ -276,38 +346,69 @@
       <span class="title">回春視務所 證件照 預約時段</span>
       <span class="subtitle">未來15天</span>
     </div>
-    <div class="right" id="statusTrigger" title="點一下重新整理並換色">
+    <div class="right" id="statusTrigger" title="點一下重新整理">
       <span class="dot" id="statusDot"></span>
       <span id="statusText">讀取中</span>
       <span class="time" id="statusTime"></span>
     </div>
   </div>
 
-  <div class="today-wrap" id="todayWrap"></div>
+  <div class="today-wrap locked" id="todayWrap"></div>
 
-  <div class="legend">
-    <span class="item"><span class="sq"></span>可預約</span>
-    <span class="item"><span class="sq off"></span>不可預約</span>
-    <span class="item"><span class="dot-legend"></span>今天</span>
+  <div class="pinned-notice">
+    <span class="pinned-notice-text">預約<b>今天</b>的檔期請直接電洽</span>
+    <a class="pinned-notice-phone" href="tel:0971080406">0971-080-406</a>
   </div>
 
-  <div class="contact-section">
-    <p class="contact-hint">請參考預約檔期後，打開對話並提出預約需求<br>一位拍攝需要一個時段，兩位拍攝需要兩個時段<br><a class="contact-hint-phone" href="tel:0971080406">預約今天的檔期請直接電洽 0971-080-406</a></p>
-    <p class="selection-status" id="selectionStatus">請先點選時段</p>
-    <div class="contact-buttons">
-      <a class="contact-btn line" id="lineBtn" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-        <span class="label">前往 LINE 送出預約</span>
-      </a>
-      <a class="contact-btn ig" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
-        <span class="label">追蹤 Instagram</span>
-      </a>
+  <div class="step-container" id="stepContainer">
+
+    <!-- Step 1：人數選擇 -->
+    <div class="step step-people active" id="stepPeople">
+      <p class="step-title">請選擇拍攝人數</p>
+      <p class="step-subtitle">選擇後即可查看可預約時段</p>
+      <div class="people-buttons">
+        <button type="button" class="people-btn" data-people="1">一位</button>
+        <button type="button" class="people-btn" data-people="2">兩位</button>
+        <button type="button" class="people-btn" data-people="3plus">兩位以上</button>
+      </div>
     </div>
+
+    <!-- Step 2：時段選擇 -->
+    <div class="step step-slots" id="stepSlots">
+      <p class="slots-hint" id="slotsHint"></p>
+      <div class="legend">
+        <span class="item"><span class="sq"></span>可預約</span>
+        <span class="item"><span class="sq off"></span>不可預約</span>
+        <span class="item"><span class="dot-legend"></span>今天</span>
+      </div>
+      <div class="days-list" id="daysList"></div>
+    </div>
+
+    <!-- Step 3：確認並送出 -->
+    <div class="step step-confirm" id="stepConfirm">
+      <p class="contact-hint">預約時段已經選定，打開對話並送出預約需求</p>
+      <p class="selection-status" id="selectionStatus">請先點選時段</p>
+      <div class="contact-buttons">
+        <a class="contact-btn line" id="lineBtn" href="https://line.me/R/ti/p/%40128mtxwg" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+          <span class="label">前往官方 LINE 對話</span>
+        </a>
+        <a class="contact-btn ig" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
+          <span class="label">追蹤 Instagram</span>
+        </a>
+      </div>
+    </div>
+
   </div>
 
-  <div class="days-list" id="daysList"></div>
+  <!-- 底部導覽列（上一步 / 下一步）-->
+  <div class="wizard-nav hidden" id="wizardNav">
+    <button type="button" class="nav-btn prev" id="prevBtn">上一步</button>
+    <button type="button" class="nav-btn next" id="nextBtn" disabled>下一步</button>
+  </div>
 
+  <!-- 兩位以上 modal -->
   <div class="modal-overlay" id="limitModal">
     <div class="modal-box">
       <p>預約三位以上請直接洽詢老闆</p>
@@ -318,13 +419,24 @@
     </div>
   </div>
 
+  <!-- 不相鄰時段確認 modal -->
+  <div class="modal-overlay" id="adjacentModal">
+    <div class="modal-box">
+      <p>您選擇的兩個時段不相鄰，是否為兩位分開時間拍攝？</p>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn confirm" id="adjacentConfirmBtn">是，分開拍攝</button>
+        <button type="button" class="modal-btn cancel" id="adjacentCancelBtn">重新選擇</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 (function(){
   "use strict";
 
-  // ====== 設定區（與預約頁共用同一份資料來源）======
+  // ====== 設定區 ======
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
   var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
@@ -332,6 +444,7 @@
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
+  var ADJACENT_MINUTES = 60; // 兩個時段時間差在此範圍內視為「相鄰」
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
 
@@ -346,9 +459,20 @@
   var limitModal = document.getElementById('limitModal');
   var modalLineBtn = document.getElementById('modalLineBtn');
   var modalCancelBtn = document.getElementById('modalCancelBtn');
+  var adjacentModal = document.getElementById('adjacentModal');
+  var adjacentConfirmBtn = document.getElementById('adjacentConfirmBtn');
+  var adjacentCancelBtn = document.getElementById('adjacentCancelBtn');
+  var slotsHint = document.getElementById('slotsHint');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var wizardNav = document.getElementById('wizardNav');
+  var stepPeople = document.getElementById('stepPeople');
+  var stepSlots = document.getElementById('stepSlots');
+  var stepConfirm = document.getElementById('stepConfirm');
 
-  var MAX_SELECTABLE = 2;
   var selectedSlots = []; // [{ sKey, dKey, time, label }]
+  var peopleCount = 0;    // 1 或 2
+  var wizardStep = 'people'; // 'people' | 'slots' | 'confirm'
 
   function slotKey(dKey, time){ return dKey + '_' + time; }
   function formatSelectionLabel(dKey, time){
@@ -368,7 +492,7 @@
       selectedSlots.forEach(function(s, i){
         lines.push('時段' + (i+1) + '：' + s.label);
       });
-      lines.push('人數：' + selectedSlots.length);
+      lines.push('人數：' + (peopleCount || selectedSlots.length));
     } else {
       lines.push('日期：');
       lines.push('時段：');
@@ -384,25 +508,112 @@
     }
     lineBtn.href = buildLineUrl();
   }
+
+  // ====== 引導式步驟（人數 -> 時段 -> 確認）======
+  function updateSlotsHint(){
+    if(peopleCount === 1){
+      slotsHint.innerHTML = '請選擇 <b>1 個</b>拍攝時段';
+    } else if(peopleCount === 2){
+      slotsHint.innerHTML = '請選擇 <b>2 個</b>時段。若兩位要一起拍攝，請選相鄰時段（如 10:00 與 11:00，或 13:30 與 14:30）；若兩位分開時間拍攝，選任意兩個時段即可。';
+    }
+    slotsHint.classList.remove('warn');
+  }
+  function updateNextButtonState(){
+    if(wizardStep === 'slots'){
+      nextBtn.disabled = selectedSlots.length !== peopleCount;
+    }
+  }
+  function goToStep(step){
+    wizardStep = step;
+    stepPeople.classList.toggle('active', step === 'people');
+    stepSlots.classList.toggle('active', step === 'slots');
+    stepConfirm.classList.toggle('active', step === 'confirm');
+
+    if(step === 'people'){
+      wizardNav.classList.add('hidden');
+    } else {
+      wizardNav.classList.remove('hidden');
+      prevBtn.classList.remove('hidden');
+      if(step === 'slots'){
+        nextBtn.classList.remove('hidden');
+        updateNextButtonState();
+      } else { // confirm
+        nextBtn.classList.add('hidden');
+      }
+    }
+  }
+  function startWithPeople(count){
+    peopleCount = count;
+    selectedSlots = [];
+    updateSelectionUI();
+    updateSlotsHint();
+    render();
+    goToStep('slots');
+  }
+
+  document.querySelectorAll('.people-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var val = btn.getAttribute('data-people');
+      if(val === '3plus'){
+        modalLineBtn.href = buildLineUrl();
+        limitModal.classList.add('show');
+        return;
+      }
+      startWithPeople(parseInt(val, 10));
+    });
+  });
+
+  prevBtn.addEventListener('click', function(){
+    if(wizardStep === 'slots'){
+      goToStep('people');
+    } else if(wizardStep === 'confirm'){
+      goToStep('slots');
+    }
+  });
+  nextBtn.addEventListener('click', function(){
+    if(wizardStep === 'slots' && selectedSlots.length === peopleCount){
+      goToStep('confirm');
+    }
+  });
+
+  function isAdjacentPair(a, b){
+    if(a.dKey !== b.dKey) return false;
+    return Math.abs(timeToMinutes(a.time) - timeToMinutes(b.time)) <= ADJACENT_MINUTES;
+  }
+
   function toggleSlot(dKey, time){
     var sKey = slotKey(dKey, time);
     for(var i=0;i<selectedSlots.length;i++){
       if(selectedSlots[i].sKey === sKey){
         selectedSlots.splice(i,1);
         updateSelectionUI();
+        updateNextButtonState();
         render();
         return;
       }
     }
-    if(selectedSlots.length >= MAX_SELECTABLE){
-      modalLineBtn.href = buildLineUrl();
-      limitModal.classList.add('show');
-      return;
-    }
+    if(selectedSlots.length >= peopleCount) return; // 已達上限，忽略
+
     selectedSlots.push({ sKey:sKey, dKey:dKey, time:time, label:formatSelectionLabel(dKey, time) });
     updateSelectionUI();
+    updateNextButtonState();
     render();
+
+    if(peopleCount === 2 && selectedSlots.length === 2 && !isAdjacentPair(selectedSlots[0], selectedSlots[1])){
+      adjacentModal.classList.add('show');
+    }
   }
+  adjacentConfirmBtn.addEventListener('click', function(){
+    adjacentModal.classList.remove('show');
+  });
+  adjacentCancelBtn.addEventListener('click', function(){
+    selectedSlots.pop();
+    updateSelectionUI();
+    updateNextButtonState();
+    render();
+    adjacentModal.classList.remove('show');
+  });
+
   function cleanupSelections(){
     var tKey = todayKey();
     var changed = false;
@@ -414,7 +625,16 @@
       if(!valid) changed = true;
       return valid;
     });
-    if(changed) updateSelectionUI();
+    if(changed){
+      updateSelectionUI();
+      updateNextButtonState();
+      if(wizardStep === 'confirm'){
+        // 已選時段在確認畫面時被別人訂走，退回選時段畫面並提示
+        goToStep('slots');
+        slotsHint.innerHTML = '⚠ 部分時段已被預約，請重新選擇';
+        slotsHint.classList.add('warn');
+      }
+    }
   }
   function hideLimitModal(){
     limitModal.classList.remove('show');
@@ -435,75 +655,6 @@
   todayWrap.addEventListener('click', handleSlotClick);
 
   updateSelectionUI();
-
-  // ====== 七色莫蘭迪主題（深底淺字，維持一致風格）======
-  var THEMES = [
-    { name:"深藍", vars:{
-      bg:"#1D2D44", "card-bg":"#243A5A", "card-border":"rgba(141,160,183,0.20)",
-      white:"#E6E9EE", gray:"#8DA0B7", "gray-dim":"rgba(141,160,183,0.42)",
-      gold:"#D4BA8A", "gold-bg":"rgba(212,186,138,0.10)", "gold-border":"rgba(212,186,138,0.45)",
-      blue:"#AEBFD1", "blue-bg":"rgba(141,160,183,0.10)", "blue-border":"rgba(141,160,183,0.55)",
-      green:"#8FBFA0", red:"#C97B6E", "tag-text":"#1D2D44"
-    }},
-    { name:"桃紅", vars:{
-      bg:"#3A2B2C", "card-bg":"#4A3638", "card-border":"rgba(199,151,140,0.22)",
-      white:"#F0E2DE", gray:"#C79E93", "gray-dim":"rgba(199,151,140,0.40)",
-      gold:"#E0A467", "gold-bg":"rgba(224,164,103,0.12)", "gold-border":"rgba(224,164,103,0.45)",
-      blue:"#DDB2A3", "blue-bg":"rgba(221,178,163,0.12)", "blue-border":"rgba(221,178,163,0.55)",
-      green:"#93BE99", red:"#D2867A", "tag-text":"#3A2B2C"
-    }},
-    { name:"深綠", vars:{
-      bg:"#212E28", "card-bg":"#2B3B33", "card-border":"rgba(150,178,160,0.20)",
-      white:"#E4EBE5", gray:"#9AB6A4", "gray-dim":"rgba(150,178,160,0.42)",
-      gold:"#CDB981", "gold-bg":"rgba(205,185,129,0.10)", "gold-border":"rgba(205,185,129,0.45)",
-      blue:"#A9C4B0", "blue-bg":"rgba(150,178,160,0.10)", "blue-border":"rgba(150,178,160,0.55)",
-      green:"#8FBF9E", red:"#D48A7D", "tag-text":"#212E28"
-    }},
-    { name:"咖啡", vars:{
-      bg:"#2E2620", "card-bg":"#3B3128", "card-border":"rgba(184,158,130,0.22)",
-      white:"#EDE3D6", gray:"#B79E85", "gray-dim":"rgba(184,158,130,0.40)",
-      gold:"#D0A25C", "gold-bg":"rgba(208,162,92,0.12)", "gold-border":"rgba(208,162,92,0.45)",
-      blue:"#C9AD8D", "blue-bg":"rgba(201,173,141,0.12)", "blue-border":"rgba(201,173,141,0.55)",
-      green:"#9BB98A", red:"#C97F6A", "tag-text":"#2E2620"
-    }},
-    { name:"米白", vars:{
-      bg:"#F0EBE1", "card-bg":"#F8F6F0", "card-border":"rgba(120,110,95,0.18)",
-      white:"#3A3630", gray:"#8B8375", "gray-dim":"rgba(139,131,117,0.45)",
-      gold:"#A9865C", "gold-bg":"rgba(169,134,92,0.14)", "gold-border":"rgba(169,134,92,0.45)",
-      blue:"#7C8D86", "blue-bg":"rgba(124,141,134,0.14)", "blue-border":"rgba(124,141,134,0.50)",
-      green:"#6E8F72", red:"#B5695A", "tag-text":"#2E2A24"
-    }},
-    { name:"粉紅", vars:{
-      bg:"#332830", "card-bg":"#413441", "card-border":"rgba(196,150,175,0.22)",
-      white:"#F0E1EA", gray:"#C79AB4", "gray-dim":"rgba(196,150,175,0.40)",
-      gold:"#D9A48F", "gold-bg":"rgba(217,164,143,0.12)", "gold-border":"rgba(217,164,143,0.45)",
-      blue:"#D8AFC4", "blue-bg":"rgba(216,175,196,0.12)", "blue-border":"rgba(216,175,196,0.55)",
-      green:"#96BFA3", red:"#CB7E8C", "tag-text":"#332830"
-    }},
-    { name:"岩石灰", vars:{
-      bg:"#2A2B2C", "card-bg":"#363839", "card-border":"rgba(170,172,175,0.22)",
-      white:"#E7E8E9", gray:"#A8ACAF", "gray-dim":"rgba(170,172,175,0.42)",
-      gold:"#C7B98E", "gold-bg":"rgba(199,185,142,0.10)", "gold-border":"rgba(199,185,142,0.45)",
-      blue:"#B7BEC4", "blue-bg":"rgba(170,172,175,0.10)", "blue-border":"rgba(170,172,175,0.55)",
-      green:"#93B79E", red:"#C4837A", "tag-text":"#2A2B2C"
-    }}
-  ];
-
-  function applyTheme(idx){
-    var t = THEMES[(idx % THEMES.length + THEMES.length) % THEMES.length];
-    var root = document.documentElement.style;
-    Object.keys(t.vars).forEach(function(k){
-      root.setProperty('--' + k, t.vars[k]);
-    });
-  }
-
-  function daysSinceEpoch(d){
-    return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
-  }
-
-  var currentThemeIndex = daysSinceEpoch(new Date()) % THEMES.length;
-  if(currentThemeIndex < 0) currentThemeIndex += THEMES.length;
-  applyTheme(currentThemeIndex);
 
   var weekdayNames = ["日","一","二","三","四","五","六"];
 
@@ -557,11 +708,17 @@
     return v !== null && v !== undefined && v !== "";
   }
 
+  var isLoading = false;
   function loadAvailability(){
+    if(isLoading) return;
+    isLoading = true;
+    statusTrigger.classList.add('spinning');
     statusText.textContent = "讀取中";
     statusTime.textContent = "";
     statusDot.className = "dot";
-    fetch(gvizUrl)
+    // 加時間戳並關閉快取，避免背景閒置後拿到舊資料
+    var url = gvizUrl + (gvizUrl.indexOf('?') > -1 ? '&' : '?') + '_ts=' + Date.now();
+    fetch(url, { cache: 'no-store' })
       .then(function(res){
         if(!res.ok) throw new Error("HTTP " + res.status);
         return res.text();
@@ -597,6 +754,10 @@
         statusText.textContent = "讀取失敗";
         statusTime.textContent = nowHHMM();
         render();
+      })
+      .finally(function(){
+        isLoading = false;
+        statusTrigger.classList.remove('spinning');
       });
   }
 
@@ -670,20 +831,27 @@
     cleanupSelections();
   }
 
-  // 點擊右上角狀態區塊：換下一個顏色 + 立即重新整理資料
+  // 點擊右上角狀態區塊：手動重新整理
   statusTrigger.addEventListener('click', function(){
-    currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
-    applyTheme(currentThemeIndex);
     loadAvailability();
   });
 
   // 初始渲染 + 讀取資料
+  goToStep('people');
   render();
   loadAvailability();
 
   // 每 30 秒重新檢查「今天」是否有時段過期；每 60 秒重新抓一次試算表資料
   setInterval(render, 30000);
   setInterval(loadAvailability, 60000);
+
+  // 分頁從背景切回前景（或 bfcache 還原）時，立即重新整理，避免顯示過期資料
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') loadAvailability();
+  });
+  window.addEventListener('pageshow', function(e){
+    if(e.persisted) loadAvailability();
+  });
 
 })();
 </script>
