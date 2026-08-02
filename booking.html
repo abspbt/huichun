@@ -512,9 +512,9 @@
   // ====== 引導式步驟（人數 -> 時段 -> 確認）======
   function updateSlotsHint(){
     if(peopleCount === 1){
-      slotsHint.innerHTML = '請選擇 <b>1 個</b> 拍攝時段';
+      slotsHint.innerHTML = '請選擇 <b>1 個 </b>時段';
     } else if(peopleCount === 2){
-      slotsHint.innerHTML = '請選擇 <b>2 個</b> 時段。<br>若兩位要一起拍攝，請選相鄰時段<br>（例如 10:00 與 11:00，或 13:30 與 14:30）<br>若兩位分開時間拍攝，選任意兩個時段即可。';
+      slotsHint.innerHTML = '請選擇 <b>2 個 </b>時段。<br>若兩位要一起拍攝，請選相鄰時段<br>（例如 10:00 與 11:00，或 13:30 與 14:30）<br>若兩位分開時間拍攝，選任意兩個時段即可。';
     }
     slotsHint.classList.remove('warn');
   }
