@@ -26,3 +26,7 @@ There's no local dev server, linter, or test command — edit the HTML files dir
 - A Google Apps Script Web App (`WEBAPP_URL` in `booking-board.html`, ending in `/exec`) handles writes (booking/cancelling slots) from the admin board. Its source (`Code.gs`) is not part of this repo.
 - Both pages hardcode `SHEET_ID`, `SHEET_NAME`, `SLOT_TIMES`, and `DAYS_TO_SHOW` near the top of their `<script>` block. **These must stay in sync across `booking.html`, `booking-board.html`, and the external `Code.gs`** — if you change the sheet, add/remove time slots, or change how many days are shown, update all relevant files (the two in this repo, and remind the user to update `Code.gs`).
 - `booking-board.html` has a `BUILD_VERSION` string plus a `checkForUpdate` polling mechanism that force-reloads open admin tabs when the version changes — bump this string whenever you edit `booking-board.html`. `booking.html` deliberately does not have this mechanism (customer-facing page doesn't need it).
+
+## Replying to the user
+
+The user has no programming background. After finishing a change or a debugging task, reply in one or two sentences: what was done, the result, and whether the user needs to do anything (e.g. refresh the page to confirm). Don't explain technical details, code logic, or root-cause analysis. Exception: if the situation requires the user to make a decision (e.g. permission setup, missing information needed to proceed), explain that situation clearly.
