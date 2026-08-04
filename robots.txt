@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /booking-board.html
+
+Sitemap: https://hui-chun.com/sitemap.xml
