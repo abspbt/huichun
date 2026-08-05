@@ -64,13 +64,21 @@
 
   /* self-hosted subset fonts (see /fonts/OFL.txt for license).
      Latin/digits render in Work Sans; Noto Sans TC covers Chinese glyphs
-     Work Sans doesn't have. Both families are only registered at 400/700
-     so the two can share the same font-weight value per rule. */
+     Work Sans doesn't have. Work Sans/Noto Sans TC share weight 400/700
+     so the two can share the same font-weight value per rule; Work Sans
+     also has a 500 face used only by .slot .t (digits, never Chinese),
+     so it doesn't need a matching Noto Sans TC 500. */
   @font-face{
     font-family:'Work Sans';
     font-weight:400;
     font-display:swap;
     src:url('/fonts/work-sans-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Work Sans';
+    font-weight:500;
+    font-display:swap;
+    src:url('/fonts/work-sans-500.woff2') format('woff2');
   }
   @font-face{
     font-family:'Work Sans';
@@ -283,6 +291,7 @@
   }
   .slot:not(.blocked):not(.selected) .t{
     font-size:clamp(12px,2.6vh,15px);
+    font-weight:500;
   }
   .slot.blocked{
     background:rgba(255,255,255,0.02);
