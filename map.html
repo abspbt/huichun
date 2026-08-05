@@ -15,9 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="回春視務所｜交通指引">
 <meta name="twitter:description" content="回春視務所交通指引，地址：高雄市前金區中山二路533號2樓之4，鄰近高雄捷運中央公園站2號出口，提供步行路線與停車場地圖。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/noto-serif-tc-900.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -67,6 +65,33 @@
     --radius:18px;
     --max:640px;
   }
+
+  /* self-hosted subset fonts (see /fonts/OFL.txt for license) */
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:900;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-900.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/space-grotesk-700.woff2') format('woff2');
+  }
+
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
