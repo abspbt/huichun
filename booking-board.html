@@ -160,7 +160,7 @@
     );
   }
   .slot:not(.blocked) .t{
-    font-size:clamp(10px,2vh,12.5px);
+    font-size:clamp(12px,2.6vh,15px);
   }
   .slot.blocked{
     background:rgba(255,255,255,0.02);
@@ -298,7 +298,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
-  var BUILD_VERSION = "2026-08-05-01";
+  var BUILD_VERSION = "2026-08-05-02";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
