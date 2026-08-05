@@ -108,7 +108,7 @@
   .crop-frame .cm-bl{ bottom:-10px; left:-10px; border-width: 0 0 2px 2px; }
 
   /* ---------- hero ---------- */
-  header{ padding: 56px 0 20px; text-align:center; opacity:0; animation: rise 0.7s ease-out 0.1s forwards; }
+  header{ padding: 56px 0 20px; text-align:center; opacity:0.01; animation: rise 0.7s ease-out 0.1s forwards; }
 
   .eyebrow{
     font-family:'Space Grotesk', sans-serif;
@@ -169,7 +169,7 @@
   .portrait-stage{
     margin: 36px auto 8px;
     width: 168px;
-    opacity:0; animation: rise 0.7s ease-out 0.35s forwards;
+    opacity:0.01; animation: rise 0.7s ease-out 0.35s forwards;
   }
   .portrait-box{
     aspect-ratio: 3.5/4.5;
@@ -191,13 +191,14 @@
   .flash{
     position: fixed; inset:0; background: var(--paper);
     z-index: 999; pointer-events:none;
-    animation: flash-out 0.9s ease-out forwards;
+    opacity: 0;
+    animation: flash-out 0.9s ease-out backwards;
   }
   @keyframes flash-out{ 0%{opacity:0.9;} 100%{opacity:0;} }
-  @keyframes rise{ from{ opacity:0; transform: translateY(14px);} to{ opacity:1; transform: translateY(0);} }
+  @keyframes rise{ from{ opacity:0.01; transform: translateY(14px);} to{ opacity:1; transform: translateY(0);} }
 
   /* ---------- CTA buttons ---------- */
-  .cta-group{ margin-top: 34px; display:flex; flex-direction:column; gap: 12px; opacity:0; animation: rise 0.7s ease-out 0.5s forwards; }
+  .cta-group{ margin-top: 34px; display:flex; flex-direction:column; gap: 12px; opacity:0.01; animation: rise 0.7s ease-out 0.5s forwards; }
 
   .btn{
     display:flex; align-items:center; justify-content:center; gap: clamp(6px, 2vw, 10px);
@@ -309,6 +310,10 @@
 
   @media (prefers-reduced-motion: reduce){
     *{ animation: none !important; transition: none !important; }
+    header,
+    .portrait-stage,
+    .cta-group{ opacity: 1 !important; transform: none !important; }
+    .flash{ display: none !important; }
   }
 </style>
 </head>
