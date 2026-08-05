@@ -15,9 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="證件照，該穿什麼？｜穿搭建議">
 <meta name="twitter:description" content="證件照該穿什麼才好看？整理證件照規範、膚色配色技巧與常見錯誤示範，拍照前先看這篇準沒錯。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -66,6 +64,26 @@
     --gold-soft:#F1E8DC;
     --radius:16px;
     --max:760px;
+  }
+
+  /* self-hosted subset fonts (see /fonts/OFL.txt for license) */
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
   }
 
   *{box-sizing:border-box;}
@@ -225,7 +243,7 @@
     margin-top:2px;
   }
   .notice p{margin:0; color:var(--ink-soft); font-size:15px;}
-  .notice strong{color:var(--ink); font-weight:600;}
+  .notice strong{color:var(--ink); font-weight:700;}
 
   /* ---------- SECTION HEADS ---------- */
   section{padding:8px 0 56px;}
@@ -252,10 +270,10 @@
     font-family:"Noto Serif TC",serif;
     font-size:22px;
     color:var(--navy);
-    font-weight:600;
+    font-weight:700;
     padding-top:2px;
   }
-  .tip .body strong{display:block; font-size:16px; margin-bottom:4px; font-weight:600;}
+  .tip .body strong{display:block; font-size:16px; margin-bottom:4px; font-weight:700;}
   .tip .body span{color:var(--ink-soft); font-size:14.5px;}
   .tip.highlight{background:var(--gold-soft); border-radius:var(--radius); border-top-color:transparent;}
   .tip.highlight + .tip{border-top-color:transparent;}
@@ -273,7 +291,7 @@
     border-radius:var(--radius);
     padding:22px;
   }
-  .cg-card h3{margin:0 0 6px; font-size:15px; font-weight:600;}
+  .cg-card h3{margin:0 0 6px; font-size:15px; font-weight:700;}
   .cg-card p{margin:0 0 14px; font-size:13.5px; color:var(--ink-soft);}
   .swatches{display:flex; gap:10px; flex-wrap:wrap;}
   .swatch{
@@ -292,7 +310,7 @@
     border-radius:var(--radius);
     padding:20px 22px;
   }
-  .avoid-row h3{margin:0 0 12px; font-size:15px; font-weight:600;}
+  .avoid-row h3{margin:0 0 12px; font-size:15px; font-weight:700;}
   .avoid-chips{display:flex; gap:10px; flex-wrap:wrap;}
   .avoid-chip{
     display:flex; align-items:center; gap:8px;
@@ -408,6 +426,10 @@
     font-size:13px;
     color:var(--ink-soft);
     letter-spacing:.02em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .tip{ opacity:1; transform:none; transition:none; }
   }
 </style>
 </head>
