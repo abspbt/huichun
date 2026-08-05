@@ -118,7 +118,7 @@
   .date-block .weekday-row{
     display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:3px;
   }
-  .date-block .weekday-text{font-size:clamp(9px,1.75vh,11px);color:var(--gray);font-weight:500;white-space:nowrap;}
+  .date-block .weekday-text{font-size:clamp(9px,1.75vh,11px);color:var(--gray);font-weight:400;white-space:nowrap;}
   .date-block .today-tag{
     font-size:clamp(7.5px,1.4vh,9px);color:var(--tag-text);background:var(--gold);
     padding:1px 5px;border-radius:999px;font-weight:700;white-space:nowrap;
@@ -137,20 +137,36 @@
     border:1.3px solid var(--blue-border);
     background:var(--blue-bg);
     color:var(--blue);
-    font-weight:600;
+    font-weight:700;
     padding:clamp(4px,1vh,8px) 2px;
   }
   .slot .t{white-space:nowrap;}
   .slot .tag{
     font-size:clamp(6.5px,1.15vh,8px);
-    font-weight:500;letter-spacing:0.01em;
+    font-weight:400;letter-spacing:0.01em;
     margin-top:2px;color:var(--gray-dim);
+  }
+  /* min-height derived from the two-line "不可預約" content (padding*2 +
+     .t line + .tag margin-top + .tag line), same clamp() expressions as
+     those rules, so every slot matches that height at any viewport size
+     without a JS-measured height. Kept in sync with booking.html. */
+  .slot{
+    min-height: calc(
+      clamp(4px,1vh,8px) * 2 +
+      clamp(9px,1.85vh,11.5px) * 1.15 +
+      2px +
+      clamp(6.5px,1.15vh,8px) * 1.15 +
+      2px
+    );
+  }
+  .slot:not(.blocked) .t{
+    font-size:clamp(10px,2vh,12.5px);
   }
   .slot.blocked{
     background:rgba(255,255,255,0.02);
     border:1.4px solid rgba(255,255,255,0.09);
     color:var(--gray-dim);
-    font-weight:500;
+    font-weight:400;
   }
   .slot.blocked .t{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.18);}
 
@@ -282,7 +298,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
-  var BUILD_VERSION = "2026-08-04-01";
+  var BUILD_VERSION = "2026-08-05-01";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
