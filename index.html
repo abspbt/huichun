@@ -15,9 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="回春視務所｜高雄自然系質感證件照．現拍．現修．現取">
 <meta name="twitter:description" content="高雄前金區證件照專門店，自然系質感修圖，現拍現修現取，約60分鐘完成，一組NT$700，平日假日皆可線上預約。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/noto-serif-tc-900.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -55,6 +53,38 @@
     --ink: #6B5D4B;
     --muted: #A69983;
     --line: rgba(140, 125, 106, 0.2);
+  }
+
+  /* self-hosted subset fonts (see /fonts/OFL.txt for license) */
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:900;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-900.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    font-weight:500;
+    font-display:swap;
+    src:url('/fonts/space-grotesk-500.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/space-grotesk-700.woff2') format('woff2');
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
@@ -296,7 +326,7 @@
   .final-cta{ margin-top: 60px; text-align:center; }
   .final-cta h2{
     font-family:'Noto Serif TC', serif;
-    font-weight: 700;
+    font-weight: 900;
     font-size: clamp(20px, 6vw, 24px);
     color: var(--ink);
     margin-bottom: 8px;
