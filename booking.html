@@ -15,9 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="預約時段｜回春視務所">
 <meta name="twitter:description" content="線上預約回春視務所證件照拍攝時段，選擇人數與時段即可完成預約，高雄前金現場拍攝、現場取件。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/work-sans-700.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -63,11 +61,41 @@
     --red:#C4837A;
     --tag-text:#2A2B2C;
   }
+
+  /* self-hosted subset fonts (see /fonts/OFL.txt for license).
+     Latin/digits render in Work Sans; Noto Sans TC covers Chinese glyphs
+     Work Sans doesn't have. Both families are only registered at 400/700
+     so the two can share the same font-weight value per rule. */
+  @font-face{
+    font-family:'Work Sans';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/work-sans-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Work Sans';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/work-sans-700.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
+  }
+
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
     margin:0;padding:0;height:100%;overflow:hidden;
     background:#12151b;color:var(--white);
-    font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:'Work Sans','Noto Sans TC',sans-serif;
     overscroll-behavior:none;
     touch-action:pan-y;
   }
@@ -91,7 +119,7 @@
     margin:0;
     font-weight:700;font-size:clamp(13px,2.5vh,17px);letter-spacing:0.01em;color:var(--white);
   }
-  .topbar .subtitle{font-size:clamp(9.5px,1.8vh,12px);color:var(--gray);font-weight:500;}
+  .topbar .subtitle{font-size:clamp(9.5px,1.8vh,12px);color:var(--gray);font-weight:400;}
   .topbar .right{
     display:flex;align-items:center;gap:7px;font-size:clamp(8.5px,1.6vh,11px);color:var(--gray);
     cursor:pointer;padding:4px 8px;margin:-4px -8px;border-radius:8px;
@@ -99,7 +127,7 @@
     -webkit-user-select:none;user-select:none;
   }
   .topbar .right:active{background:rgba(255,255,255,0.06);opacity:0.7;}
-  .topbar .right .time{color:var(--white);font-weight:600;}
+  .topbar .right .time{color:var(--white);font-weight:700;}
   .topbar .right .refresh-icon{width:12px;height:12px;flex-shrink:0;transition:transform .4s ease;}
   .topbar .right.spinning .refresh-icon{transform:rotate(360deg);}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--gray-dim);flex-shrink:0;}
@@ -208,7 +236,7 @@
   .date-block .weekday-row{
     display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:3px;
   }
-  .date-block .weekday-text{font-size:clamp(9px,1.75vh,11px);color:var(--gray);font-weight:500;white-space:nowrap;}
+  .date-block .weekday-text{font-size:clamp(9px,1.75vh,11px);color:var(--gray);font-weight:400;white-space:nowrap;}
   .date-block .today-tag{
     font-size:clamp(7.5px,1.4vh,9px);color:var(--tag-text);background:var(--gold);
     padding:1px 5px;border-radius:999px;font-weight:700;white-space:nowrap;
@@ -227,7 +255,7 @@
     border:1.3px solid var(--blue-border);
     background:var(--blue-bg);
     color:var(--blue);
-    font-weight:600;
+    font-weight:700;
     padding:clamp(4px,1vh,8px) 2px;
     cursor:pointer;
     -webkit-user-select:none;user-select:none;
@@ -237,14 +265,30 @@
   .slot .t{white-space:nowrap;}
   .slot .tag{
     font-size:clamp(6.5px,1.15vh,8px);
-    font-weight:500;letter-spacing:0.01em;
+    font-weight:400;letter-spacing:0.01em;
     margin-top:2px;color:var(--gray-dim);
+  }
+  /* min-height derived from the two-line "不可預約"/"已勾選" content
+     (padding*2 + .t line + .tag margin-top + .tag line), same clamp()
+     expressions as those rules, so every slot matches that height at
+     any viewport size without a JS-measured height */
+  .slot{
+    min-height: calc(
+      clamp(4px,1vh,8px) * 2 +
+      clamp(9px,1.85vh,11.5px) * 1.15 +
+      2px +
+      clamp(6.5px,1.15vh,8px) * 1.15 +
+      2px
+    );
+  }
+  .slot:not(.blocked):not(.selected) .t{
+    font-size:clamp(10px,2vh,12.5px);
   }
   .slot.blocked{
     background:rgba(255,255,255,0.02);
     border:1.4px solid rgba(255,255,255,0.09);
     color:var(--gray-dim);
-    font-weight:500;
+    font-weight:400;
     cursor:default;
   }
   .slot.blocked .t{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.18);}
@@ -388,6 +432,22 @@
   .modal-btn.confirm{background:#06C755;color:#fff;}
   .modal-btn.cancel{background:rgba(255,255,255,0.08);color:var(--white);}
 
+  /* ================================================================
+     CLS 骨架佔位：#todayWrap / #daysList 在 JS 建好真正卡片前顯示
+     這些卡片，重用 .day-card/.date-block/.slot 既有 class 所以尺寸
+     （含 Stage 4-B 統一過的 slot min-height）自動與真實卡片一致，
+     不需要 JS 量測高度。render() 一開始的 innerHTML="" 會自動把它們
+     換掉，不需要額外的顯示/隱藏邏輯。
+     ================================================================ */
+  .day-card.sk{ pointer-events:none; animation:sk-pulse 1.4s ease-in-out infinite; }
+  .day-card.sk .date-text,
+  .day-card.sk .weekday-text,
+  .day-card.sk .slot .t{ color:var(--gray-dim); }
+  @keyframes sk-pulse{ 0%,100%{opacity:.5;} 50%{opacity:.85;} }
+  @media (prefers-reduced-motion: reduce){
+    .day-card.sk{ animation:none; opacity:.65; }
+  }
+
   @media (max-width:340px){
     .topbar{padding:8px 10px 6px;}
     .days-list{padding:0 10px 8px;gap:5px;}
@@ -412,7 +472,19 @@
     </div>
   </div>
 
-  <div class="today-wrap locked" id="todayWrap"></div>
+  <div class="today-wrap locked" id="todayWrap"><div class="day-card sk" aria-hidden="true">
+    <div class="date-block">
+      <span class="date-text">--/--</span>
+      <span class="weekday-row"><span class="weekday-text">星期-</span></span>
+    </div>
+    <div class="slots-line">
+      <div class="slot"><span class="t">--:--</span></div>
+      <div class="slot"><span class="t">--:--</span></div>
+      <div class="slot"><span class="t">--:--</span></div>
+      <div class="slot"><span class="t">--:--</span></div>
+      <div class="slot"><span class="t">--:--</span></div>
+    </div>
+  </div></div>
 
   <div class="pinned-notice">
     <span class="pinned-notice-text">預約<b> 今天 </b>的檔期請直接電洽</span>
@@ -440,7 +512,43 @@
         <span class="item"><span class="sq off"></span>不可預約</span>
         <span class="item"><span class="dot-legend"></span>今天</span>
       </div>
-      <div class="days-list" id="daysList"></div>
+      <div class="days-list" id="daysList"><div class="day-card sk" aria-hidden="true">
+          <div class="date-block">
+            <span class="date-text">--/--</span>
+            <span class="weekday-row"><span class="weekday-text">星期-</span></span>
+          </div>
+          <div class="slots-line">
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+          </div>
+        </div><div class="day-card sk" aria-hidden="true">
+          <div class="date-block">
+            <span class="date-text">--/--</span>
+            <span class="weekday-row"><span class="weekday-text">星期-</span></span>
+          </div>
+          <div class="slots-line">
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+          </div>
+        </div><div class="day-card sk" aria-hidden="true">
+          <div class="date-block">
+            <span class="date-text">--/--</span>
+            <span class="weekday-row"><span class="weekday-text">星期-</span></span>
+          </div>
+          <div class="slots-line">
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+            <div class="slot"><span class="t">--:--</span></div>
+          </div>
+        </div></div>
     </div>
 
     <!-- Step 3：確認並送出 -->
