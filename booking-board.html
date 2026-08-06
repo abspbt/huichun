@@ -287,8 +287,8 @@
   // 設定區
   // SHEET_ID / SHEET_NAME / SLOT_TIMES / DAYS_TO_SHOW 這幾項必須跟
   // booking.html 裡的對應設定完全一致（同一份試算表、同樣的時段定義），
-  // 也必須跟 Code.gs 裡的 SHEET_ID / SHEET_NAME / SLOT_TIMES 一致。
-  // 若要換試算表、加時段、改天數，記得三個檔案都要同步修改。
+  // 也必須跟寫入用的 Worker 裡的 SHEET_ID / SHEET_NAME / SLOT_TIMES 一致。
+  // 若要換試算表、加時段、改天數，記得三個地方都要同步修改。
   // ================================================================
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
@@ -299,17 +299,30 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
-  var BUILD_VERSION = "2026-08-05-03";
+  var BUILD_VERSION = "2026-08-06-01";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
 
-  // 部署好 Apps Script 網頁應用程式後，把網址貼在這裡（結尾是 /exec）
-  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzqZdOBXl5LUoGTHw3hIgZYJSOFOl4JR286Ug1J2FQKy1us8KPjJoBZYceTwd0vZPtEZw/exec";
+  // 寫入用的 Cloudflare Worker 網址（取代舊的 Apps Script /exec 網址）
+  var WEBAPP_URL = "https://crimson-dream-d3cf.drum3126.workers.dev";
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
   var pending = null; // { dateKey, time, action, label }
   var isSubmitting = false;
+
+  // 管理密碼：不寫死在檔案裡（此 repo 為 public），第一次寫入操作時
+  // 才彈窗詢問，存進 localStorage；之後每次寫入都帶著送出，
+  // 若 Worker 回 403（密碼錯誤）就清掉重新詢問。
+  var PW_KEY = "hc_admin_pw";
+  function ensurePassword(){
+    var pw = localStorage.getItem(PW_KEY);
+    if(pw) return pw;
+    pw = window.prompt("請輸入管理密碼：");
+    if(!pw) return "";
+    localStorage.setItem(PW_KEY, pw);
+    return pw;
+  }
 
   var daysList = document.getElementById('daysList');
   var statusDot = document.getElementById('statusDot');
@@ -612,54 +625,71 @@
   });
 
   modalConfirm.addEventListener('click', function(){
-    if(!pending || isSubmitting) return;
-    isSubmitting = true;
-    modalConfirm.disabled = true;
-    modalCancel.disabled = true;
-    var originalText = modalConfirm.textContent;
-    modalConfirm.textContent = "處理中…";
-    modalError.textContent = "";
-
-    var current = pending;
+    if(!pending) return;
 
     if(!WEBAPP_URL || WEBAPP_URL.indexOf("http") !== 0){
-      modalError.textContent = "尚未設定 Apps Script 網址，無法寫入試算表";
-      modalConfirm.disabled = false;
-      modalCancel.disabled = false;
-      modalConfirm.textContent = originalText;
-      isSubmitting = false;
+      modalError.textContent = "尚未設定 Worker 網址，無法寫入試算表";
       return;
     }
+
+    var password = ensurePassword();
+    if(!password) return; // 使用者取消輸入密碼，不進行操作
+
+    var current = pending;
+    var dateKey = current.dateKey, time = current.time, action = current.action;
+
+    // 真正的樂觀更新：立刻關閉彈窗、更新格子顏色，寫入請求在背景送出，
+    // 失敗才跳提示並把格子顏色還原。
+    var dayBooked = bookedMap[dateKey] || {};
+    var hadValue = !!dayBooked[time];
+    if(action === "lock"){
+      dayBooked[time] = true;
+    } else {
+      delete dayBooked[time];
+    }
+    bookedMap[dateKey] = dayBooked;
+    render();
+    closeModal();
+
+    function revert(){
+      var d = bookedMap[dateKey] || {};
+      if(hadValue){
+        d[time] = true;
+      } else {
+        delete d[time];
+      }
+      bookedMap[dateKey] = d;
+      render();
+    }
+
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 10000);
 
     fetch(WEBAPP_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" }, // 避免CORS預檢請求
-      body: JSON.stringify({ date: current.dateKey, time: current.time, action: current.action })
+      body: JSON.stringify({ date: dateKey, time: time, action: action, password: password }),
+      signal: controller.signal
     })
-      .then(function(res){ return res.json(); })
+      .then(function(res){
+        if(res.status === 403){
+          localStorage.removeItem(PW_KEY);
+          throw new Error("密碼錯誤，請重新輸入");
+        }
+        return res.json();
+      })
       .then(function(data){
         if(!data || !data.ok){
           throw new Error((data && data.message) || "寫入失敗");
         }
-        // 樂觀更新本地資料，畫面立即反映
-        var dayBooked = bookedMap[current.dateKey] || {};
-        if(current.action === "lock"){
-          dayBooked[current.time] = true;
-        } else {
-          delete dayBooked[current.time];
-        }
-        bookedMap[current.dateKey] = dayBooked;
-        render();
-        closeModal();
-        // 背景重新抓一次試算表，確保跟雲端資料一致
-        setTimeout(loadAvailability, 1200);
       })
       .catch(function(err){
-        modalError.textContent = "操作失敗：" + err.message + "，請重試";
-        modalConfirm.disabled = false;
-        modalCancel.disabled = false;
-        modalConfirm.textContent = originalText;
-        isSubmitting = false;
+        revert();
+        var msg = (err && err.name === "AbortError") ? "連線逾時，請重試" : ("操作失敗：" + ((err && err.message) || err));
+        alert(msg);
+      })
+      .finally(function(){
+        clearTimeout(timeoutId);
       });
   });
 
