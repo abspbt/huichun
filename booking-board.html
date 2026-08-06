@@ -299,7 +299,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
-  var BUILD_VERSION = "2026-08-05-03";
+  var BUILD_VERSION = "2026-08-06-01";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -465,7 +465,10 @@
     statusText.textContent = "讀取中";
     statusTime.textContent = "";
     statusDot.className = "dot";
-    fetch(gvizUrl)
+    // 加上時間戳查詢參數並停用 HTTP 快取，避免瀏覽器/Google 端回傳過期的舊資料
+    // （鎖定／解除確認流程會在短時間內重複呼叫本函式做重試比對，須確保每次都是新資料）
+    var url = gvizUrl + (gvizUrl.indexOf("?") >= 0 ? "&" : "?") + "_=" + Date.now();
+    return fetch(url, { cache: "no-store" })
       .then(function(res){
         if(!res.ok) throw new Error("HTTP " + res.status);
         return res.text();
@@ -611,13 +614,40 @@
     if(e.target === modalOverlay && !isSubmitting) closeModal();
   });
 
+  // 寫入結果不確定時（回應非 JSON、res.ok 為 false、逾時或網路例外）的重讀確認流程。
+  // 帶退避重試是因為 Apps Script 寫入與 gviz 讀取是兩條不同管道，中間有同步延遲，
+  // 立刻重讀很可能還讀到舊資料，須等待一段時間讓試算表資料同步。
+  var RECHECK_DELAYS = [1500, 3000, 5000];
+  function recheckAfterUncertainResult(current, originalText, serverMessage, attempt){
+    attempt = attempt || 1;
+    modalError.textContent = "無法確認結果，正在重新檢查…（第 " + attempt + " 次）";
+    setTimeout(function(){
+      loadAvailability().then(function(){
+        var isBookedNow = !!(bookedMap[current.dateKey] && bookedMap[current.dateKey][current.time]);
+        var expectedBooked = current.action === "lock";
+        if(isBookedNow === expectedBooked){
+          // 重讀後狀態已符合預期，視為成功
+          closeModal();
+          modalConfirm.textContent = originalText;
+        } else if(attempt < RECHECK_DELAYS.length){
+          recheckAfterUncertainResult(current, originalText, serverMessage, attempt + 1);
+        } else {
+          modalError.textContent = (serverMessage || "操作未完成，時段狀態未變更") + "，請重新嘗試";
+          modalConfirm.disabled = false;
+          modalCancel.disabled = false;
+          modalConfirm.textContent = originalText;
+          isSubmitting = false;
+        }
+      });
+    }, RECHECK_DELAYS[attempt - 1]);
+  }
+
   modalConfirm.addEventListener('click', function(){
     if(!pending || isSubmitting) return;
     isSubmitting = true;
     modalConfirm.disabled = true;
     modalCancel.disabled = true;
     var originalText = modalConfirm.textContent;
-    modalConfirm.textContent = "處理中…";
     modalError.textContent = "";
 
     var current = pending;
@@ -631,35 +661,67 @@
       return;
     }
 
+    // 等待期間顯示經過秒數，讓使用者知道還在處理、不是當機；
+    // 超過 REQUEST_TIMEOUT_MS 就中止請求，走下面「重讀確認」流程，不要無限等待
+    var REQUEST_TIMEOUT_MS = 30000;
+    var elapsedSeconds = 0;
+    modalConfirm.textContent = "處理中… 0 秒";
+    var elapsedTimer = setInterval(function(){
+      elapsedSeconds++;
+      var txt = "處理中… " + elapsedSeconds + " 秒";
+      if(elapsedSeconds >= 10) txt += "（Apps Script 回應較慢，仍在處理中，請勿重複點擊）";
+      modalConfirm.textContent = txt;
+    }, 1000);
+
+    var controller = ("AbortController" in window) ? new AbortController() : null;
+    var timeoutId = setTimeout(function(){
+      if(controller) controller.abort();
+    }, REQUEST_TIMEOUT_MS);
+
+    function stopWaitingUi(){
+      clearInterval(elapsedTimer);
+      clearTimeout(timeoutId);
+    }
+
     fetch(WEBAPP_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" }, // 避免CORS預檢請求
-      body: JSON.stringify({ date: current.dateKey, time: current.time, action: current.action })
+      body: JSON.stringify({ date: current.dateKey, time: current.time, action: current.action }),
+      signal: controller ? controller.signal : undefined
     })
-      .then(function(res){ return res.json(); })
-      .then(function(data){
-        if(!data || !data.ok){
-          throw new Error((data && data.message) || "寫入失敗");
+      .then(function(res){
+        return res.text().then(function(text){ return { res: res, text: text }; });
+      })
+      .then(function(result){
+        stopWaitingUi();
+        var parsed = null;
+        try { parsed = JSON.parse(result.text); } catch(e){ /* 非 JSON 回應，走不確定路徑 */ }
+
+        if(result.res.ok && parsed && parsed.ok){
+          // 樂觀更新本地資料，畫面立即反映
+          var dayBooked = bookedMap[current.dateKey] || {};
+          if(current.action === "lock"){
+            dayBooked[current.time] = true;
+          } else {
+            delete dayBooked[current.time];
+          }
+          bookedMap[current.dateKey] = dayBooked;
+          render();
+          closeModal();
+          modalConfirm.textContent = originalText;
+          // 背景重新抓一次試算表，確保跟雲端資料一致
+          setTimeout(loadAvailability, 1200);
+          return;
         }
-        // 樂觀更新本地資料，畫面立即反映
-        var dayBooked = bookedMap[current.dateKey] || {};
-        if(current.action === "lock"){
-          dayBooked[current.time] = true;
-        } else {
-          delete dayBooked[current.time];
-        }
-        bookedMap[current.dateKey] = dayBooked;
-        render();
-        closeModal();
-        // 背景重新抓一次試算表，確保跟雲端資料一致
-        setTimeout(loadAvailability, 1200);
+
+        // 回應不是預期的成功 JSON（可能是逾時/併發衝突/冷啟動回傳的錯誤頁），
+        // 但資料可能其實已經寫入成功，不能直接當成失敗
+        recheckAfterUncertainResult(current, originalText, parsed && parsed.message, 1);
       })
       .catch(function(err){
-        modalError.textContent = "操作失敗：" + err.message + "，請重試";
-        modalConfirm.disabled = false;
-        modalCancel.disabled = false;
-        modalConfirm.textContent = originalText;
-        isSubmitting = false;
+        stopWaitingUi();
+        // 逾時中止或網路例外：一樣可能已經寫入成功，走重讀確認流程
+        recheckAfterUncertainResult(current, originalText, null, 1);
       });
   });
 
