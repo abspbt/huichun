@@ -1,0 +1,10 @@
+name = "crimson-dream-d3cf"
+main = "booking-worker.js"
+compatibility_date = "2026-08-06"
+
+# 密碼／金鑰不要寫在這個檔案裡（會進 git）。
+# 部署後用以下指令逐一設定 secrets：
+#   wrangler secret put GOOGLE_CLIENT_EMAIL
+#   wrangler secret put GOOGLE_PRIVATE_KEY
+#   wrangler secret put ADMIN_TOKEN
+#   wrangler secret put SPREADSHEET_ID
