@@ -274,7 +274,7 @@
   .slot .tag{
     font-size:clamp(6.5px,1.15vh,8px);
     font-weight:400;letter-spacing:0.01em;
-    margin-top:2px;color:var(--gray-dim);
+    margin-top:2px;color:#A0A3A6;
   }
   /* min-height derived from the two-line "不可預約"/"已勾選" content
      (padding*2 + .t line + .tag margin-top + .tag line), same clamp()
@@ -296,7 +296,7 @@
   .slot.blocked{
     background:rgba(255,255,255,0.02);
     border:1.4px solid rgba(255,255,255,0.09);
-    color:var(--gray-dim);
+    color:#A0A3A6;
     font-weight:400;
     cursor:default;
   }
@@ -464,10 +464,18 @@
     .date-block{width:56px;}
     .step-confirm{padding:8px 10px;}
   }
+
+  .people-btn:focus-visible,
+  .nav-btn:focus-visible,
+  .modal-btn:focus-visible,
+  .contact-btn:focus-visible{
+    outline: 3px solid #C7B98E;
+    outline-offset: 3px;
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
 
   <div class="topbar">
     <div class="left">
@@ -606,7 +614,7 @@
     </div>
   </div>
 
-</div>
+</main>
 
 <script>
 (function(){
