@@ -183,12 +183,12 @@
     function formatDateTime(val) {
       if(!val) return "【 時間 】";
       const d = new Date(val);
-      const month = d.getMonth() + 1;
-      const date = d.getDate();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const date = String(d.getDate()).padStart(2, '0');
       const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
       const hours = String(d.getHours()).padStart(2, '0');
       const mins = String(d.getMinutes()).padStart(2, '0');
-      return `${month}/${date}(${week}) ${hours}:${mins}`;
+      return `${month}/${date} (${week}) ${hours}:${mins}`;
     }
 
     function updateSec1() {
