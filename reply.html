@@ -220,17 +220,33 @@
       const dateVal = document.getElementById('sec3-date').value;
       let datePrefix = "";
       if (dateVal) {
-        const d = new Date(dateVal);
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const date = String(d.getDate()).padStart(2, '0');
-        const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
-        datePrefix = `${month}/${date} (${week})`;
+        // Avoid UTC timezone offset issues by manual string splitting
+        const parts = dateVal.split('-');
+        if (parts.length === 3) {
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10);
+          const day = parseInt(parts[2], 10);
+          const d = new Date(year, month - 1, day);
+
+          const monthStr = String(month).padStart(2, '0');
+          const dayStr = String(day).padStart(2, '0');
+          const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+          datePrefix = `${monthStr}/${dayStr} (${week})`;
+        }
       }
 
-      const activePills = Array.from(document.querySelectorAll('#time-pills .pill.active')).map(p => p.innerText);
+      const activePills = Array.from(document.querySelectorAll('#time-pills .pill.active')).map(p => p.innerText.trim());
       const timeString = activePills.join(' 、 ');
 
-      const text = datePrefix ? `${datePrefix} ${timeString}` : timeString;
+      let text = "";
+      if (datePrefix && timeString) {
+        text = `${datePrefix} ${timeString}`;
+      } else if (datePrefix) {
+        text = datePrefix;
+      } else {
+        text = timeString;
+      }
+
       document.getElementById('sec3-preview').innerText = text || "未選擇時段";
     }
 
