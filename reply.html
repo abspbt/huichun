@@ -221,16 +221,16 @@
       let datePrefix = "";
       if (dateVal) {
         const d = new Date(dateVal);
-        const month = d.getMonth() + 1;
-        const date = d.getDate();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const date = String(d.getDate()).padStart(2, '0');
         const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
-        datePrefix = `${month}/${date}(${week}) `;
+        datePrefix = `${month}/${date} (${week})`;
       }
 
       const activePills = Array.from(document.querySelectorAll('#time-pills .pill.active')).map(p => p.innerText);
       const timeString = activePills.join(' 、 ');
-      
-      const text = datePrefix ? `${datePrefix}可預約時間：\n${timeString}` : timeString;
+
+      const text = datePrefix ? `${datePrefix} ${timeString}` : timeString;
       document.getElementById('sec3-preview').innerText = text || "未選擇時段";
     }
 
