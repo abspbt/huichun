@@ -55,7 +55,9 @@
     .pill { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 8px 14px; border-radius: 18px; font-size: 14px; cursor: pointer; user-select: none; transition: all 0.2s; }
     .pill.active { background: #beaf9d; color: #1c1b18; border-color: #beaf9d; font-weight: 600; }
     
-    .preview-box { background-color: #171614; border: 1px solid #33302b; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.6; color: #cfcbcf; white-space: pre-wrap; word-break: break-all; margin-bottom: 12px; }
+    .preview-box, .output-box { background-color: #171614; border: 1px solid #33302b; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.6; color: #cfcbcf; white-space: pre-wrap; word-break: break-all; margin-bottom: 12px; }
+    .input-field { width: 100%; background: #201f1c; border: 1px solid #33302b; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f5f3ef; box-sizing: border-box; resize: vertical; font-family: inherit; margin-bottom: 12px; }
+    .input-field:focus { outline: none; border-color: #beaf9d; }
     
     .btn-copy { background-color: #625b52; color: #ffffff; border: none; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; width: 100%; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; transition: background 0.2s; }
     .btn-copy:active { background-color: #4a443d; transform: scale(0.99); }
@@ -131,6 +133,17 @@
     </div>
     <div class="preview-box" id="sec3-preview" style="margin-top: 12px;"></div>
     <button class="btn-copy" onclick="copyText('sec3-preview')">📋 複製第三段時段</button>
+  </div>
+
+  <!-- 第四區塊：自訂訊息回覆 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">💬 4. 自訂訊息</div>
+    </div>
+    <label style="font-size: 12px; color: #a39b8e; display: block; margin-bottom: 6px;">輸入自訂回覆內容：</label>
+    <textarea id="sec4-text" class="input-field" rows="4" placeholder="在此輸入自訂回覆內容..." oninput="updateSec4()"></textarea>
+    <div class="output-box" id="sec4-preview"></div>
+    <button class="btn btn-copy" onclick="copyText('sec4-preview')">📋 複製第四段內容</button>
   </div>
 
   <div id="toast" class="toast">已複製到剪貼簿！</div>
@@ -253,6 +266,11 @@
       document.getElementById('sec3-preview').innerText = text || "未選擇時段";
     }
 
+    function updateSec4() {
+      const inputVal = document.getElementById('sec4-text').value;
+      document.getElementById('sec4-preview').innerText = inputVal || "未輸入內容";
+    }
+
     function copyText(elementId) {
       const text = document.getElementById(elementId).innerText;
       navigator.clipboard.writeText(text).then(() => {
@@ -267,9 +285,22 @@
     }
 
     // 初始化設定
-    document.getElementById('sec3-date').valueAsDate = new Date();
-    initSec1();
-    updateSec3();
+    function initDefaultDates() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const date = String(now.getDate()).padStart(2, '0');
+      const todayDate = `${year}-${month}-${date}`;
+
+      document.getElementById('sec3-date').value = todayDate;
+      document.getElementById('sec1-datetime').value = `${todayDate}T10:00`;
+
+      initSec1();
+      updateSec1();
+      updateSec3();
+    }
+
+    document.addEventListener('DOMContentLoaded', initDefaultDates);
 
       // PWA Auto Update Check
       let lastFetchedVersion = null;
