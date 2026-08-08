@@ -46,6 +46,7 @@
     .btn-quick { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 6px 12px; border-radius: 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none; }
     .btn-quick:active { background: #beaf9d; color: #1c1b18; }
     .btn-quick.date-btn { background: #38342e; color: #d4c5b3; border-color: #5c5449; font-weight: 600; }
+    .btn-quick.active { background: #beaf9d; color: #1c1b18; border-color: #beaf9d; }
     
     .time-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
     .pill { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 8px 14px; border-radius: 18px; font-size: 14px; cursor: pointer; user-select: none; transition: all 0.2s; }
@@ -77,19 +78,19 @@
       <div class="control-group">
         <label>快速選擇日期：</label>
         <div class="quick-buttons">
-          <button class="btn-quick date-btn" onclick="setSec1Date(0)">今天</button>
-          <button class="btn-quick date-btn" onclick="setSec1Date(1)">明天</button>
-          <button class="btn-quick date-btn" onclick="setSec1Date(2)">後天</button>
+          <button class="btn-quick date-btn" onclick="setSec1Date(0, this)">今天</button>
+          <button class="btn-quick date-btn" onclick="setSec1Date(1, this)">明天</button>
+          <button class="btn-quick date-btn" onclick="setSec1Date(2, this)">後天</button>
         </div>
       </div>
       <div class="control-group">
         <label>指定固定時段：</label>
         <div class="quick-buttons">
-          <button class="btn-quick" onclick="setSec1Time('10:00')">10:00</button>
-          <button class="btn-quick" onclick="setSec1Time('11:00')">11:00</button>
-          <button class="btn-quick" onclick="setSec1Time('13:30')">13:30</button>
-          <button class="btn-quick" onclick="setSec1Time('14:30')">14:30</button>
-          <button class="btn-quick" onclick="setSec1Time('15:30')">15:30</button>
+          <button class="btn-quick" onclick="setSec1Time('10:00', this)">10:00</button>
+          <button class="btn-quick" onclick="setSec1Time('11:00', this)">11:00</button>
+          <button class="btn-quick" onclick="setSec1Time('13:30', this)">13:30</button>
+          <button class="btn-quick" onclick="setSec1Time('14:30', this)">14:30</button>
+          <button class="btn-quick" onclick="setSec1Time('15:30', this)">15:30</button>
         </div>
       </div>
     </div>
@@ -138,7 +139,11 @@
       setSec1Time('10:00');
     }
 
-    function setSec1Date(offsetDays) {
+    function setSec1Date(offsetDays, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
       const d = new Date();
       d.setDate(d.getDate() + offsetDays);
       selectedDate = d;
@@ -154,7 +159,11 @@
       updateSec1();
     }
 
-    function setSec1Time(timeStr) {
+    function setSec1Time(timeStr, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
       const currentVal = document.getElementById('sec1-datetime').value;
       let datePart;
       if (currentVal) {
