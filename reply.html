@@ -23,13 +23,12 @@
     input[type="datetime-local"], input[type="date"] { background: #2a2824; border: 1px solid #4a453d; color: #fff; padding: 10px; border-radius: 6px; font-size: 15px; outline: none; width: 100%; }
     
     .quick-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .btn-quick { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 6px 12px; border-radius: 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none; }
-    .btn-quick:active { background: #beaf9d; color: #1c1b18; }
-    .btn-quick.date-btn { background: #38342e; color: #d4c5b3; border-color: #5c5449; font-weight: 600; }
+    .btn-quick { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 7px 14px; border-radius: 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none; }
+    .btn-quick.active { background: #beaf9d; color: #1c1b18; border-color: #beaf9d; font-weight: 700; box-shadow: 0 2px 6px rgba(190,175,157,0.3); }
     
     .time-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
     .pill { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 8px 14px; border-radius: 18px; font-size: 14px; cursor: pointer; user-select: none; transition: all 0.2s; }
-    .pill.active { background: #beaf9d; color: #1c1b18; border-color: #beaf9d; font-weight: 600; }
+    .pill.active { background: #beaf9d; color: #1c1b18; border-color: #beaf9d; font-weight: 700; box-shadow: 0 2px 6px rgba(190,175,157,0.3); }
     
     .preview-box { background-color: #171614; border: 1px solid #33302b; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.6; color: #cfcbcf; white-space: pre-wrap; word-break: break-all; margin-bottom: 12px; }
     
@@ -57,18 +56,18 @@
       <div class="control-group">
         <label>快速選擇日期：</label>
         <div class="quick-buttons">
-          <button class="btn-quick date-btn" onclick="setSec1Date(0)">今天</button>
-          <button class="btn-quick date-btn" onclick="setSec1Date(1)">明天</button>
+          <button class="btn-quick date-btn active" onclick="setSec1Date(0, this)">今天</button>
+          <button class="btn-quick date-btn" onclick="setSec1Date(1, this)">明天</button>
         </div>
       </div>
       <div class="control-group">
         <label>指定固定時段：</label>
         <div class="quick-buttons">
-          <button class="btn-quick" onclick="setSec1Time('10:00')">10:00</button>
-          <button class="btn-quick" onclick="setSec1Time('11:00')">11:00</button>
-          <button class="btn-quick" onclick="setSec1Time('13:30')">13:30</button>
-          <button class="btn-quick" onclick="setSec1Time('14:30')">14:30</button>
-          <button class="btn-quick" onclick="setSec1Time('15:30')">15:30</button>
+          <button class="btn-quick time-btn active" onclick="setSec1Time('10:00', this)">10:00</button>
+          <button class="btn-quick time-btn" onclick="setSec1Time('11:00', this)">11:00</button>
+          <button class="btn-quick time-btn" onclick="setSec1Time('13:30', this)">13:30</button>
+          <button class="btn-quick time-btn" onclick="setSec1Time('14:30', this)">14:30</button>
+          <button class="btn-quick time-btn" onclick="setSec1Time('15:30', this)">15:30</button>
         </div>
       </div>
     </div>
@@ -111,16 +110,14 @@
   <div id="toast" class="toast">已複製到剪貼簿！</div>
 
   <script>
-    let selectedDate = new Date();
+    function setSec1Date(offsetDays, btnEl) {
+      if (btnEl) {
+        document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
 
-    function initSec1() {
-      setSec1Time('10:00');
-    }
-
-    function setSec1Date(offsetDays) {
       const d = new Date();
       d.setDate(d.getDate() + offsetDays);
-      selectedDate = d;
       
       const currentVal = document.getElementById('sec1-datetime').value;
       const timePart = currentVal ? currentVal.split('T')[1] || '10:00' : '10:00';
@@ -133,7 +130,12 @@
       updateSec1();
     }
 
-    function setSec1Time(timeStr) {
+    function setSec1Time(timeStr, btnEl) {
+      if (btnEl) {
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+
       const currentVal = document.getElementById('sec1-datetime').value;
       let datePart;
       if (currentVal) {
@@ -153,8 +155,8 @@
     function formatDateTime(val) {
       if(!val) return "【 時間 】";
       const d = new Date(val);
-      const month = d.getMonth() + 1;
-      const date = d.getDate();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const date = String(d.getDate()).padStart(2, '0');
       const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
       const hours = String(d.getHours()).padStart(2, '0');
       const mins = String(d.getMinutes()).padStart(2, '0');
@@ -191,8 +193,8 @@
       let datePrefix = "";
       if (dateVal) {
         const d = new Date(dateVal);
-        const month = d.getMonth() + 1;
-        const date = d.getDate();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const date = String(d.getDate()).padStart(2, '0');
         const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
         datePrefix = `${month}/${date}(${week}) `;
       }
@@ -219,7 +221,8 @@
 
     // 初始化設定
     document.getElementById('sec3-date').valueAsDate = new Date();
-    initSec1();
+    setSec1Date(0, document.querySelector('.date-btn'));
+    setSec1Time('10:00', document.querySelector('.time-btn'));
     updateSec3();
   </script>
 </body>
