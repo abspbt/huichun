@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>證件照預約快速回覆工具</title>
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuWKhOaZtOebuOaYr-ebuOiKseW3peeFpyIsCiAgInNob3J0X25hbWUiOiAi5pys5pmu5aO5IiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIxYzFiMTgiLAogICJ0aGVtZV9jb2xvciI6ICIxYzFiMTgiCn0=">
+  <meta name="theme-color" content="#1c1b18">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: #1c1b18; color: #e8e6e1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 60px; }
+    
+    h1 { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 16px; color: #d4c5b3; letter-spacing: 1px; }
+    
+    .card { background-color: #2a2824; border: 1px solid #3d3a33; border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-title { font-size: 15px; font-weight: 600; color: #beaf9d; display: flex; align-items: center; gap: 6px; }
+    
+    .controls { display: flex; flex-direction: column; gap: 10px; background: #201f1c; padding: 12px; border-radius: 8px; border: 1px solid #33302b; margin-bottom: 12px; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 12px; color: #a39b8e; font-weight: 500; }
+    
+    input[type="datetime-local"], input[type="date"] { background: #2a2824; border: 1px solid #4a453d; color: #fff; padding: 10px; border-radius: 6px; font-size: 15px; outline: none; width: 100%; }
+    
+    .quick-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .btn-quick { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 6px 12px; border-radius: 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none; }
+    .btn-quick:active { background: #beaf9d; color: #1c1b18; }
+    .btn-quick.date-btn { background: #38342e; color: #d4c5b3; border-color: #5c5449; font-weight: 600; }
+    
+    .time-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .pill { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 8px 14px; border-radius: 18px; font-size: 14px; cursor: pointer; user-select: none; transition: all 0.2s; }
+    .pill.active { background: #beaf9d; color: #1c1b18; border-color: #beaf9d; font-weight: 600; }
+    
+    .preview-box { background-color: #171614; border: 1px solid #33302b; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.6; color: #cfcbcf; white-space: pre-wrap; word-break: break-all; margin-bottom: 12px; }
+    
+    .btn-copy { background-color: #625b52; color: #ffffff; border: none; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; width: 100%; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; transition: background 0.2s; }
+    .btn-copy:active { background-color: #4a443d; transform: scale(0.99); }
+    
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #beaf9d; color: #1c1b18; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s ease; z-index: 1000; opacity: 0; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <h1>證件照預約快速回覆工具</h1>
+
+  <!-- 第一區塊：預約拍攝時間提醒 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📅 1. 預約拍攝時間提醒</div>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>拍攝時間設定：</label>
+        <input type="datetime-local" id="sec1-datetime" onchange="updateSec1()">
+      </div>
+      <div class="control-group">
+        <label>快速選擇日期：</label>
+        <div class="quick-buttons">
+          <button class="btn-quick date-btn" onclick="setSec1Date(0)">今天</button>
+          <button class="btn-quick date-btn" onclick="setSec1Date(1)">明天</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>指定固定時段：</label>
+        <div class="quick-buttons">
+          <button class="btn-quick" onclick="setSec1Time('10:00')">10:00</button>
+          <button class="btn-quick" onclick="setSec1Time('11:00')">11:00</button>
+          <button class="btn-quick" onclick="setSec1Time('13:30')">13:30</button>
+          <button class="btn-quick" onclick="setSec1Time('14:30')">14:30</button>
+          <button class="btn-quick" onclick="setSec1Time('15:30')">15:30</button>
+        </div>
+      </div>
+    </div>
+    <div class="preview-box" id="sec1-preview"></div>
+    <button class="btn-copy" onclick="copyText('sec1-preview')">📋 複製第一段提醒</button>
+  </div>
+
+  <!-- 第二區塊：索取聯絡資料 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📞 2. 索取聯絡資料</div>
+    </div>
+    <div class="preview-box" id="sec2-preview">您好，請您留下稱呼及聯絡電話，謝謝您</div>
+    <button class="btn-copy" onclick="copyText('sec2-preview')">📋 複製第二段訊息</button>
+  </div>
+
+  <!-- 第三區塊：每日可預約時間 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🕒 3. 可預約時段選單</div>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>選擇日期（可選）：</label>
+        <input type="date" id="sec3-date" onchange="updateSec3()">
+      </div>
+    </div>
+    <label style="font-size: 12px; color: #a39b8e; display: block; margin-bottom: 6px;">點擊選取可預約時段：</label>
+    <div class="time-pills" id="time-pills">
+      <div class="pill active" onclick="togglePill(this)">10:00</div>
+      <div class="pill active" onclick="togglePill(this)">11:00</div>
+      <div class="pill active" onclick="togglePill(this)">13:30</div>
+      <div class="pill active" onclick="togglePill(this)">14:30</div>
+      <div class="pill active" onclick="togglePill(this)">15:30</div>
+    </div>
+    <div class="preview-box" id="sec3-preview" style="margin-top: 12px;"></div>
+    <button class="btn-copy" onclick="copyText('sec3-preview')">📋 複製第三段時段</button>
+  </div>
+
+  <div id="toast" class="toast">已複製到剪貼簿！</div>
+
+  <script>
+    let selectedDate = new Date();
+
+    function initSec1() {
+      setSec1Time('10:00');
+    }
+
+    function setSec1Date(offsetDays) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      selectedDate = d;
+      
+      const currentVal = document.getElementById('sec1-datetime').value;
+      const timePart = currentVal ? currentVal.split('T')[1] || '10:00' : '10:00';
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const date = String(d.getDate()).padStart(2, '0');
+      
+      document.getElementById('sec1-datetime').value = `${year}-${month}-${date}T${timePart}`;
+      updateSec1();
+    }
+
+    function setSec1Time(timeStr) {
+      const currentVal = document.getElementById('sec1-datetime').value;
+      let datePart;
+      if (currentVal) {
+        datePart = currentVal.split('T')[0];
+      } else {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const date = String(d.getDate()).padStart(2, '0');
+        datePart = `${year}-${month}-${date}`;
+      }
+      
+      document.getElementById('sec1-datetime').value = `${datePart}T${timeStr}`;
+      updateSec1();
+    }
+
+    function formatDateTime(val) {
+      if(!val) return "【 時間 】";
+      const d = new Date(val);
+      const month = d.getMonth() + 1;
+      const date = d.getDate();
+      const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${month}/${date}(${week}) ${hours}:${mins}`;
+    }
+
+    function updateSec1() {
+      const dt = document.getElementById('sec1-datetime').value;
+      const timeStr = formatDateTime(dt);
+      const text = `您好，我是證件照攝影師
+提醒您有預約【 ${timeStr} 】拍攝證件照
+如果時間需要異動請與我聯繫，謝謝您。
+
+因後續作業時間關係，請務必準時或提早
+遲到太久將無法拍攝，請留意!!
+
+辦理各國簽證、護照、身分證、居留證
+請勿佩戴放大片
+請勿佩戴有顏色的隱形眼鏡
+必須露出耳朵，必須露出完整眉毛
+拍攝台胞證用照片請穿著深色衣服
+
+地址及拍照的注意事項放：https://hui-chin.com`;
+      document.getElementById('sec1-preview').innerText = text;
+    }
+
+    function togglePill(el) {
+      el.classList.toggle('active');
+      updateSec3();
+    }
+
+    function updateSec3() {
+      const dateVal = document.getElementById('sec3-date').value;
+      let datePrefix = "";
+      if (dateVal) {
+        const d = new Date(dateVal);
+        const month = d.getMonth() + 1;
+        const date = d.getDate();
+        const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+        datePrefix = `${month}/${date}(${week}) `;
+      }
+
+      const activePills = Array.from(document.querySelectorAll('#time-pills .pill.active')).map(p => p.innerText);
+      const timeString = activePills.join(' 、 ');
+      
+      const text = datePrefix ? `${datePrefix}可預約時間：\n${timeString}` : timeString;
+      document.getElementById('sec3-preview').innerText = text || "未選擇時段";
+    }
+
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    // 初始化設定
+    document.getElementById('sec3-date').valueAsDate = new Date();
+    initSec1();
+    updateSec3();
+  </script>
+</body>
+</html>
+EOF
+
+git add index.html
+git commit -m "refactor: update section 1 time options to 5 fixed slots and cleanup UI"
+git push
