@@ -160,7 +160,7 @@
       const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
       const hours = String(d.getHours()).padStart(2, '0');
       const mins = String(d.getMinutes()).padStart(2, '0');
-      return `${month}/${date}(${week}) ${hours}:${mins}`;
+      return `${month}/${date} (${week}) ${hours}:${mins}`;
     }
 
     function updateSec1() {
@@ -179,7 +179,7 @@
 必須露出耳朵，必須露出完整眉毛
 拍攝台胞證用照片請穿著深色衣服
 
-地址及拍照的注意事項：https://hui-chin.com`;
+地址及拍照的注意事項放：https://hui-chin.com`;
       document.getElementById('sec1-preview').innerText = text;
     }
 
@@ -196,7 +196,7 @@
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const date = String(d.getDate()).padStart(2, '0');
         const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
-        datePrefix = `${month}/${date}(${week}) `;
+        datePrefix = `${month}/${date} (${week}) `;
       }
 
       const activePills = Array.from(document.querySelectorAll('#time-pills .pill.active')).map(p => p.innerText);
