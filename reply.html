@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>證件照預約快速回覆工具</title>
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuWKhOaZtOebuOaYr-ebuOiKseW3peeFpyIsCiAgInNob3J0X25hbWUiOiAi5pys5pmu5aO5IiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIxYzFiMTgiLAogICJ0aGVtZV9jb2xvciI6ICIxYzFiMTgiCn0=">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuWKhOaZtOebuOaYr-ebuOiKseW3peeFpyIsCiAgInNob3J0X25hbWUiOiAi5pys5pmu5aO5IiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF_jb2xvciI6ICIxYzFiMTgiLAogICJ0aGVtZV9jb2xvciI6ICIxYzFiMTgiCn0=">
   <meta name="theme-color" content="#1c1b18">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -16,11 +16,31 @@
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .card-title { font-size: 15px; font-weight: 600; color: #beaf9d; display: flex; align-items: center; gap: 6px; }
     
-    .controls { display: flex; flex-direction: column; gap: 10px; background: #201f1c; padding: 12px; border-radius: 8px; border: 1px solid #33302b; margin-bottom: 12px; }
-    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .controls { display: flex; flex-direction: column; gap: 10px; background: #201f1c; padding: 12px; border-radius: 8px; border: 1px solid #33302b; margin-bottom: 12px; overflow: hidden; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
     label { font-size: 12px; color: #a39b8e; font-weight: 500; }
     
-    input[type="datetime-local"], input[type="date"] { background: #2a2824; border: 1px solid #4a453d; color: #fff; padding: 10px; border-radius: 6px; font-size: 15px; outline: none; width: 100%; }
+    /* 修正 iOS 日期輸入框溢出與置中問題 */
+    input[type="datetime-local"], input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #2a2824;
+      border: 1px solid #4a453d;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 15px;
+      outline: none;
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      text-align: center;
+    }
+    input[type="datetime-local"]::-webkit-date-and-time-value,
+    input[type="date"]::-webkit-date-and-time-value {
+      text-align: center;
+      min-height: 1.2em;
+    }
     
     .quick-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
     .btn-quick { background: #2a2824; border: 1px solid #4a453d; color: #beaf9d; padding: 7px 14px; border-radius: 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none; }
