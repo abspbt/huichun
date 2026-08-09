@@ -100,7 +100,7 @@
       </div>
     </div>
     <div class="preview-box" id="sec1-preview"></div>
-    <button class="btn-copy" onclick="copyText('sec1-preview')">📋 複製第一段提醒</button>
+    <button class="btn-copy" onclick="copyText('sec1-preview')">📋 複製訊息</button>
   </div>
 
   <!-- 第二區塊：索取聯絡資料 -->
@@ -109,7 +109,7 @@
       <div class="card-title">📞 2. 索取聯絡資料</div>
     </div>
     <div class="preview-box" id="sec2-preview">您好，請您留下稱呼及聯絡電話，謝謝您</div>
-    <button class="btn-copy" onclick="copyText('sec2-preview')">📋 複製第二段訊息</button>
+    <button class="btn-copy" onclick="copyText('sec2-preview')">📋 複製訊息</button>
   </div>
 
   <!-- 第三區塊：每日可預約時間 -->
@@ -132,7 +132,7 @@
       <div class="pill active" onclick="togglePill(this)">15:30</div>
     </div>
     <div class="preview-box" id="sec3-preview" style="margin-top: 12px;"></div>
-    <button class="btn-copy" onclick="copyText('sec3-preview')">📋 複製第三段時段</button>
+    <button class="btn-copy" onclick="copyText('sec3-preview')">📋 複製訊息</button>
   </div>
 
   <!-- 第四區塊：自訂訊息回覆 -->
@@ -143,7 +143,7 @@
     <label style="font-size: 12px; color: #a39b8e; display: block; margin-bottom: 6px;">輸入自訂回覆內容：</label>
     <textarea id="sec4-text" class="input-field" rows="4" placeholder="在此輸入自訂回覆內容..." oninput="updateSec4()"></textarea>
     <div class="output-box" id="sec4-preview"></div>
-    <button class="btn btn-copy" onclick="copyText('sec4-preview')">📋 複製第四段內容</button>
+    <button class="btn btn-copy" onclick="copyText('sec4-preview')">📋 複製訊息</button>
   </div>
 
   <div id="toast" class="toast">已複製到剪貼簿！</div>
@@ -223,7 +223,7 @@
 必須露出耳朵，必須露出完整眉毛
 拍攝台胞證用照片請穿著深色衣服
 
-地址及拍照的注意事項放：https://hui-chin.com`;
+地址及拍照的注意事項：https://hui-chin.com`;
       document.getElementById('sec1-preview').innerText = text;
     }
 
