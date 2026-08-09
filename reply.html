@@ -124,22 +124,22 @@
       </div>
       <div class="control-group">
         <label>預約時間：</label>
-        <select id="sec3-time" class="input-field" style="margin-bottom: 0;" onchange="updateSec3()">
-          <option value="10:00">10:00</option>
-          <option value="11:00">11:00</option>
-          <option value="13:30">13:30</option>
-          <option value="14:30">14:30</option>
-          <option value="15:30">15:30</option>
-        </select>
+        <div class="time-pills" id="sec3-time-pills" style="width: 100%;">
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('10:00', this)">10:00</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('11:00', this)">11:00</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('13:30', this)">13:30</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('14:30', this)">14:30</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('15:30', this)">15:30</button>
+        </div>
       </div>
       <div class="control-group">
         <label>預約人數：</label>
-        <select id="sec3-count" class="input-field" style="margin-bottom: 0;" onchange="updateSec3()">
-          <option value="一位">一位</option>
-          <option value="兩位">兩位</option>
-          <option value="三位">三位</option>
-          <option value="四位">四位</option>
-        </select>
+        <div class="time-pills" id="sec3-count-pills" style="width: 100%;">
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('一位', this)">一位</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('兩位', this)">兩位</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('三位', this)">三位</button>
+          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('四位', this)">四位</button>
+        </div>
       </div>
     </div>
     <div class="preview-box" id="sec3-preview" style="margin-top: 12px;"></div>
@@ -238,10 +238,27 @@
       document.getElementById('sec1-preview').innerText = text;
     }
 
+    let sec3TimeVal = '10:00';
+    let sec3CountVal = '一位';
+
+    function setSec3Time(timeStr, btn) {
+      sec3TimeVal = timeStr;
+      btn.parentElement.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateSec3();
+    }
+
+    function setSec3Count(countStr, btn) {
+      sec3CountVal = countStr;
+      btn.parentElement.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateSec3();
+    }
+
     function updateSec3() {
       const dateVal = document.getElementById('sec3-date').value;
-      const timeVal = document.getElementById('sec3-time').value;
-      const countVal = document.getElementById('sec3-count').value;
+      const timeVal = sec3TimeVal;
+      const countVal = sec3CountVal;
 
       const text = `您好，該時段已經幫您預留，謝謝您。
 
@@ -287,6 +304,9 @@
 
       initSec1();
       updateSec1();
+
+      document.querySelector('#sec3-time-pills .pill').classList.add('active');
+      document.querySelector('#sec3-count-pills .pill').classList.add('active');
       updateSec3();
     }
 
