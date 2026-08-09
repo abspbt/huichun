@@ -37,9 +37,6 @@
       max-width: 100%;
       min-width: 0;
       box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       margin: 0;
     }
     
@@ -122,21 +119,21 @@
       </div>
       <div class="control-group">
         <label>預約時間：</label>
-        <div class="time-pills" id="sec3-time-pills" style="width: 100%;">
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('10:00', this)">10:00</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('11:00', this)">11:00</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('13:30', this)">13:30</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('14:30', this)">14:30</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Time('15:30', this)">15:30</button>
+        <div class="quick-buttons" id="sec3-time-pills">
+          <button type="button" class="btn-quick" onclick="setSec3Time('10:00', this)">10:00</button>
+          <button type="button" class="btn-quick" onclick="setSec3Time('11:00', this)">11:00</button>
+          <button type="button" class="btn-quick" onclick="setSec3Time('13:30', this)">13:30</button>
+          <button type="button" class="btn-quick" onclick="setSec3Time('14:30', this)">14:30</button>
+          <button type="button" class="btn-quick" onclick="setSec3Time('15:30', this)">15:30</button>
         </div>
       </div>
       <div class="control-group">
         <label>預約人數：</label>
-        <div class="time-pills" id="sec3-count-pills" style="width: 100%;">
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('一位', this)">一位</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('兩位', this)">兩位</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('三位', this)">三位</button>
-          <button type="button" class="pill" style="flex: 1 1 auto; text-align: center;" onclick="setSec3Count('四位', this)">四位</button>
+        <div class="quick-buttons" id="sec3-count-pills">
+          <button type="button" class="btn-quick" onclick="setSec3Count('一位', this)">一位</button>
+          <button type="button" class="btn-quick" onclick="setSec3Count('兩位', this)">兩位</button>
+          <button type="button" class="btn-quick" onclick="setSec3Count('三位', this)">三位</button>
+          <button type="button" class="btn-quick" onclick="setSec3Count('四位', this)">四位</button>
         </div>
       </div>
     </div>
@@ -241,14 +238,14 @@
 
     function setSec3Time(timeStr, btn) {
       sec3TimeVal = timeStr;
-      btn.parentElement.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+      btn.parentElement.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       updateSec3();
     }
 
     function setSec3Count(countStr, btn) {
       sec3CountVal = countStr;
-      btn.parentElement.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+      btn.parentElement.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       updateSec3();
     }
@@ -303,8 +300,8 @@
       initSec1();
       updateSec1();
 
-      document.querySelector('#sec3-time-pills .pill').classList.add('active');
-      document.querySelector('#sec3-count-pills .pill').classList.add('active');
+      document.querySelector('#sec3-time-pills .btn-quick').classList.add('active');
+      document.querySelector('#sec3-count-pills .btn-quick').classList.add('active');
       updateSec3();
     }
 
