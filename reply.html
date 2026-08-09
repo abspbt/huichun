@@ -112,27 +112,38 @@
     <button class="btn-copy" onclick="copyText('sec2-preview')">📋 複製訊息</button>
   </div>
 
-  <!-- 第三區塊：每日可預約時間 -->
+  <!-- 第三區塊：預約確認訊息 -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">🕒 3. 可預約時段選單</div>
+      <div class="card-title">🕒 3. 預約確認訊息</div>
     </div>
     <div class="controls">
       <div class="control-group">
-        <label>選擇日期（可選）：</label>
+        <label>預約日期：</label>
         <input type="date" id="sec3-date" onchange="updateSec3()">
       </div>
-    </div>
-    <label style="font-size: 12px; color: #a39b8e; display: block; margin-bottom: 6px;">點擊選取可預約時段：</label>
-    <div class="time-pills" id="time-pills">
-      <div class="pill active" onclick="togglePill(this)">10:00</div>
-      <div class="pill active" onclick="togglePill(this)">11:00</div>
-      <div class="pill active" onclick="togglePill(this)">13:30</div>
-      <div class="pill active" onclick="togglePill(this)">14:30</div>
-      <div class="pill active" onclick="togglePill(this)">15:30</div>
+      <div class="control-group">
+        <label>預約時間：</label>
+        <select id="sec3-time" class="input-field" style="margin-bottom: 0;" onchange="updateSec3()">
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="13:30">13:30</option>
+          <option value="14:30">14:30</option>
+          <option value="15:30">15:30</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>預約人數：</label>
+        <select id="sec3-count" class="input-field" style="margin-bottom: 0;" onchange="updateSec3()">
+          <option value="一位">一位</option>
+          <option value="兩位">兩位</option>
+          <option value="三位">三位</option>
+          <option value="四位">四位</option>
+        </select>
+      </div>
     </div>
     <div class="preview-box" id="sec3-preview" style="margin-top: 12px;"></div>
-    <button class="btn-copy" onclick="copyText('sec3-preview')">📋 複製訊息</button>
+    <button class="btn-copy" onclick="copyText('sec3-preview')">📋 複製預約內容</button>
   </div>
 
   <!-- 第四區塊：自訂訊息回覆 -->
@@ -227,43 +238,22 @@
       document.getElementById('sec1-preview').innerText = text;
     }
 
-    function togglePill(el) {
-      el.classList.toggle('active');
-      updateSec3();
-    }
-
     function updateSec3() {
       const dateVal = document.getElementById('sec3-date').value;
-      let datePrefix = "";
-      if (dateVal) {
-        // Avoid UTC timezone offset issues by manual string splitting
-        const parts = dateVal.split('-');
-        if (parts.length === 3) {
-          const year = parseInt(parts[0], 10);
-          const month = parseInt(parts[1], 10);
-          const day = parseInt(parts[2], 10);
-          const d = new Date(year, month - 1, day);
+      const timeVal = document.getElementById('sec3-time').value;
+      const countVal = document.getElementById('sec3-count').value;
 
-          const monthStr = String(month).padStart(2, '0');
-          const dayStr = String(day).padStart(2, '0');
-          const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
-          datePrefix = `${monthStr}/${dayStr} (${week})`;
-        }
-      }
+      const text = `您好，該時段已經幫您預留，謝謝您。
 
-      const activePills = Array.from(document.querySelectorAll('#time-pills .pill.active')).map(p => p.innerText.trim());
-      const timeString = activePills.join(' 、 ');
+預約日期：${dateVal}
+預約時間：${timeVal}
+預約人數：${countVal}
 
-      let text = "";
-      if (datePrefix && timeString) {
-        text = `${datePrefix} ${timeString}`;
-      } else if (datePrefix) {
-        text = datePrefix;
-      } else {
-        text = timeString;
-      }
+拍攝前將私訊提醒您拍攝時間
+收到提醒訊息請回覆，謝謝您
 
-      document.getElementById('sec3-preview').innerText = text || "未選擇時段";
+地址及拍照的注意事項：https://hui-chin.com`;
+      document.getElementById('sec3-preview').innerText = text;
     }
 
     function updateSec4() {
