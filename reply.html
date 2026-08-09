@@ -73,7 +73,8 @@
     <div class="controls">
       <div class="control-group">
         <label>拍攝時間設定：</label>
-        <input type="datetime-local" id="sec1-datetime" onchange="updateSec1()">
+        <input type="date" id="sec1-date" onchange="updateSec1()" style="margin-right:8px;">
+        <input type="time" id="sec1-time" onchange="updateSec1()">
       </div>
       <div class="control-group">
         <label>快速選擇日期：</label>
@@ -170,14 +171,11 @@
       d.setDate(d.getDate() + offsetDays);
       selectedDate = d;
       
-      const currentVal = document.getElementById('sec1-datetime').value;
-      const timePart = currentVal ? currentVal.split('T')[1] || '10:00' : '10:00';
-      
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const date = String(d.getDate()).padStart(2, '0');
-      
-      document.getElementById('sec1-datetime').value = `${year}-${month}-${date}T${timePart}`;
+
+      document.getElementById('sec1-date').value = `${year}-${month}-${date}`;
       updateSec1();
     }
 
@@ -186,25 +184,13 @@
         btn.parentElement.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       }
-      const currentVal = document.getElementById('sec1-datetime').value;
-      let datePart;
-      if (currentVal) {
-        datePart = currentVal.split('T')[0];
-      } else {
-        const d = new Date();
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const date = String(d.getDate()).padStart(2, '0');
-        datePart = `${year}-${month}-${date}`;
-      }
-      
-      document.getElementById('sec1-datetime').value = `${datePart}T${timeStr}`;
+      document.getElementById('sec1-time').value = timeStr;
       updateSec1();
     }
 
-    function formatDateTime(val) {
-      if(!val) return "【 時間 】";
-      const d = new Date(val);
+    function formatDateTime(datePart, timePart) {
+      if(!datePart || !timePart) return "【 時間 】";
+      const d = new Date(`${datePart}T${timePart}`);
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const date = String(d.getDate()).padStart(2, '0');
       const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
@@ -214,8 +200,9 @@
     }
 
     function updateSec1() {
-      const dt = document.getElementById('sec1-datetime').value;
-      const timeStr = formatDateTime(dt);
+      const datePart = document.getElementById('sec1-date').value;
+      const timePart = document.getElementById('sec1-time').value;
+      const timeStr = formatDateTime(datePart, timePart);
       const text = `您好，我是證件照攝影師
 提醒您有預約【 ${timeStr} 】拍攝證件照
 如果時間需要異動請與我聯繫，謝謝您。
@@ -295,7 +282,8 @@
       const todayDate = `${year}-${month}-${date}`;
 
       document.getElementById('sec3-date').value = todayDate;
-      document.getElementById('sec1-datetime').value = `${todayDate}T10:00`;
+      document.getElementById('sec1-date').value = todayDate;
+      document.getElementById('sec1-time').value = '10:00';
 
       initSec1();
       updateSec1();
