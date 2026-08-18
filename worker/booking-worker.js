@@ -155,7 +155,7 @@ async function handlePost(request, env, headers) {
   var action = payload && payload.action;
   var password = payload && payload.password;
 
-  if (password !== env.ADMIN_TOKEN) {
+  if (!env.ADMIN_TOKEN || password !== env.ADMIN_TOKEN) {
     return jsonResponse({ ok: false, message: "密碼錯誤" }, 403, headers);
   }
 
