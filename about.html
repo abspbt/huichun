@@ -16,7 +16,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="關於回春｜高雄證件照職人故事．好看證件照與精緻證件照的堅持">
 <meta name="twitter:description" content="回春視務所創辦人擁有二十餘年攝影資歷，從電子工程師到高雄證件照職人，堅持以光影雕刻神韻，打造真正好看證件照與精緻證件照，而非流水線式修圖。">
-<link rel="preload" href="/fonts/noto-serif-tc-900.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -65,26 +64,9 @@
     --brown-soft:#EDE3D6;
     --radius:16px;
     --max:760px;
-  }
-
-  /* self-hosted subset fonts (see /fonts/OFL.txt for license) */
-  @font-face{
-    font-family:'Noto Serif TC';
-    font-weight:900;
-    font-display:swap;
-    src:url('/fonts/noto-serif-tc-900.woff2') format('woff2');
-  }
-  @font-face{
-    font-family:'Noto Sans TC';
-    font-weight:400;
-    font-display:swap;
-    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
-  }
-  @font-face{
-    font-family:'Noto Sans TC';
-    font-weight:700;
-    font-display:swap;
-    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
+    /* 一般手機內建的黑體／宋體，不額外下載字型，也不會缺字 */
+    --font-sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Heiti TC","Microsoft JhengHei","微軟正黑體",sans-serif;
+    --font-serif:"Songti TC","PMingLiU","新細明體","Microsoft JhengHei",serif;
   }
 
   *{box-sizing:border-box;}
@@ -93,13 +75,13 @@
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    font-family:var(--font-sans);
     line-height:1.9;
     -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
 
-  h1,.serif{font-family:"Noto Serif TC",serif;}
+  h1,.serif{font-family:var(--font-serif); font-style:normal;}
 
   .eyebrow{
     display:inline-flex;
@@ -128,7 +110,7 @@
     color:var(--ink-soft);
   }
   .brand-bar strong{
-    font-family:"Noto Sans TC",sans-serif;
+    font-family:var(--font-sans);
     font-size:13px;
     font-weight:400;
     color:var(--ink-soft);
@@ -150,7 +132,8 @@
     font-size:clamp(24px,4.4vw,34px);
     line-height:1.55;
     margin:18px auto 14px;
-    font-weight:900;
+    font-weight:700;
+    color:var(--brown-deep);
     max-width:26ch;
   }
   .hero p{
@@ -214,10 +197,11 @@
   }
   .closing .rule{width:44px; height:2px; background:var(--brown); margin:0 auto 24px;}
   .closing p{
-    font-family:"Noto Serif TC",serif;
-    font-size:19px;
-    line-height:1.9;
-    color:var(--ink);
+    font-family:var(--font-serif);
+    font-weight:700;
+    font-size:20px;
+    line-height:1.7;
+    color:var(--brown-deep);
     max-width:32ch;
     margin:0 auto;
   }
@@ -226,7 +210,7 @@
     margin-top:18px;
     color:var(--ink-soft);
     font-size:13px;
-    font-family:"Noto Sans TC",sans-serif;
+    font-family:var(--font-sans);
   }
 
   .cta-wrap{
@@ -238,7 +222,7 @@
     display:inline-flex;
     align-items:center;
     gap:10px;
-    font-family:"Noto Sans TC",sans-serif;
+    font-family:var(--font-sans);
     font-size:16px;
     font-weight:700;
     color:#fff;
@@ -267,7 +251,7 @@
     border-top:1px solid var(--line);
   }
   .site-footer strong{
-    font-family:"Noto Serif TC",serif;
+    font-family:var(--font-serif);
     font-size:15px;
     font-weight:700;
     color:var(--ink);
@@ -325,7 +309,7 @@
   <!-- CLOSING -->
   <div class="closing">
     <div class="rule"></div>
-    <p>把最好的一張，交給願意為方寸之間較真的人</p>
+    <p>把最好的一張<br>交給願意為方寸之間著墨的人</p>
     <small>— 高雄證件照，回春視務所 —</small>
 
     <div class="cta-wrap">
