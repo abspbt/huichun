@@ -352,5 +352,41 @@
 
 </main>
 
+<script>
+(function(){
+  "use strict";
+  // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
+  // 「Mobile browsers showing stale cached content」）。
+  // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
+  var BUILD_VERSION = "2026-08-26-01";
+  var isCheckingUpdate = false;
+  function checkForUpdate(){
+    if(isCheckingUpdate) return;
+    isCheckingUpdate = true;
+    fetch(location.pathname + '?_vc=' + Date.now(), { cache: 'no-store' })
+      .then(function(res){
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(html){
+        var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
+        if(m && m[1] && m[1] !== BUILD_VERSION){
+          location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
+        }
+      })
+      .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
+      .finally(function(){ isCheckingUpdate = false; });
+  }
+  checkForUpdate();
+  setInterval(checkForUpdate, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') checkForUpdate();
+  });
+  window.addEventListener('pageshow', function(e){
+    if(e.persisted) checkForUpdate();
+  });
+})();
+</script>
+
 </body>
 </html>
