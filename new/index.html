@@ -371,7 +371,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-15";
+  var BUILD_VERSION = "2026-09-01-16";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
@@ -396,6 +396,11 @@
     if(document.visibilityState === 'visible') checkForUpdate();
   });
   window.addEventListener('pageshow', function(e){
+    // 從瀏覽器上一頁/下一頁快取（bfcache）復原時，畫面可能還停在
+    // 點擊導覽按鈕當下淡出到一半的狀態（body 帶著 leaving/leaving-out
+    // class、opacity:0），看起來像整頁空白，要手動重新整理才會恢復。
+    // 復原當下先把這兩個 class 拿掉，讓畫面回到正常顯示。
+    document.body.classList.remove('leaving', 'leaving-out');
     if(e.persisted) checkForUpdate();
   });
 })();
