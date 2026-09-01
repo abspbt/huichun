@@ -159,7 +159,7 @@
     position: relative;
     top: -6px;
   }
-  .hero-illustration svg{ width: 100%; height: auto; overflow: visible; }
+  .hero-illustration img{ width: 100%; height: auto; display:block; }
 
   .tagline{
     margin-top: 30px;
@@ -281,52 +281,10 @@
       </ul>
 
       <div class="hero-illustration" aria-hidden="true">
-        <svg viewBox="0 0 220 260" fill="none">
-          <circle cx="188" cy="92" r="66" stroke="var(--line)" stroke-width="1" opacity="0.7"/>
-          <g stroke="var(--circle-line)" stroke-width="0.9" opacity="0.8">
-            <circle cx="196" cy="18" r="1.6" fill="var(--circle-line)" stroke="none"/>
-            <circle cx="204" cy="18" r="1.6" fill="var(--circle-line)" stroke="none"/>
-            <circle cx="212" cy="18" r="1.6" fill="var(--circle-line)" stroke="none"/>
-            <circle cx="196" cy="26" r="1.6" fill="var(--circle-line)" stroke="none"/>
-            <circle cx="204" cy="26" r="1.6" fill="var(--circle-line)" stroke="none"/>
-            <circle cx="212" cy="26" r="1.6" fill="var(--circle-line)" stroke="none"/>
-          </g>
-
-          <!-- backdrop roller + panel -->
-          <rect x="38" y="28" width="112" height="7" rx="3.5" stroke="var(--circle-line)" stroke-width="1.4"/>
-          <circle cx="38" cy="31.5" r="5" stroke="var(--circle-line)" stroke-width="1.4"/>
-          <circle cx="150" cy="31.5" r="5" stroke="var(--circle-line)" stroke-width="1.4"/>
-          <path d="M54 40 L54 182 Q74 189 94 184 Q114 179 134 185 L134 40 Z" stroke="var(--circle-line)" stroke-width="1.4"/>
-
-          <!-- viewfinder corner marks -->
-          <g stroke="var(--ink-soft)" stroke-width="1.5" stroke-linecap="round">
-            <path d="M66 74 L66 84 M66 74 L76 74"/>
-            <path d="M122 74 L122 84 M122 74 L112 74"/>
-            <path d="M66 148 L66 138 M66 148 L76 148"/>
-            <path d="M122 148 L122 138 M122 148 L112 148"/>
-          </g>
-
-          <!-- person silhouette -->
-          <g stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="94" cy="98" r="13"/>
-            <path d="M74 138 Q76 116 94 114 Q112 116 114 138"/>
-          </g>
-
-          <circle cx="50" cy="168" r="2.6" fill="var(--accent-soft)"/>
-          <path d="M148 46 l4 4 4-4-4-4z" fill="none" stroke="var(--accent-soft)" stroke-width="1.3"/>
-
-          <!-- softbox light on stand -->
-          <line x1="176" y1="108" x2="176" y2="214" stroke="var(--circle-line)" stroke-width="1.4"/>
-          <path d="M176 214 L160 240 M176 214 L176 246 M176 214 L192 240" stroke="var(--circle-line)" stroke-width="1.4" stroke-linecap="round"/>
-          <rect x="167" y="92" width="18" height="17" rx="3" stroke="var(--ink-soft)" stroke-width="1.4"/>
-          <g stroke="var(--accent-soft)" stroke-width="1.3">
-            <circle cx="176" cy="56" r="38"/>
-            <path d="M176 56 L176 20 M176 56 L204 38 M176 56 L204 74 M176 56 L148 74 M176 56 L148 38"/>
-          </g>
-          <circle cx="176" cy="56" r="6" fill="var(--card)" stroke="var(--ink-soft)" stroke-width="1.3"/>
-
-          <rect x="188" y="188" width="12" height="12" rx="2" transform="rotate(18 194 194)" stroke="var(--line)" stroke-width="1.2"/>
-        </svg>
+        <picture>
+          <source srcset="img/hero-illustration.webp" type="image/webp">
+          <img src="img/hero-illustration.png" width="677" height="773" alt="" decoding="async">
+        </picture>
       </div>
     </div>
 
@@ -396,7 +354,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-03";
+  var BUILD_VERSION = "2026-09-01-04";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
