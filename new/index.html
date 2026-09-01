@@ -119,7 +119,7 @@
   .hero-sub{
     margin-top: 8px;
     font-size: 14.5px;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--accent);
     letter-spacing: 0.05em;
   }
@@ -142,16 +142,16 @@
   .feature:last-child{ border-bottom: none; margin-bottom:0; padding-bottom:0; }
   .feature-icon{
     flex: 0 0 auto;
-    width: 46px; height: 46px;
+    width: 58px; height: 58px;
     display:flex; align-items:center; justify-content:center;
   }
   .feature-icon img{ width: 100%; height: 100%; }
   .feature-text{ padding-top: 3px; font-size: 13px; line-height: 1.6; white-space: nowrap; }
-  .feature-text .line1{ color: var(--ink); font-weight: 700; }
+  .feature-text .line1{ color: var(--ink); font-weight: 400; }
   .feature-text .line2{ color: var(--muted); }
 
   .hero-illustration{
-    flex: 0 1 34%;
+    flex: 0 1 46%;
     position: relative;
     top: -6px;
   }
@@ -175,7 +175,7 @@
     display:flex;
     align-items:center;
     gap: 16px;
-    padding: 18px 6px;
+    padding: 12px 6px;
     border-bottom: 1px solid var(--line);
     text-decoration:none;
     color: inherit;
@@ -198,21 +198,28 @@
   .menu-item:active .menu-icon img{
     filter: brightness(0) invert(1);
   }
-  .menu-item.featured{ background-color: var(--highlight-bg); }
+  .menu-item.featured{ background-color: var(--accent); }
+  .menu-item.featured .menu-label,
+  .menu-item.featured .menu-chevron{ color: var(--card); }
+  .menu-item.featured .menu-icon{ border-color: var(--card); }
+  .menu-item.featured .menu-icon img{ filter: brightness(0) invert(1); }
+  .menu-item.featured:hover,
+  .menu-item.featured:focus-visible{ background-color: var(--ink-soft); }
+  .menu-item.featured:active{ background-color: var(--ink); }
   .menu-icon{
     flex: 0 0 auto;
-    width: 40px; height: 40px;
+    width: 48px; height: 48px;
     border-radius: 50%;
     border: 1px solid var(--circle-line);
     display:flex; align-items:center; justify-content:center;
     color: var(--ink-soft);
-    transition: color .18s ease;
+    transition: color .18s ease, border-color .18s ease;
   }
-  .menu-icon img{ width: 20px; height: 20px; }
+  .menu-icon img{ width: 24px; height: 24px; }
   .menu-label{
     flex: 1 1 auto;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--ink);
     transition: color .18s ease;
   }
@@ -352,7 +359,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-05";
+  var BUILD_VERSION = "2026-09-01-06";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
