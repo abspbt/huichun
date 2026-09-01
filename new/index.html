@@ -223,10 +223,9 @@
     flex: 0 0 auto;
     width: 38px; height: 38px;
     border-radius: 50%;
-    border: 1px solid var(--circle-line);
     display:flex; align-items:center; justify-content:center;
     color: var(--ink-soft);
-    transition: color .18s ease, border-color .18s ease;
+    transition: color .18s ease;
   }
   .menu-icon img{ width: 18px; height: 18px; }
   .menu-label{
@@ -372,7 +371,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-11";
+  var BUILD_VERSION = "2026-09-01-12";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
