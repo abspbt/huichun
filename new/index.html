@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回春視務所｜高雄自然系質感證件照．現拍．現修．現取</title>
+<meta name="description" content="回春視務所｜高雄前金區證件照專門店，自然系質感修圖，現拍現修現取，約60分鐘完成，一組NT$700，平日假日皆可線上預約。">
+<link rel="canonical" href="https://hui-chun.com/new/">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/noto-sans-tc-400.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  :root{
+    --bg: #F4EFE7;
+    --bg-soft: #EFE7D9;
+    --ink: #2E2A23;
+    --ink-soft: #58513F;
+    --muted: #8A8071;
+    --accent: #AD7F4C;
+    --accent-soft: #C79C63;
+    --line: #E2D7C3;
+    --circle-line: #CFC3AC;
+    --highlight-bg: #F1E4C9;
+    --card: #FBF8F2;
+  }
+
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:900;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-900.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body{
+    opacity: 0;
+    animation: pageFadeIn .45s ease-out forwards;
+  }
+  body.leaving{
+    animation: none;
+    opacity: 1;
+    transition: opacity .22s ease-in;
+  }
+  body.leaving.leaving-out{ opacity: 0; }
+
+  @keyframes pageFadeIn{
+    from{ opacity:0; transform: translateY(6px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .wrap{ max-width: 460px; margin: 0 auto; padding: 0 24px 40px; }
+
+  /* ---------- brand header ---------- */
+  .brand{ text-align:center; padding: 40px 0 22px; }
+  .brand-title{
+    font-family:'Noto Serif TC', serif;
+    font-weight: 700;
+    font-size: clamp(26px, 8vw, 32px);
+    letter-spacing: 0.42em;
+    text-indent: 0.42em; /* re-center the trailing letter-spacing gap */
+    color: var(--ink);
+  }
+  .brand-sub{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 12px;
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+  }
+  .brand-sub::before,
+  .brand-sub::after{
+    content:"";
+    width: 26px;
+    height: 1px;
+    background: var(--circle-line);
+  }
+
+  /* ---------- hero ---------- */
+  .hero-title{
+    font-family:'Noto Serif TC', serif;
+    font-weight: 700;
+    font-size: clamp(24px, 7.2vw, 28px);
+    letter-spacing: 0.16em;
+    text-indent: 0.16em;
+    color: var(--ink);
+    margin-top: 10px;
+  }
+  .hero-sub{
+    margin-top: 8px;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .hero-grid{
+    display:flex;
+    align-items: flex-start;
+    gap: 4px;
+    margin-top: 30px;
+  }
+
+  .feature-list{ flex: 1 1 63%; min-width: 0; }
+  .feature{
+    display:flex;
+    gap: 12px;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .feature:last-child{ border-bottom: none; margin-bottom:0; padding-bottom:0; }
+  .feature-icon{
+    flex: 0 0 auto;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--circle-line);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink-soft);
+    background: var(--card);
+  }
+  .feature-icon svg{ width: 19px; height: 19px; }
+  .feature-text{ padding-top: 3px; font-size: 13px; line-height: 1.6; white-space: nowrap; }
+  .feature-text .line1{ color: var(--ink); font-weight: 700; }
+  .feature-text .line2{ color: var(--muted); }
+
+  .hero-illustration{
+    flex: 0 1 34%;
+    position: relative;
+    top: -6px;
+  }
+  .hero-illustration svg{ width: 100%; height: auto; overflow: visible; }
+
+  .tagline{
+    margin-top: 30px;
+    text-align:center;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  .tagline span{ margin: 0 12px; }
+
+  /* ---------- nav menu ---------- */
+  .menu{
+    margin-top: 34px;
+    border-top: 1px solid var(--line);
+  }
+  .menu-item{
+    display:flex;
+    align-items:center;
+    gap: 16px;
+    padding: 18px 6px;
+    border-bottom: 1px solid var(--line);
+    text-decoration:none;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .18s ease, padding-left .18s ease;
+  }
+  .menu-item:hover,
+  .menu-item:focus-visible{
+    background-color: var(--highlight-bg);
+    padding-left: 12px;
+  }
+  .menu-item:active{
+    background-color: var(--accent-soft);
+    padding-left: 12px;
+  }
+  .menu-item:active .menu-icon,
+  .menu-item:active .menu-label,
+  .menu-item:active .menu-chevron{
+    color: var(--card);
+  }
+  .menu-item.featured{ background-color: var(--highlight-bg); }
+  .menu-icon{
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--circle-line);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink-soft);
+    transition: color .18s ease;
+  }
+  .menu-icon svg{ width: 18px; height: 18px; }
+  .menu-label{
+    flex: 1 1 auto;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    transition: color .18s ease;
+  }
+  .menu-chevron{
+    flex: 0 0 auto;
+    color: var(--accent);
+    transition: color .18s ease, transform .18s ease;
+  }
+  .menu-chevron svg{ width: 16px; height: 16px; }
+  .menu-item:hover .menu-chevron{ transform: translateX(3px); }
+
+  footer{
+    margin-top: 28px;
+    text-align:center;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="brand">
+    <h1 class="brand-title">回春視務所</h1>
+    <p class="brand-sub">證件照專門</p>
+  </header>
+
+  <section class="hero">
+    <h2 class="hero-title">現拍．現修．現取</h2>
+    <p class="hero-sub">平日、假日皆可預約</p>
+
+    <div class="hero-grid">
+      <ul class="feature-list">
+        <li class="feature">
+          <span class="feature-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M11 3H3v8l10 10 8-8L11 3z"/><circle cx="7" cy="7" r="1.3" fill="currentColor" stroke="none"/></svg></span>
+          <span class="feature-text">
+            <span class="line1">一組 NT$700</span><br>
+            <span class="line2">（精修，不含妝髮）</span>
+          </span>
+        </li>
+        <li class="feature">
+          <span class="feature-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></svg></span>
+          <span class="feature-text">
+            <span class="line1">附電子檔（Email）</span><br>
+            <span class="line2">＋16 張兩吋照片（可改一吋）</span>
+          </span>
+        </li>
+        <li class="feature">
+          <span class="feature-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+          <span class="feature-text">
+            <span class="line1">從拍攝到取件，</span><br>
+            <span class="line2">大約 60 分鐘</span>
+          </span>
+        </li>
+        <li class="feature">
+          <span class="feature-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+          <span class="feature-text">
+            <span class="line1">現場即可確認修片效果，</span><br>
+            <span class="line2">不用再跑第二趟</span>
+          </span>
+        </li>
+      </ul>
+
+      <div class="hero-illustration" aria-hidden="true">
+        <svg viewBox="0 0 220 260" fill="none">
+          <circle cx="188" cy="92" r="66" stroke="var(--line)" stroke-width="1" opacity="0.7"/>
+          <g stroke="var(--circle-line)" stroke-width="0.9" opacity="0.8">
+            <circle cx="196" cy="18" r="1.6" fill="var(--circle-line)" stroke="none"/>
+            <circle cx="204" cy="18" r="1.6" fill="var(--circle-line)" stroke="none"/>
+            <circle cx="212" cy="18" r="1.6" fill="var(--circle-line)" stroke="none"/>
+            <circle cx="196" cy="26" r="1.6" fill="var(--circle-line)" stroke="none"/>
+            <circle cx="204" cy="26" r="1.6" fill="var(--circle-line)" stroke="none"/>
+            <circle cx="212" cy="26" r="1.6" fill="var(--circle-line)" stroke="none"/>
+          </g>
+
+          <!-- backdrop roller + panel -->
+          <rect x="38" y="28" width="112" height="7" rx="3.5" stroke="var(--circle-line)" stroke-width="1.4"/>
+          <circle cx="38" cy="31.5" r="5" stroke="var(--circle-line)" stroke-width="1.4"/>
+          <circle cx="150" cy="31.5" r="5" stroke="var(--circle-line)" stroke-width="1.4"/>
+          <path d="M54 40 L54 182 Q74 189 94 184 Q114 179 134 185 L134 40 Z" stroke="var(--circle-line)" stroke-width="1.4"/>
+
+          <!-- viewfinder corner marks -->
+          <g stroke="var(--ink-soft)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M66 74 L66 84 M66 74 L76 74"/>
+            <path d="M122 74 L122 84 M122 74 L112 74"/>
+            <path d="M66 148 L66 138 M66 148 L76 148"/>
+            <path d="M122 148 L122 138 M122 148 L112 148"/>
+          </g>
+
+          <!-- person silhouette -->
+          <g stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="94" cy="98" r="13"/>
+            <path d="M74 138 Q76 116 94 114 Q112 116 114 138"/>
+          </g>
+
+          <circle cx="50" cy="168" r="2.6" fill="var(--accent-soft)"/>
+          <path d="M148 46 l4 4 4-4-4-4z" fill="none" stroke="var(--accent-soft)" stroke-width="1.3"/>
+
+          <!-- softbox light on stand -->
+          <line x1="176" y1="108" x2="176" y2="214" stroke="var(--circle-line)" stroke-width="1.4"/>
+          <path d="M176 214 L160 240 M176 214 L176 246 M176 214 L192 240" stroke="var(--circle-line)" stroke-width="1.4" stroke-linecap="round"/>
+          <rect x="167" y="92" width="18" height="17" rx="3" stroke="var(--ink-soft)" stroke-width="1.4"/>
+          <g stroke="var(--accent-soft)" stroke-width="1.3">
+            <circle cx="176" cy="56" r="38"/>
+            <path d="M176 56 L176 20 M176 56 L204 38 M176 56 L204 74 M176 56 L148 74 M176 56 L148 38"/>
+          </g>
+          <circle cx="176" cy="56" r="6" fill="var(--card)" stroke="var(--ink-soft)" stroke-width="1.3"/>
+
+          <rect x="188" y="188" width="12" height="12" rx="2" transform="rotate(18 194 194)" stroke="var(--line)" stroke-width="1.2"/>
+        </svg>
+      </div>
+    </div>
+
+    <p class="tagline">專業拍攝<span>|</span>自然修圖<span>|</span>快速取件</p>
+  </section>
+
+  <nav class="menu">
+    <a class="menu-item" href="../booking.html" data-transition="fade">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <span class="menu-label">預約檔期</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="menu-item" href="../about.html" data-transition="fade">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 3.5v3.2M3.5 3.5h3.2"/><path d="M20.5 3.5v3.2M20.5 3.5h-3.2"/><path d="M3.5 20.5v-3.2M3.5 20.5h3.2"/><path d="M20.5 20.5v-3.2M20.5 20.5h-3.2"/><circle cx="12" cy="10.3" r="3.3"/><path d="M7 18c.5-3 2.3-4.6 5-4.6s4.5 1.6 5 4.6"/></svg></span>
+      <span class="menu-label">關於回春</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="menu-item" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener noreferrer">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></span>
+      <span class="menu-label">Instagram 看拍攝效果</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="menu-item" href="https://www.facebook.com/id7012/" target="_blank" rel="noopener noreferrer">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 22v-9h3l1-4h-4V6.5C13 5.3 13.4 4.5 15.1 4.5H17V1.1C16.6 1 15.3 1 14 1c-3 0-5 1.8-5 5.2V9H6v4h3v9h4z"/></svg></span>
+      <span class="menu-label">Facebook 聽老闆說垃圾話</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="menu-item" href="../outfit.html" data-transition="fade">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.25c-.95.5-1.35 1.05-1.35 2.25"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+      <span class="menu-label">證件照常見問題 Q&amp;A</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="menu-item" href="../map.html" data-transition="fade">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-7.2 7-12a7 7 0 10-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+      <span class="menu-label">交通指引</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="menu-item featured" href="https://line.me/R/ti/p/@128mtxwg" target="_blank" rel="noopener noreferrer">
+      <span class="menu-icon"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+      <span class="menu-label">直接私訊老闆</span>
+      <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+  </nav>
+
+  <footer>© 2016 回春視務所｜證件照專門</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // 導覽項目點擊時先淡出畫面再真正跳轉（真實網址跳轉，非局部置換，維持 SEO）
+  document.querySelectorAll('a.menu-item[data-transition="fade"]').forEach(function(link){
+    link.addEventListener('click', function(e){
+      if(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      var href = link.getAttribute('href');
+      document.body.classList.add('leaving');
+      requestAnimationFrame(function(){
+        document.body.classList.add('leaving-out');
+      });
+      setTimeout(function(){ location.href = href; }, 220);
+    });
+  });
+
+  // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
+  // 「Mobile browsers showing stale cached content」）。
+  // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
+  var BUILD_VERSION = "2026-09-01-02";
+  var isCheckingUpdate = false;
+  function checkForUpdate(){
+    if(isCheckingUpdate) return;
+    isCheckingUpdate = true;
+    fetch(location.pathname + '?_vc=' + Date.now(), { cache: 'no-store' })
+      .then(function(res){
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(html){
+        var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
+        if(m && m[1] && m[1] !== BUILD_VERSION){
+          location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
+        }
+      })
+      .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
+      .finally(function(){ isCheckingUpdate = false; });
+  }
+  checkForUpdate();
+  setInterval(checkForUpdate, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') checkForUpdate();
+  });
+  window.addEventListener('pageshow', function(e){
+    if(e.persisted) checkForUpdate();
+  });
+})();
+</script>
+
+</body>
+</html>
