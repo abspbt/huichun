@@ -7,11 +7,11 @@
 <meta name="description" content="回春視務所｜高雄前金區證件照專門店，自然系質感修圖，現拍現修現取，約60分鐘完成，一組NT$700，平日假日皆可線上預約。">
 <link rel="canonical" href="https://hui-chun.com/new/">
 <meta name="robots" content="noindex, nofollow">
-<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/noto-serif-tc-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/noto-sans-tc-400.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   :root{
-    --bg: #F4EFE7;
+    --bg: #F3EFEE;
     --bg-soft: #EFE7D9;
     --ink: #2E2A23;
     --ink-soft: #58513F;
@@ -21,9 +21,16 @@
     --line: #E2D7C3;
     --circle-line: #CFC3AC;
     --highlight-bg: #F1E4C9;
+    --featured-bg: #E7D4B0;
     --card: #FBF8F2;
   }
 
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-400.woff2') format('woff2');
+  }
   @font-face{
     font-family:'Noto Serif TC';
     font-weight:700;
@@ -81,7 +88,7 @@
   .brand{ text-align:center; padding: 40px 0 22px; }
   .brand-title{
     font-family:'Noto Serif TC', serif;
-    font-weight: 700;
+    font-weight: 400;
     font-size: clamp(26px, 8vw, 32px);
     letter-spacing: 0.42em;
     text-indent: 0.42em; /* re-center the trailing letter-spacing gap */
@@ -109,7 +116,7 @@
   /* ---------- hero ---------- */
   .hero-title{
     font-family:'Noto Serif TC', serif;
-    font-weight: 700;
+    font-weight: 400;
     font-size: clamp(24px, 7.2vw, 28px);
     letter-spacing: 0.16em;
     text-indent: 0.16em;
@@ -142,10 +149,12 @@
   .feature:last-child{ border-bottom: none; margin-bottom:0; padding-bottom:0; }
   .feature-icon{
     flex: 0 0 auto;
-    width: 58px; height: 58px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-soft);
     display:flex; align-items:center; justify-content:center;
   }
-  .feature-icon img{ width: 100%; height: 100%; }
+  .feature-icon img{ width: 26px; height: 26px; }
   .feature-text{ padding-top: 3px; font-size: 13px; line-height: 1.6; white-space: nowrap; }
   .feature-text .line1{ color: var(--ink); font-weight: 400; }
   .feature-text .line2{ color: var(--muted); }
@@ -198,14 +207,9 @@
   .menu-item:active .menu-icon img{
     filter: brightness(0) invert(1);
   }
-  .menu-item.featured{ background-color: var(--accent); }
-  .menu-item.featured .menu-label,
-  .menu-item.featured .menu-chevron{ color: var(--card); }
-  .menu-item.featured .menu-icon{ border-color: var(--card); }
-  .menu-item.featured .menu-icon img{ filter: brightness(0) invert(1); }
+  .menu-item.featured{ background-color: var(--featured-bg); }
   .menu-item.featured:hover,
-  .menu-item.featured:focus-visible{ background-color: var(--ink-soft); }
-  .menu-item.featured:active{ background-color: var(--ink); }
+  .menu-item.featured:focus-visible{ background-color: var(--accent-soft); }
   .menu-icon{
     flex: 0 0 auto;
     width: 48px; height: 48px;
@@ -256,28 +260,28 @@
     <div class="hero-grid">
       <ul class="feature-list">
         <li class="feature">
-          <span class="feature-icon"><img src="img/feature-tag.webp" width="46" height="46" alt="" decoding="async"></span>
+          <span class="feature-icon"><img src="img/feature-tag.webp" width="26" height="26" alt="" decoding="async"></span>
           <span class="feature-text">
             <span class="line1">一組 NT$700</span><br>
             <span class="line2">（精修，不含妝髮）</span>
           </span>
         </li>
         <li class="feature">
-          <span class="feature-icon"><img src="img/feature-mail.webp" width="46" height="46" alt="" decoding="async"></span>
+          <span class="feature-icon"><img src="img/feature-mail.webp" width="26" height="26" alt="" decoding="async"></span>
           <span class="feature-text">
             <span class="line1">附電子檔（Email）</span><br>
             <span class="line2">＋16 張兩吋照片（可改一吋）</span>
           </span>
         </li>
         <li class="feature">
-          <span class="feature-icon"><img src="img/feature-clock.webp" width="46" height="46" alt="" decoding="async"></span>
+          <span class="feature-icon"><img src="img/feature-clock.webp" width="26" height="26" alt="" decoding="async"></span>
           <span class="feature-text">
             <span class="line1">從拍攝到取件，</span><br>
             <span class="line2">大約 60 分鐘</span>
           </span>
         </li>
         <li class="feature">
-          <span class="feature-icon"><img src="img/feature-monitor.webp" width="46" height="46" alt="" decoding="async"></span>
+          <span class="feature-icon"><img src="img/feature-monitor.webp" width="26" height="26" alt="" decoding="async"></span>
           <span class="feature-text">
             <span class="line1">現場即可確認修片效果，</span><br>
             <span class="line2">不用再跑第二趟</span>
@@ -359,7 +363,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-06";
+  var BUILD_VERSION = "2026-09-01-07";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
