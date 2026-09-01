@@ -163,7 +163,7 @@
     flex: 0 0 auto;
     width: 40px; height: 40px;
     border-radius: 50%;
-    border: 1px solid var(--accent-soft);
+    border: 1px solid var(--line);
     display:flex; align-items:center; justify-content:center;
   }
   .feature-icon img{ width: 18px; height: 18px; }
@@ -371,7 +371,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-12";
+  var BUILD_VERSION = "2026-09-01-13";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
