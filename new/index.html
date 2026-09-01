@@ -94,16 +94,16 @@
     to{ opacity:1; transform: translateY(0); }
   }
 
-  .wrap{ max-width: 460px; margin: 0 auto; padding: 0 24px 40px; }
+  .wrap{ max-width: 460px; margin: 0 auto; padding: 0 24px 28px; }
 
   /* ---------- brand header ---------- */
-  .brand{ text-align:center; padding: 40px 0 22px; }
+  .brand{ text-align:center; padding: 24px 0 14px; }
   .brand-title{
     font-family:'Noto Serif TC', serif;
     font-weight: 300;
-    font-size: clamp(26px, 8vw, 32px);
-    letter-spacing: 0.42em;
-    text-indent: 0.42em; /* re-center the trailing letter-spacing gap */
+    font-size: clamp(20px, 6.4vw, 24px);
+    letter-spacing: 0.38em;
+    text-indent: 0.38em; /* re-center the trailing letter-spacing gap */
     color: var(--ink);
   }
   .brand-sub{
@@ -111,9 +111,9 @@
     align-items:center;
     justify-content:center;
     gap: 12px;
-    margin-top: 14px;
+    margin-top: 10px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0.3em;
     text-indent: 0.3em;
   }
@@ -129,15 +129,15 @@
   .hero-title{
     font-family:'Noto Serif TC', serif;
     font-weight: 300;
-    font-size: clamp(24px, 7.2vw, 28px);
-    letter-spacing: 0.16em;
-    text-indent: 0.16em;
+    font-size: clamp(18px, 5.6vw, 21px);
+    letter-spacing: 0.14em;
+    text-indent: 0.14em;
     color: var(--ink);
-    margin-top: 10px;
+    margin-top: 6px;
   }
   .hero-sub{
-    margin-top: 8px;
-    font-size: 14.5px;
+    margin-top: 5px;
+    font-size: 12.5px;
     font-weight: 300;
     color: var(--accent);
     letter-spacing: 0.05em;
@@ -147,39 +147,39 @@
     display:flex;
     align-items: flex-start;
     gap: 4px;
-    margin-top: 30px;
+    margin-top: 18px;
   }
 
-  .feature-list{ flex: 1 1 63%; min-width: 0; }
+  .feature-list{ flex: 1 1 50%; min-width: 0; }
   .feature{
     display:flex;
-    gap: 12px;
-    padding-bottom: 18px;
-    margin-bottom: 18px;
+    gap: 8px;
+    padding-bottom: 9px;
+    margin-bottom: 9px;
     border-bottom: 1px dashed var(--line);
   }
   .feature:last-child{ border-bottom: none; margin-bottom:0; padding-bottom:0; }
   .feature-icon{
     flex: 0 0 auto;
-    width: 56px; height: 56px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     border: 1px solid var(--accent-soft);
     display:flex; align-items:center; justify-content:center;
   }
-  .feature-icon img{ width: 26px; height: 26px; }
-  .feature-text{ padding-top: 3px; font-size: 13px; line-height: 1.6; white-space: nowrap; }
+  .feature-icon img{ width: 18px; height: 18px; }
+  .feature-text{ padding-top: 2px; font-size: 10.5px; line-height: 1.45; white-space: nowrap; }
   .feature-text .line1{ color: var(--ink); font-weight: 300; }
   .feature-text .line2{ color: var(--muted); }
 
   .hero-illustration{
-    flex: 0 1 46%;
+    flex: 0 1 60%;
     position: relative;
-    top: -6px;
+    top: -4px;
   }
   .hero-illustration img{ width: 100%; height: auto; display:block; }
 
   .tagline{
-    margin-top: 30px;
+    margin-top: 18px;
     text-align:center;
     font-size: 12.5px;
     letter-spacing: 0.14em;
@@ -189,14 +189,14 @@
 
   /* ---------- nav menu ---------- */
   .menu{
-    margin-top: 34px;
+    margin-top: 20px;
     border-top: 1px solid var(--line);
   }
   .menu-item{
     display:flex;
     align-items:center;
-    gap: 16px;
-    padding: 12px 6px;
+    gap: 14px;
+    padding: 8px 6px;
     border-bottom: 1px solid var(--line);
     text-decoration:none;
     color: inherit;
@@ -221,17 +221,17 @@
   }
   .menu-icon{
     flex: 0 0 auto;
-    width: 48px; height: 48px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     border: 1px solid var(--circle-line);
     display:flex; align-items:center; justify-content:center;
     color: var(--ink-soft);
     transition: color .18s ease, border-color .18s ease;
   }
-  .menu-icon img{ width: 24px; height: 24px; }
+  .menu-icon img{ width: 18px; height: 18px; }
   .menu-label{
     flex: 1 1 auto;
-    font-size: 15px;
+    font-size: 13.5px;
     font-weight: 300;
     color: var(--ink);
     transition: color .18s ease;
@@ -245,7 +245,7 @@
   .menu-item:hover .menu-chevron{ transform: translateX(3px); }
 
   footer{
-    margin-top: 28px;
+    margin-top: 16px;
     text-align:center;
     font-size: 11.5px;
     letter-spacing: 0.05em;
@@ -372,7 +372,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-01-08";
+  var BUILD_VERSION = "2026-09-01-09";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
