@@ -150,7 +150,7 @@
     margin-top: 18px;
   }
 
-  .feature-list{ flex: 1 1 50%; min-width: 0; }
+  .feature-list{ flex: 0 0 auto; }
   .feature{
     display:flex;
     gap: 8px;
@@ -172,7 +172,9 @@
   .feature-text .line2{ color: var(--muted); }
 
   .hero-illustration{
-    flex: 0 1 60%;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-right: -24px;
     position: relative;
     top: -4px;
   }
@@ -297,8 +299,9 @@
         </li>
       </ul>
 
-      <!-- 插圖待設計，暫留空間不放圖 -->
-      <div class="hero-illustration" aria-hidden="true"></div>
+      <div class="hero-illustration" aria-hidden="true">
+        <img src="img/hero-illustration.webp" alt="" decoding="async" fetchpriority="high">
+      </div>
     </div>
 
     <p class="tagline">專業拍攝<span>|</span>自然修圖<span>|</span>快速取件</p>
@@ -367,7 +370,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-02";
+  var BUILD_VERSION = "2026-09-02-03";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
