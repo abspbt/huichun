@@ -79,6 +79,12 @@
     font-family:var(--font-sans);
     line-height:1.9;
     -webkit-font-smoothing:antialiased;
+    opacity:0;
+    animation: pageFadeIn .45s ease-out forwards;
+  }
+  @keyframes pageFadeIn{
+    from{ opacity:0; transform: translateY(6px); }
+    to{ opacity:1; transform: translateY(0); }
   }
   .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
 
@@ -358,7 +364,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-08-26-01";
+  var BUILD_VERSION = "2026-09-02-01";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
