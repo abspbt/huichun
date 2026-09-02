@@ -157,14 +157,14 @@
 </script>
 <style>
   :root{
-    --paper:#EEE7E3;
+    --paper:#F5F5F4;
     --ink:#5B4B4E;
     --ink-soft:#6E5F5E;
     --line:#E0D2CD;
-    --navy:#C98F97;
-    --navy-soft:#F1DFE0;
-    --red:#A9727A;
-    --red-soft:#EEDCDC;
+    --navy:#6E5D48;
+    --navy-soft:#EDE3D6;
+    --red:#4F4232;
+    --red-soft:#F1E8DC;
     --gold:#B9A38E;
     --gold-soft:#F1E8DC;
     --radius:16px;
@@ -217,7 +217,7 @@
     gap:8px;
     font-size:13px;
     letter-spacing:.14em;
-    color:#8E5059;
+    color:#4F4232;
     font-weight:700;
     padding:6px 14px;
     background:var(--red-soft);
@@ -267,7 +267,7 @@
   }
   .hero h1 em{
     font-style:normal;
-    color:#A9636D;
+    color:#4F4232;
     border-bottom:3px solid var(--navy-soft);
   }
   .hero p{
@@ -359,17 +359,17 @@
     font-size:16px;
     font-weight:700;
     color:#fff;
-    background:#8E5059;
+    background:#4F4232;
     padding:16px 34px;
     border-radius:999px;
     text-decoration:none;
-    box-shadow:0 10px 24px -8px rgba(169,114,122,.55);
+    box-shadow:0 10px 24px -8px rgba(79,66,50,.55);
     transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
   .cta-btn:hover{
-    background:#7A444C;
+    background:#6E5D48;
     transform:translateY(-2px);
-    box-shadow:0 14px 28px -8px rgba(169,114,122,.6);
+    box-shadow:0 14px 28px -8px rgba(79,66,50,.6);
   }
   .cta-btn:focus-visible{
     outline: 3px solid #5B4B4E;
@@ -610,7 +610,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-01";
+  var BUILD_VERSION = "2026-09-02-02";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
