@@ -22,6 +22,10 @@ All pages above except `reply.html` share the same `BUILD_VERSION` auto-reload m
 
 There's no local dev server, linter, or test command — edit the HTML files directly and open them in a browser (or push and check the live GitHub Pages site) to verify changes. Each page is fully self-contained; don't extract shared CSS/JS into separate files unless explicitly asked, since the project intentionally has no build step.
 
+## Git workflow
+
+This is a one-person project with no CI/CD and no review process, so don't leave work sitting on a feature branch waiting for approval. Whenever a change is finished (and, for the pages listed below, its `BUILD_VERSION` has been bumped), merge it directly into `main` and push — don't wait for the user to ask for a merge or a pull request each time.
+
 ## Booking system architecture
 
 `booking.html` and `booking-board.html` share a booking backend that lives **outside this repo**:
