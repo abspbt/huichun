@@ -164,7 +164,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    font-family:'Space Grotesk', sans-serif;
+    font-family:'Space Grotesk', 'Noto Sans TC', sans-serif;
     font-size: clamp(10.5px, 3vw, 12px);
     color: var(--mint);
     letter-spacing: 0.3em;
@@ -293,7 +293,7 @@
   .service-icon svg{ width: 100%; height:100%; }
 
   .service-text{ font-size: clamp(13.5px, 3.8vw, 15px); line-height: 1.7; color: var(--ink); padding-top: 4px; }
-  .service-text b{ color: var(--peach-bright); font-family:'Space Grotesk', sans-serif; font-weight:700; }
+  .service-text b{ color: var(--peach-bright); font-family:'Space Grotesk', 'Noto Sans TC', sans-serif; font-weight:700; }
 
   /* ---------- price badge ---------- */
   .price-block{
@@ -322,7 +322,7 @@
     margin-top: 26px; padding-top: 26px;
     border-top: 1px dashed var(--line);
     display:flex; align-items:center; justify-content:center; gap: 10px;
-    font-family:'Space Grotesk', sans-serif; color: var(--mint-bright); font-size: clamp(13px, 3.8vw, 15px);
+    font-family:'Space Grotesk', 'Noto Sans TC', sans-serif; color: var(--mint-bright); font-size: clamp(13px, 3.8vw, 15px);
   }
   .timer-row svg{ width:18px; height:18px; flex-shrink:0; }
 
@@ -509,7 +509,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-08-26-01";
+  var BUILD_VERSION = "2026-09-02-01";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
