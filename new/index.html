@@ -126,21 +126,27 @@
   }
 
   /* ---------- hero ---------- */
-  .hero-title{
-    font-family:'Noto Serif TC', serif;
+  .hero-tagline{ margin-top: 4px; }
+  .hero-tagline-line{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 8px;
     font-weight: 300;
-    font-size: clamp(18px, 5.6vw, 21px);
-    letter-spacing: 0.14em;
-    text-indent: 0.14em;
-    color: var(--ink);
-    margin-top: 6px;
+    font-size: clamp(11px, 3.4vw, 13px);
+    letter-spacing: 0.04em;
+    text-indent: 0.04em;
+    color: var(--ink-soft);
+    white-space: nowrap;
   }
-  .hero-sub{
-    margin-top: 5px;
-    font-size: 12.5px;
-    font-weight: 300;
-    color: var(--accent);
-    letter-spacing: 0.05em;
+  .hero-tagline-line + .hero-tagline-line{ margin-top: 7px; }
+  .hero-tagline-line::before,
+  .hero-tagline-line::after{
+    content:"";
+    flex: 0 0 auto;
+    width: 16px;
+    height: 1px;
+    background: var(--circle-line);
   }
 
   .hero-grid{
@@ -264,8 +270,10 @@
   </header>
 
   <section class="hero">
-    <h2 class="hero-title">現拍．現修．現取</h2>
-    <p class="hero-sub">平日、假日皆可預約</p>
+    <div class="hero-tagline">
+      <p class="hero-tagline-line">高雄自然系質感證件照</p>
+      <h2 class="hero-tagline-line">現拍．現修．現取　平日、假日皆可預約</h2>
+    </div>
 
     <div class="hero-grid">
       <ul class="feature-list">
@@ -370,7 +378,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-03";
+  var BUILD_VERSION = "2026-09-02-04";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
