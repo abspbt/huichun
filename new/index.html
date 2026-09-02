@@ -130,21 +130,14 @@
   }
 
   /* ---------- hero ---------- */
-  /* Same look as .brand-sub (size/color/dashes); the text here is much
-     longer, so tighten the letter-spacing and dash gap enough to still
-     fit on one line down to a 320px-wide screen. */
+  /* Same look as .brand-sub — size, colour, dashes, letter-spacing all
+     inherited from it — so the two stacked sub-lines read as one pair. */
   .hero-heading{
     /* Offsets .brand's 14px bottom padding to sit tight under the line above. */
     margin-top: -9px;
-    gap: 8px;
+    /* h2 defaults to bold; match the line above. */
     font-weight: 300;
-    letter-spacing: 0.04em;
-    text-indent: 0.04em;
     white-space: nowrap;
-  }
-  .hero-heading::before,
-  .hero-heading::after{
-    width: 16px;
   }
 
   .hero-grid{
@@ -268,7 +261,7 @@
   </header>
 
   <section class="hero">
-    <h2 class="brand-sub hero-heading">現拍．現修．現取　平日、假日皆可預約</h2>
+    <h2 class="brand-sub hero-heading">現拍．現修．現取</h2>
 
     <div class="hero-grid">
       <ul class="feature-list">
@@ -373,7 +366,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-08";
+  var BUILD_VERSION = "2026-09-02-09";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
