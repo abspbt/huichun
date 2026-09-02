@@ -348,12 +348,12 @@
       <span class="menu-label">關於回春</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="menu-item" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener noreferrer">
+    <a class="menu-item" href="https://www.instagram.com/hui_chun_photo/" target="_blank" rel="noopener noreferrer" data-app="instagram://user?username=hui_chun_photo">
       <span class="menu-icon"><img src="img/nav-instagram.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">Instagram 看拍攝效果</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="menu-item" href="https://www.facebook.com/id7012/" target="_blank" rel="noopener noreferrer">
+    <a class="menu-item" href="https://www.facebook.com/id7012/" target="_blank" rel="noopener noreferrer" data-app="fb://facewebmodal/f?href=https%3A%2F%2Fwww.facebook.com%2Fid7012%2F">
       <span class="menu-icon"><img src="img/nav-facebook.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">Facebook 聽老闆說垃圾話</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -368,7 +368,7 @@
       <span class="menu-label">交通指引</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="menu-item" href="https://line.me/R/ti/p/@128mtxwg" target="_blank" rel="noopener noreferrer">
+    <a class="menu-item" href="https://line.me/R/ti/p/@128mtxwg" target="_blank" rel="noopener noreferrer" data-app="line://ti/p/@128mtxwg">
       <span class="menu-icon"><img src="img/nav-send.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">直接私訊老闆</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -397,10 +397,36 @@
     });
   });
 
+  // IG／FB／LINE 這三個連結在手機上改用 App 的 URL scheme 直接跳轉，
+  // 避免瀏覽器先跳出「要不要用 App 開啟」的詢問視窗。若手機沒裝該 App，
+  // scheme 開不了頁面就不會離開分頁，短暫等待後自動改跳網頁版當作備援。
+  // 桌機瀏覽器沒有這些 App，維持原本直接開網頁分頁的行為就好。
+  var IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(IS_MOBILE){
+    document.querySelectorAll('a.menu-item[data-app]').forEach(function(link){
+      link.addEventListener('click', function(e){
+        if(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        var appUrl = link.getAttribute('data-app');
+        var webUrl = link.getAttribute('href');
+        var didLeave = false;
+        function markLeft(){ didLeave = true; }
+        document.addEventListener('visibilitychange', markLeft, { once: true });
+        window.addEventListener('pagehide', markLeft, { once: true });
+        location.href = appUrl;
+        setTimeout(function(){
+          document.removeEventListener('visibilitychange', markLeft);
+          window.removeEventListener('pagehide', markLeft);
+          if(!didLeave) location.href = webUrl;
+        }, 1200);
+      });
+    });
+  }
+
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-12";
+  var BUILD_VERSION = "2026-09-02-13";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
