@@ -50,14 +50,14 @@
 </script>
 <style>
   :root{
-    --paper:#F0EBE0;
+    --paper:#F5F5F4;
     --card:#FBF8F1;
     --ink:#3F4A38;
     --ink-soft:#636A5A;
     --line:rgba(63,74,56,0.16);
-    --jade:#5C6E4F;
-    --jade-deep:#3A4632;
-    --jade-soft:#E4E7DA;
+    --jade:#6E5D48;
+    --jade-deep:#4F4232;
+    --jade-soft:#EDE3D6;
     --amber:#C79A6E;
     --amber-soft:#F3E7D8;
     --mrt:#9C614E;
@@ -102,7 +102,7 @@
     line-height:1.75;
     -webkit-font-smoothing:antialiased;
     background-image:
-      radial-gradient(circle at 15% 8%, rgba(92,110,79,0.07), transparent 40%),
+      radial-gradient(circle at 15% 8%, rgba(110,93,72,0.07), transparent 40%),
       radial-gradient(circle at 90% 75%, rgba(199,154,110,0.08), transparent 45%);
     opacity:0;
     animation: pageFadeIn .45s ease-out forwards;
@@ -185,7 +185,7 @@
   }
   .btn:active{transform:scale(.97);}
   .btn svg{width:18px;height:18px;flex-shrink:0;}
-  .btn-primary{background:var(--jade-deep); color:#fff; box-shadow:0 8px 22px rgba(58,70,50,0.22);}
+  .btn-primary{background:var(--jade-deep); color:#fff; box-shadow:0 8px 22px rgba(79,66,50,0.22);}
   .btn-primary:hover{background:var(--jade); transform:translateY(-2px);}
   .btn-ghost{background:transparent; color:var(--jade-deep); border-color:var(--line);}
   .btn-ghost:hover{border-color:var(--jade); transform:translateY(-2px);}
@@ -266,7 +266,7 @@
 
   .btn:focus-visible,
   .map-caption a:focus-visible{
-    outline: 3px solid #3A4632;
+    outline: 3px solid #4F4232;
     outline-offset: 3px;
   }
 
@@ -414,7 +414,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-01";
+  var BUILD_VERSION = "2026-09-02-02";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
