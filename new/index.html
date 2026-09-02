@@ -367,8 +367,13 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-01";
+  var BUILD_VERSION = "2026-09-02-02";
   var isCheckingUpdate = false;
+  // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
+  // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
+  // 分析到一半時被硬生生導頁，導致分析卡住轉圈圈。加上冷卻時間，同一個分頁
+  // 短時間內最多只強制重新整理一次，其餘留給下一輪偵測或使用者手動整理。
+  var RELOAD_COOLDOWN_MS = 20000;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
     isCheckingUpdate = true;
@@ -380,6 +385,10 @@
       .then(function(html){
         var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
         if(m && m[1] && m[1] !== BUILD_VERSION){
+          var lastReload = 0;
+          try{ lastReload = parseInt(sessionStorage.getItem('hc_last_reload') || '0', 10); }catch(e){}
+          if(Date.now() - lastReload < RELOAD_COOLDOWN_MS) return;
+          try{ sessionStorage.setItem('hc_last_reload', String(Date.now())); }catch(e){}
           location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
         }
       })
