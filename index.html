@@ -111,8 +111,10 @@
     overflow-x: hidden;
   }
 
+  /* 起始值用 0.01 而不是 0：Chrome 不會把 opacity:0 的元素當成 LCP 候選，
+     首屏整個淡入時效能報告會抓不到 LCP。看起來一樣是全透明淡入。 */
   body{
-    opacity: 0;
+    opacity: 0.01;
     animation: pageFadeIn .45s ease-out forwards;
   }
   body.leaving{
@@ -123,7 +125,7 @@
   body.leaving.leaving-out{ opacity: 0; }
 
   @keyframes pageFadeIn{
-    from{ opacity:0; transform: translateY(6px); }
+    from{ opacity:0.01; transform: translateY(6px); }
     to{ opacity:1; transform: translateY(0); }
   }
 
@@ -330,7 +332,9 @@
       </ul>
 
       <div class="hero-illustration" aria-hidden="true">
-        <img src="img/hero-illustration.webp" alt="" decoding="async" fetchpriority="high">
+        <!-- 這張圖的背景色已經直接烘進圖檔（--bg #F5F5F4），檔案才小。
+             日後若改頁面底色，這張圖要重新輸出（原始去背檔：img/hero-illustration.png）。 -->
+        <img src="img/hero-illustration.webp" width="640" height="634" alt="" decoding="async" fetchpriority="high">
       </div>
     </div>
 
@@ -426,7 +430,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-13";
+  var BUILD_VERSION = "2026-09-02-14";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
@@ -454,7 +458,11 @@
       .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
       .finally(function(){ isCheckingUpdate = false; });
   }
-  checkForUpdate();
+  // 第一次檢查等畫面載完再做：這個檢查會把整份 HTML 再抓一次，
+  // 若和圖片、字型搶頻寬，慢速網路下會拖慢首頁出現的速度。
+  function startUpdateChecks(){ setTimeout(checkForUpdate, 1500); }
+  if(document.readyState === 'complete') startUpdateChecks();
+  else window.addEventListener('load', startUpdateChecks, { once: true });
   setInterval(checkForUpdate, 5 * 60 * 1000);
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState === 'visible') checkForUpdate();
