@@ -111,7 +111,11 @@
     align-items:center;
     justify-content:center;
     gap: 12px;
-    margin-top: 10px;
+    margin-top: 12px;
+    /* `normal` leaves ~6px of leading inside the line box, which reads as
+       slack between the two stacked sub-lines; hug the glyphs instead so the
+       gap is set purely by .hero-heading's margin below. */
+    line-height: 1.1;
     color: var(--muted);
     font-size: 12px;
     letter-spacing: 0.3em;
@@ -130,7 +134,8 @@
      longer, so tighten the letter-spacing and dash gap enough to still
      fit on one line down to a 320px-wide screen. */
   .hero-heading{
-    margin-top: -8px;
+    /* Offsets .brand's 14px bottom padding to sit tight under the line above. */
+    margin-top: -11px;
     gap: 8px;
     font-weight: 300;
     letter-spacing: 0.04em;
