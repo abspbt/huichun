@@ -181,9 +181,26 @@
     align-items: flex-start;
     gap: 4px;
     margin-top: 18px;
+    position: relative;
   }
 
-  .feature-list{ flex: 0 0 auto; }
+  .hero-bg{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    z-index: 0;
+  }
+  .hero-bg-scrim{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to right, var(--bg) 46%, var(--bg) 52%, transparent 88%);
+  }
+
+  .feature-list{ flex: 0 0 auto; position: relative; z-index: 2; }
   .feature{
     display:flex;
     gap: 8px;
@@ -197,21 +214,13 @@
     width: 40px; height: 40px;
     border-radius: 50%;
     border: 1px solid var(--line);
+    background: var(--bg);
     display:flex; align-items:center; justify-content:center;
   }
   .feature-icon img{ width: 18px; height: 18px; }
   .feature-text{ padding-top: 2px; font-size: 10.5px; line-height: 1.45; white-space: nowrap; }
   .feature-text .line1{ color: var(--ink); font-weight: 300; }
   .feature-text .line2{ color: var(--muted); }
-
-  .hero-illustration{
-    flex: 1 1 auto;
-    min-width: 0;
-    margin-right: -24px;
-    position: relative;
-    top: -4px;
-  }
-  .hero-illustration img{ width: 100%; height: auto; display:block; }
 
   .tagline{
     margin-top: 18px;
@@ -303,6 +312,10 @@
     <h2 class="brand-sub hero-heading">現拍．現修．現取</h2>
 
     <div class="hero-grid">
+      <!-- 這張圖現在當背景鋪滿整個 hero-grid，文字疊在上面（見下面 .hero-bg-scrim 的淡化遮罩，
+           讓文字這一側維持可讀）。 -->
+      <img class="hero-bg" src="img/hero-illustration.webp" width="640" height="557" alt="" decoding="async" fetchpriority="high" aria-hidden="true">
+      <div class="hero-bg-scrim" aria-hidden="true"></div>
       <ul class="feature-list">
         <li class="feature">
           <span class="feature-icon"><img src="img/feature-tag.webp" width="26" height="26" alt="" decoding="async"></span>
@@ -333,12 +346,6 @@
           </span>
         </li>
       </ul>
-
-      <div class="hero-illustration" aria-hidden="true">
-        <!-- 這張圖的背景色已經直接烘進圖檔（--bg #F5F5F4），檔案才小。
-             日後若改頁面底色，這張圖要重新輸出（原始去背檔：img/hero-illustration.png）。 -->
-        <img src="img/hero-illustration.webp" width="640" height="557" alt="" decoding="async" fetchpriority="high">
-      </div>
     </div>
 
     <p class="tagline">專業拍攝<span>|</span>自然修圖<span>|</span>快速取件</p>
@@ -411,7 +418,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-03-2";
+  var BUILD_VERSION = "2026-09-03-3";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
