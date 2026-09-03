@@ -239,18 +239,21 @@
     transition: background-color .18s ease, padding-left .18s ease;
   }
   .menu-item:hover,
-  .menu-item:focus-visible{
-    background-color: var(--highlight-bg);
-    padding-left: 12px;
-  }
+  .menu-item:focus-visible,
   .menu-item:active{
     background-color: var(--accent-deep);
     padding-left: 12px;
   }
+  .menu-item:hover .menu-label,
+  .menu-item:hover .menu-chevron,
+  .menu-item:focus-visible .menu-label,
+  .menu-item:focus-visible .menu-chevron,
   .menu-item:active .menu-label,
   .menu-item:active .menu-chevron{
     color: var(--card);
   }
+  .menu-item:hover .menu-icon img,
+  .menu-item:focus-visible .menu-icon img,
   .menu-item:active .menu-icon img{
     filter: brightness(0) invert(1);
   }
@@ -408,7 +411,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-15";
+  var BUILD_VERSION = "2026-09-03-1";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
