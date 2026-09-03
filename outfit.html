@@ -158,15 +158,14 @@
 <style>
   :root{
     --paper:#F5F5F4;
-    --ink:#5B4B4E;
-    --ink-soft:#6E5F5E;
-    --line:#E0D2CD;
-    --navy:#6E5D48;
-    --navy-soft:#EDE3D6;
+    --card:#FBF8F2;
+    --ink:#2E2A23;
+    --ink-soft:#58513F;
+    --line:#E2D7C3;
+    --navy:#AD7F4C;
+    --navy-soft:#F1E4C9;
     --red:#4F4232;
-    --red-soft:#F1E8DC;
-    --gold:#B9A38E;
-    --gold-soft:#F1E8DC;
+    --red-soft:#F1E4C9;
     --radius:16px;
     --max:760px;
   }
@@ -217,7 +216,7 @@
     gap:8px;
     font-size:13px;
     letter-spacing:.14em;
-    color:#4F4232;
+    color:var(--red);
     font-weight:700;
     padding:6px 14px;
     background:var(--red-soft);
@@ -263,7 +262,7 @@
   }
   .hero h1 em{
     font-style:normal;
-    color:#4F4232;
+    color:var(--red);
     border-bottom:3px solid var(--navy-soft);
   }
   .hero p{
@@ -274,7 +273,7 @@
   /* ---------- NOTICE ---------- */
   .notice{
     margin:8px 0 56px;
-    background:#fff;
+    background:var(--card);
     border:1px solid var(--line);
     border-radius:var(--radius);
     padding:22px 26px;
@@ -303,7 +302,7 @@
 
   /* ---------- FAQ ---------- */
   .faq-list{display:flex; flex-direction:column; gap:12px; margin-top:8px;}
-  .faq-item{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px;}
+  .faq-item{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px;}
   .faq-item h3{margin:0 0 8px; font-size:15px; font-weight:700; color:var(--ink);}
   .faq-item p{margin:0; font-size:14.5px; color:var(--ink-soft);}
   .faq-sub{margin:12px 0 0; padding-left:20px; display:flex; flex-direction:column; gap:6px;}
@@ -350,20 +349,20 @@
     font-size:16px;
     font-weight:700;
     color:#fff;
-    background:#4F4232;
+    background:var(--navy);
     padding:16px 34px;
     border-radius:999px;
     text-decoration:none;
-    box-shadow:0 10px 24px -8px rgba(79,66,50,.55);
+    box-shadow:0 10px 24px -8px rgba(173,127,76,.55);
     transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
   .cta-btn:hover{
-    background:#6E5D48;
+    background:var(--red);
     transform:translateY(-2px);
-    box-shadow:0 14px 28px -8px rgba(79,66,50,.6);
+    box-shadow:0 14px 28px -8px rgba(173,127,76,.6);
   }
   .cta-btn:focus-visible{
-    outline: 3px solid #5B4B4E;
+    outline: 3px solid var(--red);
     outline-offset: 3px;
   }
   .cta-btn svg{width:18px; height:18px; flex:0 0 auto;}
@@ -588,7 +587,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-03-01";
+  var BUILD_VERSION = "2026-09-03-02";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
