@@ -43,6 +43,16 @@ The fix, applied to every page in this repo except `reply.html` (which has its o
 
 **Whenever you edit `index.html`, `booking.html`, `booking-board.html`, `outfit.html`, `map.html`, or `about.html`, bump that file's own `BUILD_VERSION` string** (e.g. to the current date) — otherwise open tabs/phones won't detect the change and won't auto-reload. Each page's version is independent; they don't need to match each other. If you ever add a new page to this repo, copy this same block (from the bottom of any existing page, e.g. `outfit.html`) into it rather than leaving it without update detection.
 
+## Homepage hero illustration sizing (applies to the 2026-09-01 v2 homepage layout)
+
+This spec applies to the current `index.html` hero layout (`.hero-grid` = feature list on the left + `.hero-illustration` on the right, four feature rows with icons, four-line brand header). If that layout is redesigned later, re-derive these numbers rather than reusing them as-is — they're measured against this specific structure, not a general rule.
+
+- **Output canvas: 1380 × 1200 px, transparent-background PNG.** This is the size at the widest the illustration ever renders (the flex-grow illustration slot filling the full card width); exporting larger just wastes file size.
+- **Reserve the top-left 828 × 840 px (60% × 70% of the canvas) for text/icons.** That's where the four feature rows (icons + two-line copy) sit — don't put illustration subject matter there beyond faint, low-contrast twigs/leaf tips that can tolerate text sitting on top of them.
+- **Draw the main subject in the right-hand vertical strip** (right of that 60%-width line), and optionally in the horizontal band below the 70%-height line (below the feature list, still above the tagline).
+- Overlapping the illustration with the text does **not** by itself make the subject bigger — the feature-list column width is unchanged, so the subject is still confined to the right-hand strip plus the band below. To make the subject visibly larger, the feature-text column would need to shrink/shorten, which is a separate content decision.
+- Reference: `img/hero-illustration.png` (source, transparent) / `img/hero-illustration.webp` (background baked in at `--bg` #F5F5F4, used on the page — see comment above the `<img>` tag in `index.html`).
+
 ## Replying to the user
 
 The user has no programming background. After finishing a change or a debugging task, reply in one or two sentences: what was done, the result, and whether the user needs to do anything (e.g. refresh the page to confirm). Don't explain technical details, code logic, or root-cause analysis. Exception: if the situation requires the user to make a decision (e.g. permission setup, missing information needed to proceed), explain that situation clearly.
