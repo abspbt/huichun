@@ -254,10 +254,6 @@
   /* ---------- HERO ---------- */
   .hero{
     padding:72px 0 40px;
-    display:grid;
-    grid-template-columns:1.15fr .85fr;
-    gap:32px;
-    align-items:center;
   }
   .hero h1{
     font-size:clamp(30px,4.6vw,44px);
@@ -275,9 +271,6 @@
     font-size:16.5px;
     max-width:46ch;
   }
-  .frame-wrap{display:flex; justify-content:center;}
-  .frame-wrap svg{width:100%; max-width:250px; height:auto;}
-
   /* ---------- NOTICE ---------- */
   .notice{
     margin:8px 0 56px;
@@ -340,9 +333,7 @@
   }
 
   @media (max-width:680px){
-    .hero{grid-template-columns:1fr; padding-top:52px;}
-    .frame-wrap{order:-1;}
-    .frame-wrap svg{max-width:160px;}
+    .hero{padding-top:52px;}
   }
 
   /* ---------- CTA ---------- */
@@ -413,19 +404,6 @@
       <span class="eyebrow">顧客提問榜　No.1</span>
       <h1>證件照<br><em>常見問題</em>總整理</h1>
       <p>從法規尺寸、穿搭妝髮，到交付流程與特殊證件申辦<br>把最常被問到的問題，一次整理清楚</p>
-    </div>
-    <div class="frame-wrap">
-      <svg viewBox="0 0 320 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="證件照構圖示意：頭頂與胸口的位置範圍">
-        <rect x="10" y="10" width="300" height="360" rx="18" fill="var(--navy-soft)" stroke="var(--navy)" stroke-width="1.5"/>
-        <line x1="30" y1="66" x2="290" y2="66" stroke="var(--navy)" stroke-width="1" stroke-dasharray="4 5" opacity=".55"/>
-        <text x="30" y="56" font-family="Noto Sans TC" font-size="12" fill="var(--navy)" opacity=".8">頭頂</text>
-        <line x1="30" y1="322" x2="290" y2="322" stroke="var(--navy)" stroke-width="1" stroke-dasharray="4 5" opacity=".55"/>
-        <text x="30" y="342" font-family="Noto Sans TC" font-size="12" fill="var(--navy)" opacity=".8">胸口</text>
-        <circle cx="160" cy="150" r="52" fill="var(--ink)" opacity=".88"/>
-        <path d="M62,320 Q160,208 258,320 L258,340 L62,340 Z" fill="var(--ink)" opacity=".88"/>
-        <path d="M130,258 L160,214 L190,258" stroke="var(--paper)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M160,214 L160,300" stroke="var(--red)" stroke-width="5" stroke-linecap="round"/>
-      </svg>
     </div>
   </div>
 
@@ -610,7 +588,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-02";
+  var BUILD_VERSION = "2026-09-03-01";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
