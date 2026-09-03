@@ -6,6 +6,7 @@
 <title>關於回春｜高雄證件照職人的堅持故事</title>
 <meta name="description" content="回春視務所創辦人擁有二十餘年攝影資歷，從電子工程師到高雄證件照職人，堅持以光影雕刻神韻，打造真正好看證件照與精緻證件照，而非流水線式修圖。">
 <link rel="canonical" href="https://hui-chun.com/about">
+<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="回春視務所">
 <meta property="og:title" content="關於回春｜高雄證件照職人故事．好看證件照與精緻證件照的堅持">
@@ -56,18 +57,37 @@
 <style>
   :root{
     --paper:#F5F5F4;
-    --card:#FBF7F1;
-    --ink:#4A3F32;
-    --ink-soft:#746854;
-    --line:rgba(140,125,106,0.22);
-    --brown:#6E5D48;
+    --card:#FBF8F2;
+    --ink:#2E2A23;
+    --ink-soft:#58513F;
+    --line:#E2D7C3;
+    --brown:#AD7F4C;
     --brown-deep:#4F4232;
-    --brown-soft:#EDE3D6;
+    --brown-soft:#F1E4C9;
     --radius:16px;
     --max:760px;
-    /* 一般手機內建的黑體／宋體，不額外下載字型，也不會缺字 */
-    --font-sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Heiti TC","Microsoft JhengHei","微軟正黑體",sans-serif;
-    --font-serif:"Songti TC","PMingLiU","新細明體","Microsoft JhengHei",serif;
+    --font-sans:'Noto Sans TC', sans-serif;
+    --font-serif:'Noto Serif TC', serif;
+  }
+
+  /* self-hosted subset fonts (see /fonts/OFL.txt for license), same family used site-wide */
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
   }
 
   *{box-sizing:border-box;}
@@ -249,13 +269,13 @@
     padding:16px 34px;
     border-radius:999px;
     text-decoration:none;
-    box-shadow:0 10px 24px -8px rgba(110,93,72,.55);
+    box-shadow:0 10px 24px -8px rgba(173,127,76,.55);
     transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
   .cta-btn:hover{
     background:var(--brown-deep);
     transform:translateY(-2px);
-    box-shadow:0 14px 28px -8px rgba(110,93,72,.6);
+    box-shadow:0 14px 28px -8px rgba(173,127,76,.6);
   }
   .cta-btn:focus-visible{
     outline: 3px solid var(--brown-deep);
@@ -364,7 +384,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-02";
+  var BUILD_VERSION = "2026-09-03-01";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
