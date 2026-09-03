@@ -50,29 +50,18 @@
 </script>
 <style>
   :root{
-    --paper:#F5F5F4;
-    --card:#FBF8F1;
-    --ink:#5B4B4E;
-    --ink-soft:#6E5F5E;
-    --line:rgba(91,75,78,0.16);
-    --jade:#6E5D48;
-    --jade-deep:#4F4232;
-    --jade-soft:#EDE3D6;
-    --amber:#C79A6E;
-    --amber-soft:#F3E7D8;
-    --mrt:#9C614E;
-    --mrt-soft:#F1DED8;
+    --bg:#F6F1E9;
+    --card:#FBF8F2;
+    --ink:#4F4232;
+    --muted:#8A8071;
+    --line:#E2D7C3;
+    --accent:#AD7F4C;
+    --accent-soft:#C79A6E;
     --radius:18px;
-    --max:640px;
+    --max:480px;
   }
 
   /* self-hosted subset fonts (see /fonts/OFL.txt for license) */
-  @font-face{
-    font-family:'Noto Serif TC';
-    font-weight:900;
-    font-display:swap;
-    src:url('/fonts/noto-serif-tc-900.woff2') format('woff2');
-  }
   @font-face{
     font-family:'Noto Serif TC';
     font-weight:700;
@@ -81,29 +70,33 @@
   }
   @font-face{
     font-family:'Noto Sans TC';
+    font-weight:300;
+    font-display:swap;
+    src:url('/fonts/noto-sans-tc-300.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Noto Sans TC';
     font-weight:400;
     font-display:swap;
     src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
   }
   @font-face{
-    font-family:'Space Grotesk';
+    font-family:'Noto Sans TC';
     font-weight:700;
     font-display:swap;
-    src:url('/fonts/space-grotesk-700.woff2') format('woff2');
+    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
   }
 
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;
-    background:var(--paper);
+    background:var(--bg);
     color:var(--ink);
     font-family:'Noto Sans TC', sans-serif;
-    line-height:1.75;
+    font-weight:300;
+    line-height:1.7;
     -webkit-font-smoothing:antialiased;
-    background-image:
-      radial-gradient(circle at 15% 8%, rgba(110,93,72,0.07), transparent 40%),
-      radial-gradient(circle at 90% 75%, rgba(199,154,110,0.08), transparent 45%);
     opacity:0;
     animation: pageFadeIn .45s ease-out forwards;
   }
@@ -111,140 +104,134 @@
     from{ opacity:0; transform: translateY(6px); }
     to{ opacity:1; transform: translateY(0); }
   }
-  .wrap{max-width:var(--max); margin:0 auto; padding:0 22px 70px;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px 60px;}
 
   h1,h2,.serif{font-family:'Noto Serif TC', serif;}
 
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px;
-    font-family:'Space Grotesk', sans-serif;
-    font-size:12px; letter-spacing:.2em; text-transform:uppercase;
-    color:var(--jade); font-weight:700;
+  /* ---------- HEADER ---------- */
+  header.hero{padding:52px 0 30px; text-align:center;}
+  h1.page-title{
+    font-weight:700;
+    font-size:clamp(28px, 7vw, 34px);
+    letter-spacing:.3em;
+    text-indent:.3em;
+    color:var(--ink);
+    margin:0;
   }
-  .eyebrow::before{content:"";width:20px;height:1px;background:var(--jade);display:inline-block;}
-
-  /* film sprockets — the studio's recurring motif, doubles as a route dashed-line here */
-  .sprockets{display:flex; justify-content:space-between; padding:0 2px; opacity:.55;}
-  .sprockets span{width:6px;height:9px;border-radius:2px;background:var(--jade);opacity:.55;}
-
-  /* crop marks — same corner device used across the site's other pages */
-  .crop-frame{position:relative;}
-  .crop-frame::before,.crop-frame::after,
-  .crop-frame .cm-tr,.crop-frame .cm-bl{
-    content:""; position:absolute; width:20px; height:20px;
-    border-color:var(--jade); border-style:solid; opacity:.85;
+  .page-sub{
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    margin-top:14px;
+    font-size:12.5px; letter-spacing:.25em; text-indent:.25em;
+    color:var(--muted);
   }
-  .crop-frame::before{top:-9px;left:-9px;border-width:2px 0 0 2px;}
-  .crop-frame::after{bottom:-9px;right:-9px;border-width:0 2px 2px 0;}
-  .crop-frame .cm-tr{top:-9px;right:-9px;border-width:2px 2px 0 0;}
-  .crop-frame .cm-bl{bottom:-9px;left:-9px;border-width:0 0 2px 2px;}
+  .page-sub::before,
+  .page-sub::after{ content:""; width:22px; height:1px; background:var(--line); }
 
-  /* ---------- HERO ---------- */
-  header.hero{padding:60px 0 8px; text-align:center;}
-  header.hero .sprockets{margin-bottom:22px;}
-  h1.storename{
-    font-weight:900;
-    font-size:clamp(34px, 9vw, 50px);
-    margin:16px 0 6px;
-    letter-spacing:.01em;
-  }
-  .tagline{font-size:14.5px; color:var(--ink-soft); margin:0 0 34px; letter-spacing:.03em;}
-
-  .addr-block{
-    margin:0 6px 26px;
+  /* ---------- ADDRESS CARD ---------- */
+  .addr-card{
     background:var(--card);
     border:1px solid var(--line);
     border-radius:var(--radius);
-    padding:26px 24px 24px;
-    text-align:left;
-    display:flex; gap:16px; align-items:flex-start;
+    padding:24px 22px;
+    margin-bottom:16px;
   }
-  .addr-block .pin{
-    flex:0 0 auto; width:36px; height:36px; border-radius:50%;
-    background:var(--jade-deep); color:#fff;
+  .addr-row{display:flex; gap:14px; align-items:flex-start;}
+  .addr-icon{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line); background:var(--bg);
     display:flex; align-items:center; justify-content:center;
+    color:var(--accent);
   }
-  .addr-block .pin svg{width:17px;height:17px;}
+  .addr-icon svg{width:17px;height:17px;}
   .addr-text{flex:1; min-width:0;}
-  .addr-main{font-family:'Space Grotesk', sans-serif; font-size:15.5px; font-weight:700; color:var(--ink);}
-  .addr-sub{font-size:13px; color:var(--ink-soft); margin-top:8px; line-height:1.7;}
+  .addr-main{font-size:15px; font-weight:700; color:var(--ink);}
+  .addr-sub{font-size:13px; color:var(--muted); margin-top:8px; line-height:1.7;}
   .addr-building{
-    font-family:'Space Grotesk', sans-serif;
-    font-size:12.5px; color:var(--jade-deep); font-weight:700;
-    margin-top:10px; padding-top:10px;
+    font-size:12.5px; color:var(--ink); font-weight:700;
+    margin-top:14px; padding-top:12px;
     border-top:1px dashed var(--line);
   }
 
-  .cta-row{display:flex; flex-direction:column; gap:12px; margin:0 6px;}
-  .btn{
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    font-weight:700; font-size:15px;
+  /* ---------- NAV BUTTON ---------- */
+  .btn-nav{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    background:var(--card); border:1px solid var(--line);
+    color:var(--ink); font-weight:700; font-size:14.5px;
     padding:15px 20px; border-radius:999px;
-    text-decoration:none; border:1px solid transparent;
-    transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+    text-decoration:none;
+    transition:transform .15s ease, border-color .15s ease;
   }
-  .btn:active{transform:scale(.97);}
-  .btn svg{width:18px;height:18px;flex-shrink:0;}
-  .btn-primary{background:var(--jade-deep); color:#fff; box-shadow:0 8px 22px rgba(79,66,50,0.22);}
-  .btn-primary:hover{background:var(--jade); transform:translateY(-2px);}
-  .btn-ghost{background:transparent; color:var(--jade-deep); border-color:var(--line);}
-  .btn-ghost:hover{border-color:var(--jade); transform:translateY(-2px);}
+  .btn-nav svg{width:16px;height:16px;flex-shrink:0; color:var(--accent);}
+  .btn-nav:hover{border-color:var(--accent-soft); transform:translateY(-1px);}
+  .btn-nav:active{transform:scale(.98);}
+  .btn-nav:focus-visible{ outline: 3px solid var(--ink); outline-offset: 3px; }
+
+  /* ---------- SECTION DIVIDER ---------- */
+  .divider{
+    display:flex; align-items:center; gap:10px;
+    margin:34px 0 6px;
+    color:var(--muted); font-size:12.5px; letter-spacing:.14em;
+  }
+  .divider::before,
+  .divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .divider svg{width:15px;height:15px; color:var(--accent); flex-shrink:0;}
 
   /* ---------- SECTION GENERIC ---------- */
-  section{padding:52px 0 0;}
-  .sec-head{margin-bottom:24px;}
-  .sec-head .eyebrow{margin-bottom:12px;}
-  .sec-head h2{font-size:clamp(22px,5vw,27px); margin:0 0 6px; font-weight:700;}
-  .sec-head p{color:var(--ink-soft); margin:0; font-size:14px;}
+  section{padding:36px 0 0;}
+  .sec-title{
+    font-size:19px; font-weight:700; color:var(--ink);
+    margin:0 0 4px;
+  }
+  .sec-desc{color:var(--muted); margin:0 0 16px; font-size:13.5px;}
 
-  /* ---------- ACCESS NOTE ---------- */
-  .notice{
-    display:flex; gap:16px; align-items:flex-start;
+  /* ---------- INFO CARD (怎麼進門) ---------- */
+  .info-card{
+    display:flex; gap:14px; align-items:flex-start;
     background:var(--card); border:1px solid var(--line);
     border-radius:var(--radius);
-    padding:22px 24px;
+    padding:20px 20px;
   }
-  .notice .dot{
-    flex:0 0 auto; width:36px; height:36px; border-radius:50%;
-    background:var(--amber-soft); color:var(--amber);
+  .info-icon{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line); background:var(--bg);
     display:flex; align-items:center; justify-content:center;
+    color:var(--accent);
   }
-  .notice .dot svg{width:18px;height:18px;}
-  .notice p{margin:0; font-size:14.5px; color:var(--ink-soft);}
-  .notice strong{display:block; color:var(--ink); font-weight:700; margin-bottom:4px;}
-  .notice span{display:block;}
+  .info-icon svg{width:16px;height:16px;}
+  .info-card p{margin:0; font-size:13.5px; color:var(--muted); line-height:1.7;}
+  .info-card strong{display:block; color:var(--ink); font-weight:700; margin-bottom:4px;}
 
-  /* ---------- TRANSIT / FILM-FRAME CARD ---------- */
+  /* ---------- TRANSIT CARD ---------- */
   .mrt-card{
-    background:var(--jade-deep);
-    color:#F3F1E9;
+    background:var(--card);
+    border:1px solid var(--line);
     border-radius:var(--radius);
-    padding:26px 24px 22px;
+    padding:22px 20px 18px;
   }
-  .mrt-card .sprockets span{background:rgba(255,255,255,.35);}
-  .mrt-top{display:flex; align-items:center; gap:14px; margin:20px 0 22px; flex-wrap:wrap;}
+  .mrt-top{display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap;}
   .mrt-badge{
-    width:52px; height:52px; border-radius:50%;
-    background:var(--mrt); color:#fff;
-    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px;
+    width:44px; height:44px; border-radius:50%;
+    background:var(--bg); color:var(--ink);
+    border:1.5px solid var(--accent-soft);
+    font-weight:700; font-size:14px;
     display:flex; align-items:center; justify-content:center;
-    flex:0 0 auto; box-shadow:0 0 0 3px rgba(255,255,255,.14);
+    flex:0 0 auto;
   }
-  .mrt-name{font-family:'Noto Serif TC', serif; font-size:19px; font-weight:700;}
-  .mrt-line{font-family:'Space Grotesk', sans-serif; font-size:11.5px; letter-spacing:.1em; color:#E4C9A8; text-transform:uppercase; margin-top:2px;}
+  .mrt-name{font-family:'Noto Serif TC', serif; font-size:16.5px; font-weight:700; color:var(--ink);}
+  .mrt-line{font-size:12px; letter-spacing:.04em; color:var(--muted); margin-top:2px;}
 
-  .route-steps{display:flex; flex-direction:column; gap:0; border-top:1px dashed rgba(255,255,255,.25); padding-top:6px;}
-  .route-step{display:flex; gap:14px; align-items:flex-start; padding:16px 0;}
-  .route-step:not(:last-child){border-bottom:1px dashed rgba(255,255,255,.16);}
+  .route-steps{display:flex; flex-direction:column; border-top:1px dashed var(--line); padding-top:2px;}
+  .route-step{display:flex; gap:12px; align-items:flex-start; padding:14px 0;}
+  .route-step:not(:last-child){border-bottom:1px dashed var(--line);}
   .route-step .num{
-    font-family:'Noto Serif TC', serif; font-weight:700; font-size:16px;
-    width:26px; height:26px; border-radius:50%;
-    border:1px solid rgba(255,255,255,.4);
+    font-weight:700; font-size:13px;
+    width:24px; height:24px; border-radius:50%;
+    border:1px solid var(--line);
     display:flex; align-items:center; justify-content:center;
-    flex:0 0 auto; color:#F3F1E9;
+    flex:0 0 auto; color:var(--ink);
   }
-  .route-step .txt{font-size:14.5px; color:#D9DAD3; padding-top:2px;}
-  .route-step .txt b{color:#fff;}
+  .route-step .txt{font-size:13.5px; color:var(--muted); padding-top:2px; line-height:1.6;}
+  .route-step .txt b{color:var(--ink); font-weight:700;}
 
   /* ---------- MAP EMBED ---------- */
   .map-card{
@@ -252,41 +239,26 @@
     border-radius:var(--radius);
     overflow:hidden;
     background:var(--card);
-    margin:0 6px;
   }
-  .map-card iframe{width:100%; height:420px; border:0; display:block;}
+  .map-card iframe{width:100%; height:340px; border:0; display:block;}
   .map-caption{
-    padding:16px 22px;
-    font-size:13px; color:var(--ink-soft);
+    padding:14px 18px;
+    font-size:12.5px; color:var(--muted);
     display:flex; justify-content:space-between; align-items:center;
     flex-wrap:wrap; gap:10px;
+    border-top:1px solid var(--line);
   }
-  .map-caption a{color:var(--jade-deep); font-weight:700; text-decoration:none;}
+  .map-caption a{color:var(--ink); font-weight:700; text-decoration:none;}
   .map-caption a:hover{text-decoration:underline;}
-
-  .btn:focus-visible,
-  .map-caption a:focus-visible{
-    outline: 3px solid #4F4232;
-    outline-offset: 3px;
-  }
+  .map-caption a:focus-visible{ outline: 3px solid var(--ink); outline-offset: 3px; }
 
   footer{
-    margin-top:56px; text-align:center;
-    font-size:12px; color:var(--ink-soft); letter-spacing:.04em;
+    margin-top:44px; text-align:center;
   }
-  footer span + span{display:block; margin-top:4px;}
-
-  /* reveal-on-scroll, respects reduced motion */
-  .reveal{opacity:0; transform:translateY(10px); transition:opacity .55s ease, transform .55s ease;}
-  .reveal.show{opacity:1; transform:translateY(0);}
-  @media (prefers-reduced-motion: reduce){
-    .reveal{opacity:1; transform:none; transition:none;}
-  }
-
-  @media (max-width:480px){
-    .addr-block{flex-direction:row;}
-    .mrt-card{padding:22px 18px 18px;}
-  }
+  .footer-name{font-family:'Noto Serif TC', serif; font-weight:700; font-size:14px; color:var(--ink);}
+  .footer-addr{font-size:12.5px; color:var(--muted); margin-top:6px;}
+  .footer-rule{width:100%; height:1px; background:var(--line); margin:18px 0;}
+  .footer-copy{font-size:11px; letter-spacing:.03em; color:var(--muted);}
 </style>
 </head>
 <body>
@@ -294,67 +266,50 @@
 <main class="wrap">
 
   <header class="hero">
-    <div class="sprockets">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <div class="eyebrow">高雄・前金</div>
-    <h1 class="storename">交通指引</h1>
-    <p class="tagline">回春視務所．證件照．現拍．現修．現取</p>
+    <h1 class="page-title">交通指引</h1>
+    <p class="page-sub">如何前往回春視務所</p>
+  </header>
 
-    <div class="addr-block crop-frame">
-      <span class="cm-tr"></span><span class="cm-bl"></span>
-      <div class="pin">
+  <div class="addr-card">
+    <div class="addr-row">
+      <span class="addr-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 21s7-7.2 7-12a7 7 0 10-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
-      </div>
+      </span>
       <div class="addr-text">
         <div class="addr-main">高雄市前金區中山二路533號2樓之4</div>
         <div class="addr-sub">二樓電梯出來後，左手邊走廊到底，右手邊那一間</div>
-        <div class="addr-building">大樓名稱：航聯保險大樓</div>
       </div>
     </div>
+    <div class="addr-building">大樓名稱：航聯保險大樓</div>
+  </div>
 
-    <div class="cta-row">
-      <a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&destination=高雄市前金區中山二路533號" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
-        開始導航
-      </a>
-      <a class="btn btn-ghost" href="#transit">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11V8a7 7 0 0114 0v3"/></svg>
-        大眾運輸方式
-      </a>
-    </div>
-  </header>
+  <a class="btn-nav" href="https://www.google.com/maps/dir/?api=1&destination=高雄市前金區中山二路533號" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+    開始導航
+  </a>
+
+  <div class="divider">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11V8a7 7 0 0114 0v3"/></svg>
+    大眾運輸方式
+  </div>
 
   <section id="access">
-    <div class="sec-head">
-      <span class="eyebrow">樓層指引</span>
-      <h2 class="serif">怎麼進門</h2>
-    </div>
-    <div class="notice reveal">
-      <div class="dot">
+    <h2 class="sec-title serif">怎麼進門</h2>
+    <div class="info-card">
+      <span class="info-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M10 6h.01M14 6h.01M10 10h.01M14 10h.01M10 14h.01M14 14h.01"/></svg>
-      </div>
+      </span>
       <p>
         <strong>回春視務所位於二樓，可搭乘電梯上樓。</strong>
-        <span>電梯出來後，左手邊走廊到底，右手邊那一間就是回春視務所。</span>
+        電梯出來後，左手邊走廊到底，右手邊那一間就是回春視務所。
       </p>
     </div>
   </section>
 
   <section id="transit">
-    <div class="sec-head">
-      <span class="eyebrow">大眾運輸</span>
-      <h2 class="serif">搭捷運過來</h2>
-      <p>從出站到店門口，只有這兩步。</p>
-    </div>
-    <div class="mrt-card reveal">
-      <div class="sprockets">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
+    <h2 class="sec-title serif">搭捷運過來</h2>
+    <p class="sec-desc">從出站到店門口，只有這兩步。</p>
+    <div class="mrt-card">
       <div class="mrt-top">
         <div class="mrt-badge">R9</div>
         <div>
@@ -376,13 +331,9 @@
   </section>
 
   <section id="map">
-    <div class="sec-head">
-      <span class="eyebrow">完整地圖</span>
-      <h2 class="serif">交通指引地圖</h2>
-      <p>包含全部停車場位置與捷運步行路線。</p>
-    </div>
-    <div class="map-card crop-frame reveal">
-      <span class="cm-tr"></span><span class="cm-bl"></span>
+    <h2 class="sec-title serif">交通指引地圖</h2>
+    <p class="sec-desc">包含全部停車場位置與捷運步行路線。</p>
+    <div class="map-card">
       <iframe src="https://www.google.com/maps/d/embed?mid=1HxRFjl6GiolWfNiYSBEIGqntbA_txjI" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen title="回春視務所交通指引地圖"></iframe>
       <div class="map-caption">
         <span>包含全部停車場位置與捷運步行路線</span>
@@ -392,21 +343,13 @@
   </section>
 
   <footer>
-    <span>回春視務所</span>
-    <span>高雄市前金區中山二路533號2樓之4</span>
+    <div class="footer-name">回春視務所</div>
+    <div class="footer-addr">高雄市前金區中山二路533號2樓之4</div>
+    <div class="footer-rule"></div>
+    <div class="footer-copy">© 2016 回春視務所｜高雄・證件照專門・現拍・現修・現取</div>
   </footer>
 
 </main>
-
-<script>
-  var revealEls = document.querySelectorAll('.reveal');
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); }
-    });
-  }, {threshold:.15});
-  revealEls.forEach(function(el){ io.observe(el); });
-</script>
 
 <script>
 (function(){
@@ -414,7 +357,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-02-04";
+  var BUILD_VERSION = "2026-09-03-01";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
