@@ -288,11 +288,6 @@
     開始導航
   </a>
 
-  <div class="divider">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11V8a7 7 0 0114 0v3"/></svg>
-    大眾運輸方式
-  </div>
-
   <section id="access">
     <h2 class="sec-title serif">怎麼進門</h2>
     <div class="info-card">
@@ -305,6 +300,11 @@
       </p>
     </div>
   </section>
+
+  <div class="divider">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11V8a7 7 0 0114 0v3"/></svg>
+    大眾運輸方式
+  </div>
 
   <section id="transit">
     <h2 class="sec-title serif">搭捷運過來</h2>
@@ -357,7 +357,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-03-02";
+  var BUILD_VERSION = "2026-09-03-03";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
