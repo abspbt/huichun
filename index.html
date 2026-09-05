@@ -308,7 +308,24 @@
     <div class="hero-grid">
       <!-- 這張圖當背景鋪滿整個 hero-grid，文字直接疊在圖片上面（兩層：圖片在下、文字在上），
            沒有遮罩擋住插圖。 -->
-      <img class="hero-bg" src="img/hero-illustration.webp?v=2026-09-05-02" width="640" height="389" alt="" decoding="async" fetchpriority="high" aria-hidden="true">
+      <img class="hero-bg" id="heroBg" src="img/hero-illustration.webp?v=2026-09-05-02" width="640" height="389" alt="" decoding="async" fetchpriority="high" aria-hidden="true">
+      <script>
+      (function(){
+        // 首頁背景每日自動輪播：把要輪播的圖放進 img/hero-rotation/ 資料夾，
+        // 檔名用「幾號」命名（1.webp ~ 31.webp，對應每月的第幾天，以台灣時區為準），
+        // 詳見該資料夾裡的 README.txt。哪一天沒有對應檔名的圖，就自動維持上面
+        // 這張預設的 hero-illustration.webp，不會壞版。以後只要上傳/更換輪播圖片
+        // 檔案即可，不用改這段程式碼，也不用因此手動更新 BUILD_VERSION——下面的
+        // 版本查詢字串是用「今天日期」自動算出來的，本來就會每天換。
+        var img = document.getElementById('heroBg');
+        var todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' }); // "YYYY-MM-DD"
+        var day = parseInt(todayStr.slice(8, 10), 10); // 1-31
+        var rotationSrc = 'img/hero-rotation/' + day + '.webp?v=' + todayStr;
+        var probe = new Image();
+        probe.onload = function(){ img.src = rotationSrc; };
+        probe.src = rotationSrc;
+      })();
+      </script>
       <ul class="feature-list">
         <li class="feature">
           <span class="feature-icon"><img src="img/feature-tag.webp" width="26" height="26" alt="" decoding="async"></span>
@@ -411,7 +428,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-05-02";
+  var BUILD_VERSION = "2026-09-05-03";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
