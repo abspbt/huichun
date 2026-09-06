@@ -178,8 +178,8 @@
 
   .hero-grid{
     display:flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
     margin-top: 18px;
     position: relative;
   }
@@ -217,7 +217,11 @@
   .feature-text .line2{ color: var(--muted); }
 
   .tagline{
+    align-self: stretch;
+    position: relative;
+    z-index: 2;
     margin-top: 18px;
+    margin-bottom: 20px;
     text-align:center;
     font-size: 12.5px;
     letter-spacing: 0.14em;
@@ -227,7 +231,6 @@
 
   /* ---------- nav menu ---------- */
   .menu{
-    margin-top: 20px;
     border-top: 1px solid var(--line);
   }
   .menu-item{
@@ -357,9 +360,9 @@
           </span>
         </li>
       </ul>
-    </div>
 
-    <p class="tagline">專業拍攝<span>|</span>自然修圖<span>|</span>快速取件</p>
+      <p class="tagline">專業拍攝<span>|</span>自然修圖<span>|</span>快速取件</p>
+    </div>
   </section>
 
   <nav class="menu">
@@ -429,7 +432,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-06-01";
+  var BUILD_VERSION = "2026-09-06-02";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
