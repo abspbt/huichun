@@ -6,8 +6,8 @@
 inline <script> 裡，這裡只是說明怎麼放檔案，不用改任何程式碼。
 
 怎麼放圖：
-- 檔名就是「幾號」，例如 5.webp 對應每個月的 5 號、17.webp 對應 17 號，
-  以此類推，最多到 31.webp（用台灣時區判斷今天是幾號）。
+- 檔名就是「幾號」，固定兩位數，例如 5 號要存成 05.webp（不是 5.webp）、
+  17 號存成 17.webp，以此類推，最多到 31.webp（用台灣時區判斷今天是幾號）。
 - 檔案格式用 .webp（跟現在首頁用的 img/hero-illustration.webp 一樣）。
 - 尺寸／構圖要求跟 CLAUDE.md「Homepage hero illustration sizing」那節
   完全一樣：寬度 640px（高度依來源照片比例）、把想強調的主體放在畫面
