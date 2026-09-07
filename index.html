@@ -44,16 +44,13 @@
 <style>
   :root{
     --bg: #F5F5F4;
-    --bg-soft: #EFE7D9;
     --ink: #2E2A23;
     --ink-soft: #58513F;
-    --muted: #8A8071;
-    --accent: #AD7F4C;
-    --accent-soft: #C79C63;
+    --muted: #6A6252;   /* 內文次要文字。原本 #8A8071 對 --bg 只有 3.56:1，未達 4.5:1 */
+    --accent: #8E6531;   /* 選單箭頭。原本 #AD7F4C 為 3.25:1 */
     --accent-deep: #4F4232;
     --line: #E2D7C3;
     --circle-line: #CFC3AC;
-    --highlight-bg: #F1E4C9;
     --card: #FBF8F2;
   }
 
@@ -347,12 +344,12 @@
   </section>
 
   <nav class="menu">
-    <a class="menu-item" href="booking.html" data-transition="fade">
+    <a class="menu-item" href="/booking" data-transition="fade">
       <span class="menu-icon"><img src="img/nav-calendar.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">預約檔期</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="menu-item" href="about.html" data-transition="fade">
+    <a class="menu-item" href="/about" data-transition="fade">
       <span class="menu-icon"><img src="img/nav-about.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">關於回春</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -371,12 +368,12 @@
       <span class="menu-label">Facebook 聽老闆說垃圾話</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="menu-item" href="outfit.html" data-transition="fade">
+    <a class="menu-item" href="/outfit" data-transition="fade">
       <span class="menu-icon"><img src="img/nav-faq.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">證件照常見問題 Q&amp;A</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="menu-item" href="map.html" data-transition="fade">
+    <a class="menu-item" href="/map" data-transition="fade">
       <span class="menu-icon"><img src="img/nav-map.webp" width="20" height="20" alt="" decoding="async"></span>
       <span class="menu-label">交通指引</span>
       <span class="menu-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -413,7 +410,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-07-02";
+  var BUILD_VERSION = "2026-09-07-03";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）

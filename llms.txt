@@ -4,8 +4,8 @@
 
 ## 主要頁面
 
-- [首頁](https://hui-chun.com/index.html): 品牌介紹、價格與服務總覽，連結至 Instagram、Facebook、LINE。
-- [線上預約](https://hui-chun.com/booking.html): 顧客自助選擇拍攝人數與時段進行預約。
-- [證件照須知](https://hui-chun.com/outfit.html): 證件照規格與服裝儀容建議。
-- [交通指南](https://hui-chun.com/map.html): 前往店面的交通與位置說明。
-- [關於我們](https://hui-chun.com/about.html): 工作室與團隊介紹。
+- [首頁](https://hui-chun.com/): 品牌介紹、價格與服務總覽，連結至 Instagram、Facebook、LINE。
+- [線上預約](https://hui-chun.com/booking): 顧客自助選擇拍攝人數與時段進行預約。
+- [證件照須知](https://hui-chun.com/outfit): 證件照規格與服裝儀容建議。
+- [交通指南](https://hui-chun.com/map): 前往店面的交通與位置說明。
+- [關於我們](https://hui-chun.com/about): 工作室與團隊介紹。

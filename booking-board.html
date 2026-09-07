@@ -43,7 +43,10 @@
   html,body{
     margin:0;padding:0;height:100%;overflow:hidden;
     background:var(--bg);color:var(--white);
-    font-family:'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* 原本這裡寫 'Work Sans'，但本頁從來沒有對應的 @font-face（fonts/work-sans-*.woff2
+       沒有被任何頁面引用），所以實際上一直都是用系統字顯示。拿掉那個名字，並把中文
+       系統字型寫明確，跟其他頁面一致。 */
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
     overscroll-behavior:none;
   }
   .wrap{
@@ -302,8 +305,8 @@
   // 每次更新這個檔案，把版本號改成新的（例如當天日期），
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
-  // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
-  var BUILD_VERSION = "2026-09-07-02";
+  // 六個頁面（含 booking.html 客人端）用的是同一套做法，改行為時要一起改。
+  var BUILD_VERSION = "2026-09-07-03";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -376,7 +379,7 @@
     }},
     { name:"米白", vars:{
       bg:"#F0EBE1", "card-bg":"#F8F6F0", "card-border":"rgba(120,110,95,0.18)",
-      white:"#3A3630", gray:"#8B8375", "gray-dim":"rgba(139,131,117,0.45)",
+      white:"#3A3630", gray:"#6A6355", "gray-dim":"rgba(139,131,117,0.45)",
       gold:"#A9865C", "gold-bg":"rgba(169,134,92,0.14)", "gold-border":"rgba(169,134,92,0.45)",
       blue:"#7C8D86", "blue-bg":"rgba(124,141,134,0.14)", "blue-border":"rgba(124,141,134,0.50)",
       green:"#6E8F72", red:"#B5695A", "tag-text":"#2E2A24"

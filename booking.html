@@ -42,16 +42,25 @@
   /* ================================================================
      色彩變數
      這裡的變數「名稱」與色值都跟 booking-board.html 的「米白」主題
-     （THEMES 陣列裡的其中一組淺色配色）保持一致。
+     （THEMES 陣列裡的其中一組淺色配色）保持一致——改動任何一邊時，
+     另一邊要同步改（2026-09-07 把 --gray 從 #8B8375 調深成 #6A6355 時，
+     兩邊都改了）。唯一的例外是下面的 --gold-text：那是本頁為了文字對比
+     另外加的，booking-board 沒有對應的主題變數。
      ================================================================ */
   :root{
     --bg:#F0EBE1;
     --card-bg:#F8F6F0;
     --card-border:rgba(120,110,95,0.18);
     --white:#3A3630;
-    --gray:#8B8375;
+    --gray:#6A6355;
     --gray-dim:rgba(139,131,117,0.45);
     --gold:#A9865C;
+  /* --gold 同時當「填色」（今天標籤底色、下一步按鈕底色、選取框線）與「文字色」用，
+     但這兩種用途的對比方向相反：填色上壓的是深色字（--tag-text），把 --gold 調深
+     會讓那些字更難讀；而淺底上的金色文字則需要更深才夠對比。所以拆成兩個：
+     --gold 維持原值專供填色，淺底上的文字改用下面這個較深的 --gold-text
+     （#A9865C 對 --bg 只有 2.83:1，未達無障礙標準的 4.5:1；#8A6224 為 4.59:1）。 */
+  --gold-text:#8A6224;
     --gold-bg:rgba(169,134,92,0.14);
     --gold-border:rgba(169,134,92,0.45);
     --blue:#7C8D86;
@@ -144,8 +153,6 @@
   }
   .topbar .right:active{background:rgba(255,255,255,0.06);opacity:0.7;}
   .topbar .right .time{color:var(--white);font-weight:700;}
-  .topbar .right .refresh-icon{width:12px;height:12px;flex-shrink:0;transition:transform .4s ease;}
-  .topbar .right.spinning .refresh-icon{transform:rotate(360deg);}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--gray-dim);flex-shrink:0;}
   .dot.live{background:var(--green);box-shadow:0 0 6px rgba(62,217,138,0.7);}
   .dot.err{background:var(--red);}
@@ -161,8 +168,8 @@
     color:var(--gray);
     text-align:center;
   }
-  .pinned-notice-text b{color:var(--gold);}
-  .pinned-notice-phone{color:var(--gold);font-weight:700;text-decoration:none;}
+  .pinned-notice-text b{color:var(--gold-text);}
+  .pinned-notice-phone{color:var(--gold-text);font-weight:700;text-decoration:none;}
 
   .today-wrap.locked .slot{pointer-events:none;opacity:.55;}
 
@@ -187,7 +194,6 @@
     font-family:inherit;
   }
   .people-btn:active{transform:scale(.97);opacity:.85;}
-  .people-btn.emphasis{border-color:var(--gold-border);background:var(--gold-bg);color:var(--gold);}
 
   .step-slots{overflow:hidden;}
   .slots-hint{
@@ -195,7 +201,7 @@
     padding:clamp(8px,1.6vh,12px) clamp(14px,3.5vw,22px) 0;
     font-size:clamp(10px,1.8vh,12.5px);color:var(--gray);line-height:1.5;text-align:center;
   }
-  .slots-hint b{color:var(--gold);font-weight:700;}
+  .slots-hint b{color:var(--gold-text);font-weight:700;}
   .slots-hint.warn{color:var(--red);}
 
   .today-wrap{
@@ -248,7 +254,7 @@
   .date-block .date-text{
     font-weight:700;font-size:clamp(12px,2.7vh,17px);color:var(--white);letter-spacing:0.01em;white-space:nowrap;
   }
-  .day-card.today .date-block .date-text{color:var(--gold);}
+  .day-card.today .date-block .date-text{color:var(--gold-text);}
   .date-block .weekday-row{
     display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:3px;
   }
@@ -312,9 +318,9 @@
   .slot.selected{
     background:var(--gold-bg);
     border:1.6px solid var(--gold);
-    color:var(--gold);
+    color:var(--gold-text);
   }
-  .slot.selected .tag{color:var(--gold);font-weight:700;}
+  .slot.selected .tag{color:var(--gold-text);font-weight:700;}
 
   .legend{
     flex:0 0 auto;
@@ -336,12 +342,11 @@
     color:var(--gray);
     margin:0 0 clamp(7px,1.3vh,10px);
   }
-  .contact-hint-phone{color:var(--gold);font-weight:700;text-decoration:none;}
   .selection-status{
     text-align:center;
     font-size:clamp(11px,2vh,13.5px);
     font-weight:700;
-    color:var(--gold);
+    color:var(--gold-text);
     min-height:1.3em;
     margin:0 0 clamp(7px,1.3vh,10px);
     transition:color 0.15s ease;
@@ -635,7 +640,7 @@
   // 已開啟的頁面會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 跟 booking-board.html 用的是同一套做法。
-  var BUILD_VERSION = "2026-09-07-02";
+  var BUILD_VERSION = "2026-09-07-03";
 
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";

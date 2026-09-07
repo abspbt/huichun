@@ -13,6 +13,11 @@
 // （booking.html / booking-board.html 讀資料走的是 Google 試算表的公開
 // gviz 端點，跟這支 Worker 無關），所以已經移除，GET 一律回 405。
 
+// 對外一律回這句。Google API 的原始錯誤內容可能含試算表 ID、服務帳號信箱等資訊，
+// 不該回給呼叫端（這個端點任何人都能打）；詳細內容用 console.log 留在 Cloudflare
+// 後台的 Logs / `wrangler tail` 裡自己看。
+var GENERIC_ERROR = "暫時無法連線，請稍後再試";
+
 var SHEET_NAME = "booking";
 var SHEET_RANGE_DATES = SHEET_NAME + "!A1:A400";
 
@@ -162,7 +167,8 @@ async function handlePost(request, env, headers) {
   );
   var dateData = await dateRes.json();
   if (!dateRes.ok) {
-    return jsonResponse({ ok: false, message: "讀取試算表失敗：" + JSON.stringify(dateData) }, 502, headers);
+    console.log("讀取試算表失敗", JSON.stringify(dateData));
+    return jsonResponse({ ok: false, message: GENERIC_ERROR }, 502, headers);
   }
 
   var targetLabel = dateToSheetLabel(date);
@@ -194,8 +200,8 @@ async function handlePost(request, env, headers) {
   );
 
   if (!updateRes.ok) {
-    var errBody = await updateRes.text();
-    return jsonResponse({ ok: false, message: "寫入試算表失敗：" + errBody }, 502, headers);
+    console.log("寫入試算表失敗", await updateRes.text());
+    return jsonResponse({ ok: false, message: GENERIC_ERROR }, 502, headers);
   }
 
   return jsonResponse({ ok: true }, 200, headers);
@@ -216,7 +222,8 @@ export default {
       }
       return jsonResponse({ ok: false, message: "Method Not Allowed" }, 405, headers);
     } catch (err) {
-      return jsonResponse({ ok: false, message: (err && err.message) || String(err) }, 500, headers);
+      console.log("未預期的錯誤", (err && err.stack) || String(err));
+      return jsonResponse({ ok: false, message: GENERIC_ERROR }, 500, headers);
     }
   }
 };

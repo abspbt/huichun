@@ -16,11 +16,15 @@ Static marketing/booking site for 回春視務所 (Hui Chun Photo), an ID-photo 
 - `about.html` — about/studio intro page.
 - `reply.html` — internal staff tool (quick-reply message generator), not linked from the public site.
 
+The two non-public pages, `booking-board.html` and `reply.html`, each carry `<meta name="robots" content="noindex, nofollow">` **and** a `Disallow` line in `robots.txt` — both spellings of each URL, with and without `.html`, since GitHub Pages serves either. Keep both belts on for any page added later that shouldn't be found: `robots.txt` only asks crawlers not to fetch, `noindex` is what actually keeps a page out of results if someone links to it.
+
 All pages above except `reply.html` share the same `BUILD_VERSION` auto-reload mechanism (see "Mobile browsers showing stale cached content" below). `reply.html` predates that pattern and instead does its own HEAD-request + ETag/Last-Modified comparison to detect updates — leave it as-is rather than converting it, it works the same way in practice.
 
 ## Working with this repo
 
 There's no local dev server, linter, or test command — edit the HTML files directly and open them in a browser (or push and check the live GitHub Pages site) to verify changes. Each page is fully self-contained; don't extract shared CSS/JS into separate files unless explicitly asked, since the project intentionally has no build step. The one exception is `tools/build-fonts.py`, which regenerates the per-page font subsets — see "Fonts" below; it is run by hand and its output is committed, so deployment is still "push and it's live".
+
+**Internal links are written without the `.html` extension** (`href="/booking"`, not `href="booking.html"` or an absolute `https://hui-chun.com/booking`), matching each page's `<link rel="canonical">` and the URLs in `sitemap.xml` and `llms.txt`. GitHub Pages serves both spellings, so a mix works but splits the page's ranking signal between two URLs. Use the extensionless, root-relative form for new links too.
 
 ## Fonts — per-page subsets, and when you must rebuild them
 
