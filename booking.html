@@ -15,8 +15,8 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="預約時段｜回春視務所">
 <meta name="twitter:description" content="線上預約回春視務所證件照拍攝時段，選擇人數與時段即可完成預約，高雄前金現場拍攝、現場取件。">
-<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/noto-sans-tc-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/page/booking-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/page/booking-sans-tc-300.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -65,36 +65,41 @@
   /* self-hosted subset fonts (see /fonts/OFL.txt for license), same
      families as index.html: Noto Sans TC for body text, Noto Serif TC
      for the brand-ish headings (topbar title / step titles). */
+  /* 自架子集字型。這些檔案在 fonts/page/ 底下，是「這一頁專用」的：只收這一頁
+     真的會顯示到的字，所以每頁只有幾十 KB，而不是全站合一份的兩三百 KB。
+     產生方式見 tools/build-fonts.py——★ 改到頁面上的文字時要重跑那支程式，
+     否則新加的字不在子集裡，會退回系統字顯示（不會變成空白方框，但粗細會不一致）。
+     授權見 /fonts/OFL.txt。 */
+  @font-face{
+    font-family:'Noto Serif TC';
+    font-weight:700;
+    font-display:swap;
+    src:url('/fonts/page/booking-serif-tc-700.woff2') format('woff2');
+  }
   @font-face{
     font-family:'Noto Sans TC';
     font-weight:300;
     font-display:swap;
-    src:url('/fonts/noto-sans-tc-300.woff2') format('woff2');
+    src:url('/fonts/page/booking-sans-tc-300.woff2') format('woff2');
   }
   @font-face{
     font-family:'Noto Sans TC';
     font-weight:400;
     font-display:swap;
-    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+    src:url('/fonts/page/booking-sans-tc-400.woff2') format('woff2');
   }
   @font-face{
     font-family:'Noto Sans TC';
     font-weight:700;
     font-display:swap;
-    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
-  }
-  @font-face{
-    font-family:'Noto Serif TC';
-    font-weight:700;
-    font-display:swap;
-    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+    src:url('/fonts/page/booking-sans-tc-700.woff2') format('woff2');
   }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
     margin:0;padding:0;height:100%;overflow:hidden;
     background:var(--bg);color:var(--white);
-    font-family:'Noto Sans TC',sans-serif;
+    font-family:'Noto Sans TC',"PingFang TC","Microsoft JhengHei",sans-serif;
     font-weight:300;
     overscroll-behavior:none;
     touch-action:pan-y;
@@ -127,7 +132,7 @@
   .topbar .left{display:flex;align-items:baseline;gap:10px;}
   .topbar .title{
     margin:0;
-    font-family:'Noto Serif TC',serif;
+    font-family:'Noto Serif TC',"Songti TC","PMingLiU",serif;
     font-weight:700;font-size:clamp(13px,2.5vh,17px);letter-spacing:0.01em;color:var(--white);
   }
   .topbar .subtitle{font-size:clamp(9.5px,1.8vh,12px);color:var(--gray);font-weight:400;}
@@ -170,7 +175,7 @@
   .step.active{display:flex;}
 
   .step-people{align-items:center;justify-content:center;gap:18px;padding:24px;}
-  .step-title{font-family:'Noto Serif TC',serif;font-size:clamp(14px,2.4vh,18px);font-weight:700;color:var(--white);text-align:center;margin:0;}
+  .step-title{font-family:'Noto Serif TC',"Songti TC","PMingLiU",serif;font-size:clamp(14px,2.4vh,18px);font-weight:700;color:var(--white);text-align:center;margin:0;}
   .step-subtitle{font-size:clamp(10px,1.8vh,12.5px);color:var(--gray);text-align:center;margin:-8px 0 4px;}
   .people-buttons{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;}
   .people-btn{
@@ -630,7 +635,7 @@
   // 已開啟的頁面會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 跟 booking-board.html 用的是同一套做法。
-  var BUILD_VERSION = "2026-09-07-01";
+  var BUILD_VERSION = "2026-09-07-02";
 
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
@@ -1072,6 +1077,11 @@
   // 原理：定期用不快取的方式重新抓自己的原始碼，比對裡面的版本號，
   // 發現不一樣就強制導向一個帶新版本號的網址，逼瀏覽器重新載入最新內容
   var isCheckingUpdate = false;
+  // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
+  // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
+  // 分析到一半時被硬生生導頁，導致分析卡住轉圈圈。加上冷卻時間，同一個分頁
+  // 短時間內最多只強制重新整理一次，其餘留給下一輪偵測或使用者手動整理。
+  var RELOAD_COOLDOWN_MS = 20000;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
     isCheckingUpdate = true;
@@ -1083,14 +1093,24 @@
       .then(function(html){
         var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
         if(m && m[1] && m[1] !== BUILD_VERSION){
+          var lastReload = 0;
+          try{ lastReload = parseInt(sessionStorage.getItem('hc_last_reload') || '0', 10); }catch(e){}
+          if(Date.now() - lastReload < RELOAD_COOLDOWN_MS) return;
+          try{ sessionStorage.setItem('hc_last_reload', String(Date.now())); }catch(e){}
           location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
         }
       })
       .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
       .finally(function(){ isCheckingUpdate = false; });
   }
-  checkForUpdate();
-  setInterval(checkForUpdate, 5 * 60 * 1000); // 每 5 分鐘背景檢查一次
+  // 第一次檢查等畫面載完再做：這個檢查會把整份 HTML 再抓一次，
+  // 若和圖片、字型搶頻寬，慢速網路下會拖慢畫面出現的速度。
+  function startUpdateChecks(){ setTimeout(checkForUpdate, 1500); }
+  if(document.readyState === 'complete') startUpdateChecks();
+  else window.addEventListener('load', startUpdateChecks, { once: true });
+  // 每 30 分鐘背景檢查一次。每次檢查都會把整份 HTML 重抓一遍，5 分鐘一次在行動
+  // 網路下太耗流量；切回分頁時本來就會另外檢查一次，所以固定間隔可以拉長。
+  setInterval(checkForUpdate, 30 * 60 * 1000);
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState === 'visible') checkForUpdate();
   });

@@ -6,11 +6,14 @@
 //   ADMIN_TOKEN          admin 後台寫入用的密碼
 //   SPREADSHEET_ID       Google 試算表 ID
 //
-// GET  /   →  回傳 booking!A1:F400 的 Sheets API values.get 原始 JSON（唯讀，前端目前未使用，但保留舊行為）
 // POST /   →  body 為 {date, time, action, password}，寫入/清除單一格子
+//
+// 這支 Worker 只提供寫入。以前有一個不需要密碼的 GET 端點，會把整份
+// booking!A1:F400 原封不動回傳，任何知道網址的人都能抓走；前端從來沒用過
+// （booking.html / booking-board.html 讀資料走的是 Google 試算表的公開
+// gviz 端點，跟這支 Worker 無關），所以已經移除，GET 一律回 405。
 
 var SHEET_NAME = "booking";
-var SHEET_RANGE_FULL = SHEET_NAME + "!A1:F400";
 var SHEET_RANGE_DATES = SHEET_NAME + "!A1:A400";
 
 var COLUMN_BY_TIME = {
@@ -114,20 +117,6 @@ async function getAccessToken(env) {
   return data.access_token;
 }
 
-// ---- GET：轉發 booking!A1:F400 的原始 Sheets API JSON ----
-
-async function handleGet(env, headers) {
-  var accessToken = await getAccessToken(env);
-  var url = "https://sheets.googleapis.com/v4/spreadsheets/" + env.SPREADSHEET_ID +
-    "/values/" + encodeURIComponent(SHEET_RANGE_FULL);
-  var res = await fetch(url, { headers: { Authorization: "Bearer " + accessToken } });
-  var body = await res.text();
-  return new Response(body, {
-    status: res.status,
-    headers: Object.assign({}, headers, { "Content-Type": "application/json;charset=utf-8" })
-  });
-}
-
 // ---- POST：鎖定／解除單一時段 ----
 
 function dateToSheetLabel(dateStr) {
@@ -222,9 +211,6 @@ export default {
     }
 
     try {
-      if (request.method === "GET") {
-        return await handleGet(env, headers);
-      }
       if (request.method === "POST") {
         return await handlePost(request, env, headers);
       }

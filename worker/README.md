@@ -22,7 +22,7 @@ wrangler secret put SPREADSHEET_ID
 
 ## API
 
-- `GET /`：回傳 `booking!A1:F400` 的 Sheets API `values.get` 原始 JSON。
+- `GET /`：回 405。舊版有一個不需要密碼的讀取端點，會把整份 `booking!A1:F400` 回傳給任何知道網址的人，前端從未使用，已移除。
 - `POST /`：body 為 `{"date":"2026-08-06","time":"10:00","action":"lock","password":"..."}`
   - `action` 為 `"lock"` 或 `"unlock"`
   - 密碼錯誤回 HTTP 403

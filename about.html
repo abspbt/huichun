@@ -6,13 +6,15 @@
 <title>關於回春｜高雄證件照職人的堅持故事</title>
 <meta name="description" content="回春視務所創辦人擁有二十餘年攝影資歷，從電子工程師到高雄證件照職人，堅持以光影雕刻神韻，打造真正好看證件照與精緻證件照，而非流水線式修圖。">
 <link rel="canonical" href="https://hui-chun.com/about">
-<link rel="preload" href="/fonts/noto-serif-tc-300.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/page/about-serif-tc-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/page/about-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="回春視務所">
 <meta property="og:title" content="關於回春｜高雄證件照職人故事．好看證件照與精緻證件照的堅持">
 <meta property="og:description" content="回春視務所創辦人擁有二十餘年攝影資歷，從電子工程師到高雄證件照職人，堅持以光影雕刻神韻，打造真正好看證件照與精緻證件照，而非流水線式修圖。">
 <meta property="og:url" content="https://hui-chun.com/about">
+<!-- og/twitter 的預覽圖刻意維持 .jpg：頁面本身用的是同一張的 .webp（見下方 <img>），
+     但社群平台的預覽爬蟲對 WebP 支援不一致，分享縮圖用 JPG 比較保險。 -->
 <meta property="og:image" content="https://hui-chun.com/images/about-story-2.jpg">
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
@@ -67,21 +69,26 @@
     --brown-soft:#F1E4C9;
     --radius:16px;
     --max:760px;
-    --font-serif:'Noto Serif TC', serif;
+    --font-serif:'Noto Serif TC',"Songti TC","PMingLiU",serif;
   }
 
   /* self-hosted subset fonts (see /fonts/OFL.txt for license), same family used site-wide */
+  /* 自架子集字型。這些檔案在 fonts/page/ 底下，是「這一頁專用」的：只收這一頁
+     真的會顯示到的字，所以每頁只有幾十 KB，而不是全站合一份的兩三百 KB。
+     產生方式見 tools/build-fonts.py——★ 改到頁面上的文字時要重跑那支程式，
+     否則新加的字不在子集裡，會退回系統字顯示（不會變成空白方框，但粗細會不一致）。
+     授權見 /fonts/OFL.txt。 */
   @font-face{
     font-family:'Noto Serif TC';
     font-weight:300;
     font-display:swap;
-    src:url('/fonts/noto-serif-tc-300.woff2') format('woff2');
+    src:url('/fonts/page/about-serif-tc-300.woff2') format('woff2');
   }
   @font-face{
     font-family:'Noto Serif TC';
     font-weight:700;
     font-display:swap;
-    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+    src:url('/fonts/page/about-serif-tc-700.woff2') format('woff2');
   }
 
   *{box-sizing:border-box;}
@@ -325,7 +332,7 @@
     <h2>從電子工程師到光影職人的起點</h2>
 
     <figure class="article-figure figure-right">
-      <img src="/images/about-story-2.jpg" width="900" height="631" loading="eager" fetchpriority="high" alt="回春視務所職人特寫，專注神情，象徵二十年來對光影與神韻的堅持">
+      <img src="/images/about-story-2.webp" width="900" height="631" loading="eager" fetchpriority="high" alt="回春視務所職人特寫，專注神情，象徵二十年來對光影與神韻的堅持">
       <figcaption>用二十年時間，只為專注做好一件事</figcaption>
     </figure>
 
@@ -338,7 +345,7 @@
     <p>長久以來，證件照在多數人的記憶中宛如一場尷尬的受刑——蒼白的頂光、僵硬的神經與失真的輪廓。他當時問了自己一個問題：為什麼不能用人像外拍時那種靈動、自然且帶著呼吸感的光影，來徹底顛覆這項沉悶的日常？</p>
 
     <figure class="article-figure figure-left">
-      <img src="/images/about-story-1.jpg" width="900" height="900" loading="lazy" alt="回春視務所職人於戶外自然光下的人像，體現對光影雕刻的長年鑽研">
+      <img src="/images/about-story-1.webp" width="900" height="900" loading="lazy" alt="回春視務所職人於戶外自然光下的人像，體現對光影雕刻的長年鑽研">
       <figcaption>從人像外拍到證件照，光影的鑽研從未停下</figcaption>
     </figure>
 
@@ -383,8 +390,13 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-07-01";
+  var BUILD_VERSION = "2026-09-07-02";
   var isCheckingUpdate = false;
+  // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
+  // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
+  // 分析到一半時被硬生生導頁，導致分析卡住轉圈圈。加上冷卻時間，同一個分頁
+  // 短時間內最多只強制重新整理一次，其餘留給下一輪偵測或使用者手動整理。
+  var RELOAD_COOLDOWN_MS = 20000;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
     isCheckingUpdate = true;
@@ -396,14 +408,24 @@
       .then(function(html){
         var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
         if(m && m[1] && m[1] !== BUILD_VERSION){
+          var lastReload = 0;
+          try{ lastReload = parseInt(sessionStorage.getItem('hc_last_reload') || '0', 10); }catch(e){}
+          if(Date.now() - lastReload < RELOAD_COOLDOWN_MS) return;
+          try{ sessionStorage.setItem('hc_last_reload', String(Date.now())); }catch(e){}
           location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
         }
       })
       .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
       .finally(function(){ isCheckingUpdate = false; });
   }
-  checkForUpdate();
-  setInterval(checkForUpdate, 5 * 60 * 1000);
+  // 第一次檢查等畫面載完再做：這個檢查會把整份 HTML 再抓一次，
+  // 若和圖片、字型搶頻寬，慢速網路下會拖慢畫面出現的速度。
+  function startUpdateChecks(){ setTimeout(checkForUpdate, 1500); }
+  if(document.readyState === 'complete') startUpdateChecks();
+  else window.addEventListener('load', startUpdateChecks, { once: true });
+  // 每 30 分鐘背景檢查一次。每次檢查都會把整份 HTML 重抓一遍，5 分鐘一次在行動
+  // 網路下太耗流量；切回分頁時本來就會另外檢查一次，所以固定間隔可以拉長。
+  setInterval(checkForUpdate, 30 * 60 * 1000);
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState === 'visible') checkForUpdate();
   });

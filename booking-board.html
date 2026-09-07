@@ -303,7 +303,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 目前只用在本頁（管理端），booking.html 客人端沒有啟用這個機制。
-  var BUILD_VERSION = "2026-08-09-01";
+  var BUILD_VERSION = "2026-09-07-02";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -716,6 +716,11 @@
   // 原理：定期用不快取的方式重新抓自己的原始碼，比對裡面的版本號，
   // 發現不一樣就強制導向一個帶新版本號的網址，逼瀏覽器重新載入最新內容
   var isCheckingUpdate = false;
+  // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
+  // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
+  // 分析到一半時被硬生生導頁，導致分析卡住轉圈圈。加上冷卻時間，同一個分頁
+  // 短時間內最多只強制重新整理一次，其餘留給下一輪偵測或使用者手動整理。
+  var RELOAD_COOLDOWN_MS = 20000;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
     isCheckingUpdate = true;
@@ -727,14 +732,24 @@
       .then(function(html){
         var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
         if(m && m[1] && m[1] !== BUILD_VERSION){
+          var lastReload = 0;
+          try{ lastReload = parseInt(sessionStorage.getItem('hc_last_reload') || '0', 10); }catch(e){}
+          if(Date.now() - lastReload < RELOAD_COOLDOWN_MS) return;
+          try{ sessionStorage.setItem('hc_last_reload', String(Date.now())); }catch(e){}
           location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
         }
       })
       .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
       .finally(function(){ isCheckingUpdate = false; });
   }
-  checkForUpdate();
-  setInterval(checkForUpdate, 5 * 60 * 1000); // 每 5 分鐘背景檢查一次
+  // 第一次檢查等畫面載完再做：這個檢查會把整份 HTML 再抓一次，
+  // 若和圖片、字型搶頻寬，慢速網路下會拖慢畫面出現的速度。
+  function startUpdateChecks(){ setTimeout(checkForUpdate, 1500); }
+  if(document.readyState === 'complete') startUpdateChecks();
+  else window.addEventListener('load', startUpdateChecks, { once: true });
+  // 每 30 分鐘背景檢查一次。每次檢查都會把整份 HTML 重抓一遍，5 分鐘一次在行動
+  // 網路下太耗流量；切回分頁時本來就會另外檢查一次，所以固定間隔可以拉長。
+  setInterval(checkForUpdate, 30 * 60 * 1000);
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState === 'visible') checkForUpdate();
   });

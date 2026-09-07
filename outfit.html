@@ -15,7 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="證件照常見問題 FAQ｜隱形眼鏡、尺寸、穿搭一次看懂">
 <meta name="twitter:description" content="證件照可以戴隱形眼鏡嗎？可以露齒笑嗎？衣服該穿什麼顏色？整理隱形眼鏡、尺寸規格、瀏海耳朵、穿搭妝髮、韓式證件照、電子檔交付、台胞證美簽日簽等常見問題。">
-<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/page/outfit-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,23 +171,28 @@
   }
 
   /* self-hosted subset fonts (see /fonts/OFL.txt for license) */
+  /* 自架子集字型。這些檔案在 fonts/page/ 底下，是「這一頁專用」的：只收這一頁
+     真的會顯示到的字，所以每頁只有幾十 KB，而不是全站合一份的兩三百 KB。
+     產生方式見 tools/build-fonts.py——★ 改到頁面上的文字時要重跑那支程式，
+     否則新加的字不在子集裡，會退回系統字顯示（不會變成空白方框，但粗細會不一致）。
+     授權見 /fonts/OFL.txt。 */
   @font-face{
     font-family:'Noto Serif TC';
     font-weight:700;
     font-display:swap;
-    src:url('/fonts/noto-serif-tc-700.woff2') format('woff2');
+    src:url('/fonts/page/outfit-serif-tc-700.woff2') format('woff2');
   }
   @font-face{
     font-family:'Noto Sans TC';
     font-weight:400;
     font-display:swap;
-    src:url('/fonts/noto-sans-tc-400.woff2') format('woff2');
+    src:url('/fonts/page/outfit-sans-tc-400.woff2') format('woff2');
   }
   @font-face{
     font-family:'Noto Sans TC';
     font-weight:700;
     font-display:swap;
-    src:url('/fonts/noto-sans-tc-700.woff2') format('woff2');
+    src:url('/fonts/page/outfit-sans-tc-700.woff2') format('woff2');
   }
 
   *{box-sizing:border-box;}
@@ -210,7 +215,7 @@
   }
   .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
 
-  h1,h2,.serif{font-family:"Noto Serif TC",serif;}
+  h1,h2,.serif{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;}
 
   .eyebrow{
     display:inline-flex;
@@ -239,7 +244,7 @@
     color:var(--ink-soft);
   }
   .brand-bar strong{
-    font-family:"Noto Sans TC",sans-serif;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
     font-size:13px;
     font-weight:400;
     color:var(--ink-soft);
@@ -289,7 +294,7 @@
     background:var(--navy);
     color:#fff;
     display:flex;align-items:center;justify-content:center;
-    font-family:"Noto Serif TC",serif;font-weight:700;font-size:16px;
+    font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-weight:700;font-size:16px;
     margin-top:2px;
   }
   .notice p{margin:0; color:var(--ink-soft); font-size:15px;}
@@ -318,7 +323,7 @@
   }
   .closing .rule{width:44px; height:2px; background:var(--red); margin:0 auto 24px;}
   .closing p{
-    font-family:"Noto Serif TC",serif;
+    font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;
     font-size:20px;
     line-height:1.9;
     color:var(--ink);
@@ -330,7 +335,7 @@
     margin-top:18px;
     color:var(--ink-soft);
     font-size:13px;
-    font-family:"Noto Sans TC",sans-serif;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
   }
 
   @media (max-width:680px){
@@ -347,7 +352,7 @@
     display:inline-flex;
     align-items:center;
     gap:10px;
-    font-family:"Noto Sans TC",sans-serif;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
     font-size:16px;
     font-weight:700;
     color:#fff;
@@ -376,7 +381,7 @@
     border-top:1px solid var(--line);
   }
   .site-footer strong{
-    font-family:"Noto Serif TC",serif;
+    font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;
     font-size:15px;
     font-weight:700;
     color:var(--ink);
@@ -589,8 +594,13 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-07-01";
+  var BUILD_VERSION = "2026-09-07-02";
   var isCheckingUpdate = false;
+  // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
+  // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
+  // 分析到一半時被硬生生導頁，導致分析卡住轉圈圈。加上冷卻時間，同一個分頁
+  // 短時間內最多只強制重新整理一次，其餘留給下一輪偵測或使用者手動整理。
+  var RELOAD_COOLDOWN_MS = 20000;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
     isCheckingUpdate = true;
@@ -602,14 +612,24 @@
       .then(function(html){
         var m = html.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
         if(m && m[1] && m[1] !== BUILD_VERSION){
+          var lastReload = 0;
+          try{ lastReload = parseInt(sessionStorage.getItem('hc_last_reload') || '0', 10); }catch(e){}
+          if(Date.now() - lastReload < RELOAD_COOLDOWN_MS) return;
+          try{ sessionStorage.setItem('hc_last_reload', String(Date.now())); }catch(e){}
           location.href = location.pathname + '?v=' + encodeURIComponent(m[1]) + '&_r=' + Date.now();
         }
       })
       .catch(function(){ /* 離線或抓取失敗就先沿用目前版本，不打擾使用 */ })
       .finally(function(){ isCheckingUpdate = false; });
   }
-  checkForUpdate();
-  setInterval(checkForUpdate, 5 * 60 * 1000);
+  // 第一次檢查等畫面載完再做：這個檢查會把整份 HTML 再抓一次，
+  // 若和圖片、字型搶頻寬，慢速網路下會拖慢畫面出現的速度。
+  function startUpdateChecks(){ setTimeout(checkForUpdate, 1500); }
+  if(document.readyState === 'complete') startUpdateChecks();
+  else window.addEventListener('load', startUpdateChecks, { once: true });
+  // 每 30 分鐘背景檢查一次。每次檢查都會把整份 HTML 重抓一遍，5 分鐘一次在行動
+  // 網路下太耗流量；切回分頁時本來就會另外檢查一次，所以固定間隔可以拉長。
+  setInterval(checkForUpdate, 30 * 60 * 1000);
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState === 'visible') checkForUpdate();
   });
