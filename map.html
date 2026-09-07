@@ -15,7 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="回春視務所｜交通指引">
 <meta name="twitter:description" content="回春視務所交通指引，地址：高雄市前金區中山二路533號2樓之4，鄰近高雄捷運中央公園站2號出口，提供步行路線與停車場地圖。">
-<link rel="preload" href="/fonts/noto-serif-tc-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/noto-serif-tc-700.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -97,11 +97,13 @@
     font-weight:300;
     line-height:1.7;
     -webkit-font-smoothing:antialiased;
-    opacity:0;
+    /* 起始值用 0.01 而不是 0：Chrome 不會把 opacity:0 的元素當成 LCP 候選，
+       首屏整個淡入時效能報告會抓不到 LCP。看起來一樣是全透明淡入。 */
+    opacity:0.01;
     animation: pageFadeIn .45s ease-out forwards;
   }
   @keyframes pageFadeIn{
-    from{ opacity:0; transform: translateY(6px); }
+    from{ opacity:0.01; transform: translateY(6px); }
     to{ opacity:1; transform: translateY(0); }
   }
   .wrap{max-width:var(--max); margin:0 auto; padding:0 24px 60px;}
@@ -357,7 +359,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-03-03";
+  var BUILD_VERSION = "2026-09-07-01";
   var isCheckingUpdate = false;
   function checkForUpdate(){
     if(isCheckingUpdate) return;
