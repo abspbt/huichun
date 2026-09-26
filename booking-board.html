@@ -199,11 +199,22 @@
     padding:12px clamp(10px,2.2vw,18px);
     font-size:13px;color:var(--gray);font-weight:600;
   }
+  .cards-box{display:flex;flex-direction:column;gap:inherit;}
+  .far-picker span{flex:0 0 auto;white-space:nowrap;}
   .far-picker input{
+    flex:1 1 auto;
     font:inherit;font-size:14px;color:var(--white);
     background:transparent;border:1px solid var(--blue-border);border-radius:8px;
-    padding:6px 8px;min-width:0;
+    padding:6px 8px;min-width:0;min-height:34px;
   }
+  .far-picker button{
+    flex:0 0 auto;
+    font:inherit;font-size:13px;font-weight:700;
+    padding:8px 12px;border-radius:8px;
+    background:var(--gold);border:1px solid var(--gold-border);color:var(--tag-text);
+    cursor:pointer;
+  }
+  .far-picker button:disabled{opacity:0.4;cursor:default;}
 
   /* ================================================================
      確認彈窗（本頁專屬：鎖定／解除時段用）
@@ -325,7 +336,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 六個頁面（含 booking.html 客人端）用的是同一套做法，改行為時要一起改。
-  var BUILD_VERSION = "2026-09-26-02";
+  var BUILD_VERSION = "2026-09-26-03";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -580,10 +591,42 @@
     return card;
   }
 
-  var farPicker = null; // 日期選擇器，重繪時沿用同一個元素，避免選到一半被清掉
+  // 卡片放在 cardsBox 裡，每次 render() 只重建 cardsBox；日期選擇器放在它後面、
+  // 永遠不重建。iPhone 的日期選擇器一旦元素被移除就會直接關掉，所以選擇器不能跟著
+  // 卡片一起重建（每 30／60 秒的自動重繪也一樣）。
+  var cardsBox = document.createElement('div');
+  cardsBox.className = "cards-box";
+  daysList.appendChild(cardsBox);
+
+  var farPicker = document.createElement('div');
+  farPicker.className = "far-picker";
+  farPicker.innerHTML =
+    '<span>選擇其他日期</span>' +
+    '<input type="date" id="farDate">' +
+    '<button type="button" id="farGo" disabled>顯示</button>';
+  daysList.appendChild(farPicker);
+  var farDate = farPicker.querySelector('#farDate');
+  var farGo = farPicker.querySelector('#farGo');
+
+  // 選日期只記下來；按「顯示」才加入列表。iPhone 一打開選擇器就會先填入今天、
+  // 觸發 change，若在 change 裡直接重繪＋捲動，選擇器會被關掉、畫面跳回今天。
+  function syncFarGo(){ farGo.disabled = !farDate.value; }
+  farDate.addEventListener('change', syncFarGo);
+  farDate.addEventListener('input', syncFarGo);
+  farGo.addEventListener('click', function(){
+    var v = farDate.value;
+    if(!v) return;
+    farDate.value = "";
+    syncFarGo();
+    if(v > lastKeyNow() && pickedDates.indexOf(v) === -1) pickedDates.push(v);
+    render();
+    var card = document.getElementById("day-" + v);
+    if(card && card.scrollIntoView) card.scrollIntoView({ block: "center", behavior: "smooth" });
+  });
 
   function render(){
-    daysList.innerHTML = "";
+    var scrollTop = daysList.scrollTop;
+    cardsBox.innerHTML = "";
     var base = new Date();
     var tKey = todayKey();
     var lastKey = dayOffsetKey(DAYS_TO_SHOW - 1);
@@ -591,7 +634,7 @@
     for(var i=0; i<DAYS_TO_SHOW; i++){
       var d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
       var key = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
-      daysList.appendChild(buildDayCard(d, key, key === tKey));
+      cardsBox.appendChild(buildDayCard(d, key, key === tKey));
     }
 
     // 15 天以後：有鎖定的日期 + 手動挑選的日期
@@ -606,30 +649,15 @@
     var label = document.createElement('div');
     label.className = "far-label";
     label.textContent = sorted.length ? "15 天以後" : "15 天以後（目前沒有鎖定的時段）";
-    daysList.appendChild(label);
+    cardsBox.appendChild(label);
 
     sorted.forEach(function(k){
-      daysList.appendChild(buildDayCard(keyToDate(k), k, false));
+      cardsBox.appendChild(buildDayCard(keyToDate(k), k, false));
     });
 
-    if(!farPicker){
-      farPicker = document.createElement('label');
-      farPicker.className = "far-picker";
-      farPicker.innerHTML = '<span>選擇其他日期</span><input type="date" id="farDate">';
-      farPicker.querySelector('input').addEventListener('change', function(){
-        var v = this.value;
-        this.value = "";
-        if(!v) return;
-        if(v > lastKeyNow() && pickedDates.indexOf(v) === -1) pickedDates.push(v);
-        render();
-        var card = document.getElementById("day-" + v);
-        if(card && card.scrollIntoView) card.scrollIntoView({ block: "center", behavior: "smooth" });
-      });
-    }
-    var input = farPicker.querySelector('input');
-    input.min = tKey;
-    input.max = dayOffsetKey(FAR_DAYS);
-    daysList.appendChild(farPicker);
+    farDate.min = tKey;
+    farDate.max = dayOffsetKey(FAR_DAYS);
+    daysList.scrollTop = scrollTop; // 自動重繪時維持目前捲動位置
   }
   function lastKeyNow(){ return dayOffsetKey(DAYS_TO_SHOW - 1); }
 
