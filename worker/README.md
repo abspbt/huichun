@@ -4,7 +4,7 @@
 
 ## 部署
 
-Worker 已接上 GitHub（Cloudflare 後台 Workers & Pages → `crimson-dream-d3cf` → 設定 → 建置），`main` 分支的 `worker/` 有變動就會自動部署，不用手動操作。
+Worker 已接上 GitHub（Cloudflare 後台 Workers & Pages → `crimson-dream-d3cf` → 設定 → 組建），每次推送到 `main` 就會自動部署，不用手動操作。設定：根目錄 `/`、組建命令留空、部署命令 `npx wrangler deploy --config worker/wrangler.toml`。
 
 要手動部署的話：
 
