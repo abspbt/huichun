@@ -3,14 +3,18 @@ main = "booking-worker.js"
 compatibility_date = "2026-08-06"
 
 # 密碼／金鑰不要寫在這個檔案裡（會進 git）。
-# 部署後用以下指令逐一設定 secrets：
+# secrets（已在 Cloudflare 後台設好，重新部署不會清掉）：
 #   wrangler secret put GOOGLE_CLIENT_EMAIL
 #   wrangler secret put GOOGLE_PRIVATE_KEY
 #   wrangler secret put ADMIN_TOKEN
 #   wrangler secret put SPREADSHEET_ID
+# GOOGLE_CLIENT_EMAIL / GOOGLE_PRIVATE_KEY / SPREADSHEET_ID 只用在第一次把舊試算表資料匯入 D1，匯入後可刪。
 
-# D1 資料庫（2026-09-26 在 Cloudflare 後台建立並綁到這支 Worker，準備取代
-# Google 試算表；目前程式碼還沒用到它，讀寫仍走 Google 試算表）。
+# Cloudflare 後台已開啟 Workers Logs；寫在這裡，部署時才不會被關掉。
+[observability]
+enabled = true
+
+# D1 資料庫（2026-09-26 在 Cloudflare 後台建立並綁到這支 Worker），預約資料存這裡。
 # 這段必須留著：wrangler deploy 會以這個檔案為準，少了它會把後台設好的繫結拿掉。
 # 資料表：CREATE TABLE bookings (date TEXT NOT NULL, time TEXT NOT NULL, PRIMARY KEY (date, time));
 # 一列 = 一個被鎖定的時段，例如 ('2026-10-01', '10:00')。

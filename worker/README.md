@@ -1,31 +1,40 @@
 # booking-worker
 
-`booking-board.html` 寫入預約表用的 Cloudflare Worker（讀取仍走 Google Sheets 的公開 gviz 端點，跟這支 Worker 無關）。
+`booking.html` / `booking-board.html` 讀寫預約時段用的 Cloudflare Worker，資料存在 Cloudflare D1（資料庫 `huichun-booking`，綁定名稱 `DB`，見 `wrangler.toml`）。
 
 ## 部署
+
+Worker 已接上 GitHub（Cloudflare 後台 Workers & Pages → `crimson-dream-d3cf` → 設定 → 建置），`main` 分支的 `worker/` 有變動就會自動部署，不用手動操作。
+
+要手動部署的話：
 
 ```
 cd worker
 wrangler deploy
 ```
 
-首次部署或金鑰更新時設定 secrets（不要寫進 `wrangler.toml` 或提交進 git）：
+secrets（已在 Cloudflare 後台設好，不要寫進 `wrangler.toml` 或提交進 git）：
 
 ```
-wrangler secret put GOOGLE_CLIENT_EMAIL
-wrangler secret put GOOGLE_PRIVATE_KEY   # 貼 PEM 全文即可，字面 \n 會自動轉換
 wrangler secret put ADMIN_TOKEN          # 前端 booking-board.html 要求輸入的密碼
+wrangler secret put GOOGLE_CLIENT_EMAIL  # ↓ 這三個只用在第一次把舊 Google 試算表的資料匯入 D1
+wrangler secret put GOOGLE_PRIVATE_KEY
 wrangler secret put SPREADSHEET_ID
 ```
 
-`GOOGLE_CLIENT_EMAIL` / `GOOGLE_PRIVATE_KEY` 來自 Google Cloud 服務帳號的 JSON 金鑰，且該服務帳號的 email 需要有這份 Google Sheet 的編輯權限。
+## 資料
+
+表 `bookings (date TEXT, time TEXT, PRIMARY KEY (date, time))`：一列 = 一個被鎖定（不可預約）的時段。
+表 `meta`：`sheet_imported` 這一列存在，代表舊試算表已經匯入過。Worker 第一次收到請求時如果沒有這一列，會先把 Google 試算表 `booking!A1:F400` 裡有值的格子匯入 D1（只做一次），之後完全不再讀寫試算表。
 
 ## API
 
-- `GET /`：回 405。舊版有一個不需要密碼的讀取端點，會把整份 `booking!A1:F400` 回傳給任何知道網址的人，前端從未使用，已移除。
-- `POST /`：body 為 `{"date":"2026-08-06","time":"10:00","action":"lock","password":"..."}`
+- `GET /bookings?from=YYYY-MM-DD&to=YYYY-MM-DD`：公開讀取，回 `{"ok":true,"booked":{"2026-10-01":["10:00","13:30"]}}`。只有日期和時段，沒有客人資料（跟以前公開的試算表內容一樣）。範圍最多 400 天。
+- `POST /`：body 為 `{"date":"2026-10-01","time":"10:00","action":"lock","password":"..."}`
   - `action` 為 `"lock"` 或 `"unlock"`
+  - `time` 為五個時段之一，或 `"ALL"`（整天）
   - 密碼錯誤回 HTTP 403
-  - 成功回 `{"ok":true}`；找不到日期回 `{"ok":false,"message":"找不到該日期"}`
+  - 成功回 `{"ok":true}`
+- 其他路徑回 404。
 
 CORS 只允許 `https://hui-chun.com`、`https://www.hui-chun.com`、`https://abspbt.github.io` 這幾個網域呼叫。若前端網域不同，記得同步修改 `booking-worker.js` 裡的 `ALLOWED_ORIGINS`。

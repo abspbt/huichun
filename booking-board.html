@@ -182,6 +182,29 @@
   .slot.clickable:active{transform:scale(0.94);opacity:0.75;}
   .slot.passed{cursor:default;}
 
+  /* 本頁專屬：點日期整天鎖定、15 天以後的日期、日期選擇器 */
+  .date-block.clickable-day{cursor:pointer;-webkit-user-select:none;user-select:none;border-radius:8px;transition:opacity 0.12s ease;}
+  .date-block.clickable-day:active{opacity:0.6;}
+  .far-label{
+    flex:0 0 auto;
+    margin-top:clamp(6px,1.4vh,12px);
+    font-size:clamp(9.5px,1.7vh,11.5px);color:var(--gray);font-weight:500;
+  }
+  .far-picker{
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--card-bg);
+    border:1px dashed var(--card-border);
+    border-radius:clamp(10px,1.6vh,16px);
+    padding:12px clamp(10px,2.2vw,18px);
+    font-size:13px;color:var(--gray);font-weight:600;
+  }
+  .far-picker input{
+    font:inherit;font-size:14px;color:var(--white);
+    background:transparent;border:1px solid var(--blue-border);border-radius:8px;
+    padding:6px 8px;min-width:0;
+  }
+
   /* ================================================================
      確認彈窗（本頁專屬：鎖定／解除時段用）
      注意：booking.html 也有 class 名稱同為 .modal-overlay/.modal-box 的
@@ -261,7 +284,7 @@
         <span class="time" id="statusTime"></span>
       </div>
     </div>
-    <span class="subtitle">未來15天・點時段可鎖定/解除</span>
+    <span class="subtitle">點時段可鎖定/解除・點日期可整天鎖定/解除</span>
   </div>
 
   <div class="days-list" id="daysList"></div>
@@ -292,10 +315,12 @@
 
   // ================================================================
   // 設定區
-  // SHEET_ID / SHEET_NAME / SLOT_TIMES / DAYS_TO_SHOW 這幾項必須跟
-  // booking.html 裡的對應設定完全一致（同一份試算表、同樣的時段定義），
-  // 也必須跟寫入用的 Worker 裡的 SHEET_ID / SHEET_NAME / SLOT_TIMES 一致。
-  // 若要換試算表、加時段、改天數，記得三個地方都要同步修改。
+  // SLOT_TIMES / DAYS_TO_SHOW 必須跟 booking.html 一致，
+  // SLOT_TIMES 也必須跟 worker/booking-worker.js 一致。
+  // 預約資料存在 Cloudflare D1：讀取走 Worker 的 GET /bookings，
+  // 寫入走 POST（WEBAPP_URL）。
+  // SHEET_ID / gvizUrl 只是過渡期備援：Worker 還是舊版（GET 回 405）時
+  // 才退回讀 Google 試算表，確認新版 Worker 上線後可以整段拿掉。
   // ================================================================
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
@@ -306,16 +331,21 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 六個頁面（含 booking.html 客人端）用的是同一套做法，改行為時要一起改。
-  var BUILD_VERSION = "2026-09-07-03";
+  var BUILD_VERSION = "2026-09-26-01";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
+  // 15 天以後的日期：讀取範圍（有鎖定的日期會自動列在 15 天之後），
+  // 也是「選擇其他日期」能選到的最遠日期。Worker 最多接受 400 天。
+  var FAR_DAYS = 365;
 
-  // 寫入用的 Cloudflare Worker 網址（取代舊的 Apps Script /exec 網址）
+  // Cloudflare Worker 網址：POST 寫入，GET /bookings 讀取
   var WEBAPP_URL = "https://crimson-dream-d3cf.drum3126.workers.dev";
+  var BOOKINGS_API = WEBAPP_URL + "/bookings";
 
   var bookedMap = {}; // { "YYYY-MM-DD": { "10:00": true, ... } }
-  var pending = null; // { dateKey, time, action, label }
+  var pending = null; // { dateKey, time, action }；time 為 "ALL" 代表整天
+  var pickedDates = []; // 用「選擇其他日期」挑出來、要額外顯示的日期（YYYY-MM-DD）
   var isSubmitting = false;
 
   // 管理密碼：不寫死在檔案裡（此 repo 為 public），第一次寫入操作時
@@ -476,16 +506,32 @@
   // ==================== 共用工具函式結束 ====================
 
   // ================================================================
-  // 資料讀取：抓取並解析 GViz 回應，建立 bookedMap
-  // 解析試算表回傳格式的核心邏輯與 booking.html 相同。
-  // 差異：booking.html 多了 isLoading 防重入、強制 no-store 不快取、
-  // 以及重新整理圖示旋轉動畫；本頁沒有這些，是既有的設計差異，非遺漏。
+  // 資料讀取：從 Worker 讀鎖定時段，建立 bookedMap
+  // fetchBookedMap / fetchGvizMap 與 booking.html 逐字相同。
+  // 差異：booking.html 多了 isLoading 防重入以及重新整理圖示旋轉動畫；
+  // 本頁沒有這些，是既有的設計差異，非遺漏。
   // ================================================================
-  function loadAvailability(){
-    statusText.textContent = "讀取中";
-    statusTime.textContent = "";
-    statusDot.className = "dot";
-    fetch(gvizUrl)
+  function fetchBookedMap(fromKey, toKey){
+    var url = BOOKINGS_API + "?from=" + fromKey + "&to=" + toKey + "&_ts=" + Date.now();
+    return fetch(url, { cache: 'no-store' }).then(function(res){
+      // 舊版 Worker 沒有 GET（回 405）：過渡期暫時退回讀 Google 試算表
+      if(res.status === 405) return fetchGvizMap();
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      return res.json().then(function(data){
+        if(!data || !data.ok || !data.booked) throw new Error("資料格式不符");
+        var map = {};
+        Object.keys(data.booked).forEach(function(dKey){
+          var dayBooked = {};
+          data.booked[dKey].forEach(function(time){ dayBooked[time] = true; });
+          map[dKey] = dayBooked;
+        });
+        return map;
+      });
+    });
+  }
+  function fetchGvizMap(){
+    var url = gvizUrl + (gvizUrl.indexOf('?') > -1 ? '&' : '?') + '_ts=' + Date.now();
+    return fetch(url, { cache: 'no-store' })
       .then(function(res){
         if(!res.ok) throw new Error("HTTP " + res.status);
         return res.text();
@@ -495,21 +541,33 @@
         if(!match) throw new Error("格式解析失敗");
         var json = JSON.parse(match[1]);
         if(!json.table || !json.table.rows) throw new Error("試算表格式不符");
-
-        var rows = json.table.rows;
         var map = {};
-        rows.forEach(function(row){
+        json.table.rows.forEach(function(row){
           var cells = row.c;
           if(!cells || !cells[0]) return;
           var dKey = extractDateString(cells[0]);
           if(!dKey) return;
           var dayBooked = map[dKey] || {};
           SLOT_TIMES.forEach(function(time, idx){
-            var cell = cells[idx + 1];
-            if(cellHasValue(cell)) dayBooked[time] = true;
+            if(cellHasValue(cells[idx + 1])) dayBooked[time] = true;
           });
           map[dKey] = dayBooked;
         });
+        return map;
+      });
+  }
+  function dayOffsetKey(offset){
+    var t = new Date();
+    var d = new Date(t.getFullYear(), t.getMonth(), t.getDate() + offset);
+    return dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function loadAvailability(){
+    statusText.textContent = "讀取中";
+    statusTime.textContent = "";
+    statusDot.className = "dot";
+    fetchBookedMap(dayOffsetKey(0), dayOffsetKey(FAR_DAYS))
+      .then(function(map){
         bookedMap = map;
         statusDot.className = "dot live";
         statusText.textContent = "已同步";
@@ -529,58 +587,113 @@
   }
 
   // ================================================================
-  // 畫面渲染：組出 15 天 × 5 時段的卡片列表
+  // 畫面渲染：組出 15 天 × 5 時段的卡片列表，
+  // 後面再接「15 天以後」有鎖定或手動挑選的日期，最後是日期選擇器
   // ================================================================
+  function keyToDate(key){
+    var p = key.split('-');
+    return new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+  }
+
+  function buildDayCard(d, key, isToday){
+    var booked = bookedMap[key] || {};
+
+    var card = document.createElement('div');
+    card.className = "day-card" + (isToday ? " today" : "");
+    card.id = "day-" + key;
+
+    // 點日期：整天鎖定（若五個時段都已鎖定則整天解除）
+    var allBooked = SLOT_TIMES.every(function(t){ return !!booked[t]; });
+    var dateBlock = document.createElement('div');
+    dateBlock.className = "date-block clickable-day";
+    dateBlock.dataset.date = key;
+    dateBlock.dataset.action = allBooked ? "unlock" : "lock";
+    dateBlock.innerHTML =
+      '<span class="date-text">' + formatDateLine(d.getFullYear(), d.getMonth(), d.getDate()) + '</span>' +
+      '<span class="weekday-row"><span class="weekday-text">星期' + weekdayNames[d.getDay()] + '</span>' +
+      (isToday ? '<span class="today-tag">今天</span>' : '') + '</span>';
+    card.appendChild(dateBlock);
+
+    var slotsLine = document.createElement('div');
+    slotsLine.className = "slots-line";
+
+    SLOT_TIMES.forEach(function(time){
+      var timePassed = isToday && isSlotTimePassed(time);
+      var isBooked = !!booked[time];
+      var blocked = timePassed || isBooked;
+      // 已過期且尚未鎖定的時段：不能操作（過去的時段不能預約）
+      // 已鎖定的時段：無論是否過期，都能點擊解除（避免按錯無法復原）
+      var clickable = isBooked || !timePassed;
+
+      var slot = document.createElement('div');
+      slot.className = "slot" + (blocked ? " blocked" : "") + (clickable ? " clickable" : " passed");
+      slot.dataset.date = key;
+      slot.dataset.time = time;
+      slot.dataset.action = isBooked ? "unlock" : "lock";
+      var html = '<span class="t">' + time + '</span>';
+      if(blocked){
+        html += '<span class="tag">不可預約</span>';
+      }
+      slot.innerHTML = html;
+      slotsLine.appendChild(slot);
+    });
+
+    card.appendChild(slotsLine);
+    return card;
+  }
+
+  var farPicker = null; // 日期選擇器，重繪時沿用同一個元素，避免選到一半被清掉
+
   function render(){
     daysList.innerHTML = "";
     var base = new Date();
     var tKey = todayKey();
+    var lastKey = dayOffsetKey(DAYS_TO_SHOW - 1);
 
     for(var i=0; i<DAYS_TO_SHOW; i++){
       var d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
       var key = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
-      var isToday = key === tKey;
-      var booked = bookedMap[key] || {};
-
-      var card = document.createElement('div');
-      card.className = "day-card" + (isToday ? " today" : "");
-
-      var dateBlock = document.createElement('div');
-      dateBlock.className = "date-block";
-      dateBlock.innerHTML =
-        '<span class="date-text">' + formatDateLine(d.getFullYear(), d.getMonth(), d.getDate()) + '</span>' +
-        '<span class="weekday-row"><span class="weekday-text">星期' + weekdayNames[d.getDay()] + '</span>' +
-        (isToday ? '<span class="today-tag">今天</span>' : '') + '</span>';
-      card.appendChild(dateBlock);
-
-      var slotsLine = document.createElement('div');
-      slotsLine.className = "slots-line";
-
-      SLOT_TIMES.forEach(function(time){
-        var timePassed = isToday && isSlotTimePassed(time);
-        var isBooked = !!booked[time];
-        var blocked = timePassed || isBooked;
-        // 已過期且尚未鎖定的時段：不能操作（過去的時段不能預約）
-        // 已鎖定的時段：無論是否過期，都能點擊解除（避免按錯無法復原）
-        var clickable = isBooked || !timePassed;
-
-        var slot = document.createElement('div');
-        slot.className = "slot" + (blocked ? " blocked" : "") + (clickable ? " clickable" : " passed");
-        slot.dataset.date = key;
-        slot.dataset.time = time;
-        slot.dataset.action = isBooked ? "unlock" : "lock";
-        var html = '<span class="t">' + time + '</span>';
-        if(blocked){
-          html += '<span class="tag">不可預約</span>';
-        }
-        slot.innerHTML = html;
-        slotsLine.appendChild(slot);
-      });
-
-      card.appendChild(slotsLine);
-      daysList.appendChild(card);
+      daysList.appendChild(buildDayCard(d, key, key === tKey));
     }
+
+    // 15 天以後：有鎖定的日期 + 手動挑選的日期
+    var farKeys = {};
+    Object.keys(bookedMap).forEach(function(k){
+      var b = bookedMap[k];
+      if(k > lastKey && b && Object.keys(b).length) farKeys[k] = true;
+    });
+    pickedDates.forEach(function(k){ if(k > lastKey) farKeys[k] = true; });
+    var sorted = Object.keys(farKeys).sort();
+
+    var label = document.createElement('div');
+    label.className = "far-label";
+    label.textContent = sorted.length ? "15 天以後" : "15 天以後（目前沒有鎖定的時段）";
+    daysList.appendChild(label);
+
+    sorted.forEach(function(k){
+      daysList.appendChild(buildDayCard(keyToDate(k), k, false));
+    });
+
+    if(!farPicker){
+      farPicker = document.createElement('label');
+      farPicker.className = "far-picker";
+      farPicker.innerHTML = '<span>選擇其他日期</span><input type="date" id="farDate">';
+      farPicker.querySelector('input').addEventListener('change', function(){
+        var v = this.value;
+        this.value = "";
+        if(!v) return;
+        if(v > lastKeyNow() && pickedDates.indexOf(v) === -1) pickedDates.push(v);
+        render();
+        var card = document.getElementById("day-" + v);
+        if(card && card.scrollIntoView) card.scrollIntoView({ block: "center", behavior: "smooth" });
+      });
+    }
+    var input = farPicker.querySelector('input');
+    input.min = tKey;
+    input.max = dayOffsetKey(FAR_DAYS);
+    daysList.appendChild(farPicker);
   }
+  function lastKeyNow(){ return dayOffsetKey(DAYS_TO_SHOW - 1); }
 
   // ================================================================
   // 鎖定／解除確認彈窗（本頁專屬流程）
@@ -588,19 +701,21 @@
   function formatDetailLine(dateKey, time){
     var p = dateKey.split('-');
     var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
-    return p[0] + "/" + p[1] + "/" + p[2] + "（" + weekdayNames[d.getDay()] + "）" + time;
+    return p[0] + "/" + p[1] + "/" + p[2] + "（" + weekdayNames[d.getDay()] + "）" +
+      (time === "ALL" ? "整天" : time);
   }
 
   function openModal(dateKey, time, action){
     pending = { dateKey: dateKey, time: time, action: action };
     modalError.textContent = "";
     modalDetail.textContent = formatDetailLine(dateKey, time);
+    var what = time === "ALL" ? "這一整天" : "這個時段";
     if(action === "lock"){
-      modalTitle.textContent = "確定要鎖定這個時段嗎？";
+      modalTitle.textContent = "確定要鎖定" + what + "嗎？";
       modalConfirm.textContent = "確定鎖定";
       modalConfirm.classList.remove("unlock");
     } else {
-      modalTitle.textContent = "確定要解除這個時段的鎖定嗎？";
+      modalTitle.textContent = "確定要解除" + what + "的鎖定嗎？";
       modalConfirm.textContent = "確定解除";
       modalConfirm.classList.add("unlock");
     }
@@ -615,11 +730,16 @@
     isSubmitting = false;
   }
 
-  // 時段點擊（事件委派，效能較好）
+  // 時段／日期點擊（事件委派，效能較好）
   daysList.addEventListener('click', function(e){
-    var slot = e.target.closest ? e.target.closest('.slot.clickable') : null;
-    if(!slot) return;
-    openModal(slot.dataset.date, slot.dataset.time, slot.dataset.action);
+    if(!e.target.closest) return;
+    var slot = e.target.closest('.slot.clickable');
+    if(slot){
+      openModal(slot.dataset.date, slot.dataset.time, slot.dataset.action);
+      return;
+    }
+    var day = e.target.closest('.clickable-day');
+    if(day) openModal(day.dataset.date, "ALL", day.dataset.action);
   });
 
   modalCancel.addEventListener('click', function(){
@@ -635,7 +755,7 @@
     if(!pending) return;
 
     if(!WEBAPP_URL || WEBAPP_URL.indexOf("http") !== 0){
-      modalError.textContent = "尚未設定 Worker 網址，無法寫入試算表";
+      modalError.textContent = "尚未設定 Worker 網址，無法寫入";
       return;
     }
 
@@ -647,24 +767,30 @@
 
     // 真正的樂觀更新：立刻關閉彈窗、更新格子顏色，寫入請求在背景送出，
     // 失敗才跳提示並把格子顏色還原。
+    var times = time === "ALL" ? SLOT_TIMES.slice() : [time];
     var dayBooked = bookedMap[dateKey] || {};
-    var hadValue = !!dayBooked[time];
-    if(action === "lock"){
-      dayBooked[time] = true;
-    } else {
-      delete dayBooked[time];
-    }
+    var hadValue = {};
+    times.forEach(function(t){
+      hadValue[t] = !!dayBooked[t];
+      if(action === "lock"){
+        dayBooked[t] = true;
+      } else {
+        delete dayBooked[t];
+      }
+    });
     bookedMap[dateKey] = dayBooked;
     render();
     closeModal();
 
     function revert(){
       var d = bookedMap[dateKey] || {};
-      if(hadValue){
-        d[time] = true;
-      } else {
-        delete d[time];
-      }
+      times.forEach(function(t){
+        if(hadValue[t]){
+          d[t] = true;
+        } else {
+          delete d[t];
+        }
+      });
       bookedMap[dateKey] = d;
       render();
     }

@@ -629,23 +629,25 @@
 
   // ================================================================
   // 設定區
-  // SHEET_ID / SHEET_NAME / SLOT_TIMES / DAYS_TO_SHOW 這幾項必須跟
-  // booking-board.html 裡的對應設定完全一致（同一份試算表、同樣的
-  // 時段定義），也必須跟 Code.gs 裡的 SHEET_ID / SHEET_NAME /
-  // SLOT_TIMES 一致。若要換試算表、加時段、改天數，記得三個檔案
-  // 都要同步修改。
+  // SLOT_TIMES / DAYS_TO_SHOW 必須跟 booking-board.html 一致，
+  // SLOT_TIMES 也必須跟 worker/booking-worker.js 一致。
+  // 預約資料存在 Cloudflare D1，透過 Worker 的 GET /bookings 讀取。
+  // SHEET_ID / gvizUrl 只是過渡期備援：Worker 還是舊版（GET 回 405）時
+  // 才退回讀 Google 試算表，確認新版 Worker 上線後可以整段拿掉。
   // ================================================================
 
   // 每次更新這個檔案，把版本號改成新的（例如當天日期），
   // 已開啟的頁面會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 跟 booking-board.html 用的是同一套做法。
-  var BUILD_VERSION = "2026-09-07-03";
+  var BUILD_VERSION = "2026-09-26-01";
 
   var SHEET_ID = "1-0UwxcPNxA95FFRCNICMbhheGtC5-Z9wwBGUQRaLZP0";
   var SHEET_NAME = "booking";
   var gvizUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json" +
                 (SHEET_NAME ? "&sheet=" + encodeURIComponent(SHEET_NAME) : "");
+
+  var BOOKINGS_API = "https://crimson-dream-d3cf.drum3126.workers.dev/bookings";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -925,22 +927,32 @@
   // ==================== 共用工具函式結束 ====================
 
   // ================================================================
-  // 資料讀取：抓取並解析 GViz 回應，建立 bookedMap
-  // 解析試算表回傳格式的核心邏輯與 booking-board.html 相同。
-  // 本頁多了 isLoading 防重入、強制 no-store 不快取、以及重新整理
-  // 圖示旋轉動畫；booking-board.html 沒有這些，是既有的設計差異。
+  // 資料讀取：從 Worker 讀鎖定時段，建立 bookedMap
+  // fetchBookedMap / fetchGvizMap 與 booking-board.html 逐字相同。
+  // 本頁多了 isLoading 防重入以及重新整理圖示旋轉動畫；
+  // booking-board.html 沒有這些，是既有的設計差異。
   // ================================================================
-  var isLoading = false;
-  function loadAvailability(){
-    if(isLoading) return;
-    isLoading = true;
-    statusTrigger.classList.add('spinning');
-    statusText.textContent = "讀取中";
-    statusTime.textContent = "";
-    statusDot.className = "dot";
-    // 加時間戳並關閉快取，避免背景閒置後拿到舊資料
+  function fetchBookedMap(fromKey, toKey){
+    var url = BOOKINGS_API + "?from=" + fromKey + "&to=" + toKey + "&_ts=" + Date.now();
+    return fetch(url, { cache: 'no-store' }).then(function(res){
+      // 舊版 Worker 沒有 GET（回 405）：過渡期暫時退回讀 Google 試算表
+      if(res.status === 405) return fetchGvizMap();
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      return res.json().then(function(data){
+        if(!data || !data.ok || !data.booked) throw new Error("資料格式不符");
+        var map = {};
+        Object.keys(data.booked).forEach(function(dKey){
+          var dayBooked = {};
+          data.booked[dKey].forEach(function(time){ dayBooked[time] = true; });
+          map[dKey] = dayBooked;
+        });
+        return map;
+      });
+    });
+  }
+  function fetchGvizMap(){
     var url = gvizUrl + (gvizUrl.indexOf('?') > -1 ? '&' : '?') + '_ts=' + Date.now();
-    fetch(url, { cache: 'no-store' })
+    return fetch(url, { cache: 'no-store' })
       .then(function(res){
         if(!res.ok) throw new Error("HTTP " + res.status);
         return res.text();
@@ -950,21 +962,37 @@
         if(!match) throw new Error("格式解析失敗");
         var json = JSON.parse(match[1]);
         if(!json.table || !json.table.rows) throw new Error("試算表格式不符");
-
-        var rows = json.table.rows;
         var map = {};
-        rows.forEach(function(row){
+        json.table.rows.forEach(function(row){
           var cells = row.c;
           if(!cells || !cells[0]) return;
           var dKey = extractDateString(cells[0]);
           if(!dKey) return;
           var dayBooked = map[dKey] || {};
           SLOT_TIMES.forEach(function(time, idx){
-            var cell = cells[idx + 1];
-            if(cellHasValue(cell)) dayBooked[time] = true;
+            if(cellHasValue(cells[idx + 1])) dayBooked[time] = true;
           });
           map[dKey] = dayBooked;
         });
+        return map;
+      });
+  }
+  function dayOffsetKey(offset){
+    var t = new Date();
+    var d = new Date(t.getFullYear(), t.getMonth(), t.getDate() + offset);
+    return dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  var isLoading = false;
+  function loadAvailability(){
+    if(isLoading) return;
+    isLoading = true;
+    statusTrigger.classList.add('spinning');
+    statusText.textContent = "讀取中";
+    statusTime.textContent = "";
+    statusDot.className = "dot";
+    fetchBookedMap(dayOffsetKey(0), dayOffsetKey(DAYS_TO_SHOW - 1))
+      .then(function(map){
         bookedMap = map;
         statusDot.className = "dot live";
         statusText.textContent = "已同步";
