@@ -8,3 +8,13 @@ compatibility_date = "2026-08-06"
 #   wrangler secret put GOOGLE_PRIVATE_KEY
 #   wrangler secret put ADMIN_TOKEN
 #   wrangler secret put SPREADSHEET_ID
+
+# D1 資料庫（2026-09-26 在 Cloudflare 後台建立並綁到這支 Worker，準備取代
+# Google 試算表；目前程式碼還沒用到它，讀寫仍走 Google 試算表）。
+# 這段必須留著：wrangler deploy 會以這個檔案為準，少了它會把後台設好的繫結拿掉。
+# 資料表：CREATE TABLE bookings (date TEXT NOT NULL, time TEXT NOT NULL, PRIMARY KEY (date, time));
+# 一列 = 一個被鎖定的時段，例如 ('2026-10-01', '10:00')。
+[[d1_databases]]
+binding = "DB"
+database_name = "huichun-booking"
+database_id = "83628f10-41c5-41ff-976f-47e3778729be"
