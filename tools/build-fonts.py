@@ -104,10 +104,14 @@ def main():
     for page, fonts in PAGES.items():
         used = set(c for c in rendered_text(os.path.join(ROOT, page + ".html")) if c.strip())
         cover = TTFont(os.path.join(SRC_DIR, fonts[0] + ".woff2")).getBestCmap()
-        # 母檔沒有的字：收不進子集，網頁上會改用系統字顯示，值得回報
-        missing = sorted(c for c in used if ord(c) > 0x2E80 and ord(c) not in cover)
-        if missing:
-            problems.append((page, "".join(missing)))
+        # 母檔沒有的字：收不進子集，網頁上會改用系統字顯示，值得回報。
+        # 每個字重的母檔都要查——各母檔收的字不一定一樣（noto-sans-tc-300 曾經只收了
+        # 首頁的 259 個字，map 頁的內文因此大半跑成系統字，只查第一個母檔看不出來）。
+        for font in fonts:
+            fcover = TTFont(os.path.join(SRC_DIR, font + ".woff2")).getBestCmap()
+            missing = sorted(c for c in used if ord(c) > 0x2E80 and ord(c) not in fcover)
+            if missing:
+                problems.append((page + " / " + font, "".join(missing)))
         # 保險字元只收母檔真的有的，避免白白放大子集
         chars = used | set(c for c in ALWAYS if ord(c) in cover)
         old = new = 0
