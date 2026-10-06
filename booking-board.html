@@ -185,6 +185,14 @@
   /* 本頁專屬：點日期整天鎖定、15 天以後的日期、日期選擇器 */
   .date-block.clickable-day{cursor:pointer;-webkit-user-select:none;user-select:none;border-radius:8px;transition:opacity 0.12s ease;}
   .date-block.clickable-day:active{opacity:0.6;}
+  /* 手動挑出、沒有鎖定的日期：日期下方的「隱藏」小按鈕，點了就從列表收起來 */
+  .date-block .hide-day{
+    font:inherit;font-size:clamp(8px,1.45vh,10px);font-weight:600;line-height:1.3;
+    color:var(--gray);background:transparent;
+    border:1px solid var(--card-border);border-radius:999px;
+    padding:1px 7px;cursor:pointer;white-space:nowrap;
+  }
+  .date-block .hide-day:active{opacity:0.6;}
   .far-label{
     flex:0 0 auto;
     margin-top:clamp(6px,1.4vh,12px);
@@ -336,7 +344,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 六個頁面（含 booking.html 客人端）用的是同一套做法，改行為時要一起改。
-  var BUILD_VERSION = "2026-09-26-03";
+  var BUILD_VERSION = "2026-10-06-01";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -553,6 +561,9 @@
 
     // 點日期：整天鎖定（若五個時段都已鎖定則整天解除）
     var allBooked = SLOT_TIMES.every(function(t){ return !!booked[t]; });
+    // 用「選擇其他日期」挑出來、又沒有任何鎖定的日期可以收起來；
+    // 有鎖定的日期本來就會一直列出，隱藏也沒用，所以不給按鈕。
+    var canHide = pickedDates.indexOf(key) !== -1 && !Object.keys(booked).length;
     var dateBlock = document.createElement('div');
     dateBlock.className = "date-block clickable-day";
     dateBlock.dataset.date = key;
@@ -560,7 +571,8 @@
     dateBlock.innerHTML =
       '<span class="date-text">' + formatDateLine(d.getFullYear(), d.getMonth(), d.getDate()) + '</span>' +
       '<span class="weekday-row"><span class="weekday-text">星期' + weekdayNames[d.getDay()] + '</span>' +
-      (isToday ? '<span class="today-tag">今天</span>' : '') + '</span>';
+      (isToday ? '<span class="today-tag">今天</span>' : '') +
+      (canHide ? '<button type="button" class="hide-day" data-date="' + key + '">隱藏</button>' : '') + '</span>';
     card.appendChild(dateBlock);
 
     var slotsLine = document.createElement('div');
@@ -699,6 +711,13 @@
   // 時段／日期點擊（事件委派，效能較好）
   daysList.addEventListener('click', function(e){
     if(!e.target.closest) return;
+    var hide = e.target.closest('.hide-day');
+    if(hide){
+      var i = pickedDates.indexOf(hide.dataset.date);
+      if(i !== -1) pickedDates.splice(i, 1);
+      render();
+      return;
+    }
     var slot = e.target.closest('.slot.clickable');
     if(slot){
       openModal(slot.dataset.date, slot.dataset.time, slot.dataset.action);
