@@ -300,14 +300,14 @@
       <script>
       (function(){
         var img = document.getElementById('heroBg');
-        var FALLBACK = 'img/hero-illustration.webp?v=2026-09-05-02';
+        var FALLBACK = 'img/hero-illustration.webp?v=2026-09-28';
         var todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' }); // "YYYY-MM-DD"
         var day = todayStr.slice(8, 10); // "01".."31"
         img.onerror = function(){ img.onerror = null; img.src = FALLBACK; };
         img.src = 'img/hero-rotation/' + day + '.webp?v=' + todayStr;
       })();
       </script>
-      <noscript><img class="hero-bg" src="img/hero-illustration.webp?v=2026-09-05-02" width="640" height="390" alt="" aria-hidden="true"></noscript>
+      <noscript><img class="hero-bg" src="img/hero-illustration.webp?v=2026-09-28" width="640" height="424" alt="" aria-hidden="true"></noscript>
       <ul class="feature-list">
         <li class="feature">
           <span class="feature-icon"><img src="img/feature-tag.webp" width="26" height="26" alt="" decoding="async"></span>
@@ -410,7 +410,7 @@
   // 自動偵測改版，避免手機瀏覽器停留在舊版內容（做法見 CLAUDE.md
   // 「Mobile browsers showing stale cached content」）。
   // 每次更新這個檔案，把版本號改成新的（例如當天日期）。
-  var BUILD_VERSION = "2026-09-07-03";
+  var BUILD_VERSION = "2026-10-07";
   var isCheckingUpdate = false;
   // 剛部署完的那幾分鐘，CDN 各節點還沒同步完成，這裡抓到的內容可能忽新忽舊，
   // 若每次偵測到差異就立刻重新整理，會讓頁面在測速工具（如 PageSpeed Insights）
