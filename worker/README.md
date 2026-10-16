@@ -35,7 +35,6 @@ wrangler secret put SPREADSHEET_ID
   - `time` 為五個時段之一，或 `"ALL"`（整天）
   - 密碼錯誤回 HTTP 403
   - 成功回 `{"ok":true}`
-- `GET /calendar.ics`：公開的 iCal 行事曆訂閱。五個時段全被鎖定的日期 = 一個「OFF」整天行程；只鎖部分時段的日子，每個鎖定的時段 = 一個一小時的「OFF」行程（只放今天以後的日期）。`booking-board.html` 底部的「訂閱」按鈕是這個網址的 `webcal://` 版本，iPhone 點了會問要不要加入行事曆；之後手機會自己定時重抓（不是即時）。
 - 其他路徑回 404。
 
 CORS 只允許 `https://hui-chun.com`、`https://www.hui-chun.com`、`https://abspbt.github.io` 這幾個網域呼叫。若前端網域不同，記得同步修改 `booking-worker.js` 裡的 `ALLOWED_ORIGINS`。
