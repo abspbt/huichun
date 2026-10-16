@@ -223,6 +223,13 @@
     cursor:pointer;
   }
   .far-picker button:disabled{opacity:0.4;cursor:default;}
+  /* 「同步到 iPhone 行事曆」：webcal:// 連結，iPhone 點了會問要不要訂閱 */
+  .far-picker a{
+    flex:0 0 auto;
+    font:inherit;font-size:13px;font-weight:700;text-decoration:none;
+    padding:8px 12px;border-radius:8px;
+    background:var(--gold);border:1px solid var(--gold-border);color:var(--tag-text);
+  }
 
   /* ================================================================
      確認彈窗（本頁專屬：鎖定／解除時段用）
@@ -344,7 +351,7 @@
   // 已開啟的頁面/PWA會在背景偵測到版本不同，自動強制重新載入最新版本
   // 注意：此版本偵測機制（BUILD_VERSION + checkForUpdate，見檔案最下方）
   // 六個頁面（含 booking.html 客人端）用的是同一套做法，改行為時要一起改。
-  var BUILD_VERSION = "2026-10-06-01";
+  var BUILD_VERSION = "2026-10-16-01";
 
   var SLOT_TIMES = ["10:00", "11:00", "13:30", "14:30", "15:30"];
   var DAYS_TO_SHOW = 15; // 含今天共 15 天
@@ -617,6 +624,14 @@
     '<input type="date" id="farDate">' +
     '<button type="button" id="farGo" disabled>顯示</button>';
   daysList.appendChild(farPicker);
+  // 整天鎖定的日期，在 iPhone 行事曆顯示「OFF」：訂閱 Worker 的 /calendar.ics
+  // （手機會自己定時重抓，不是即時）
+  var calSub = document.createElement('div');
+  calSub.className = "far-picker";
+  calSub.innerHTML =
+    '<span>整天休息同步到 iPhone 行事曆</span>' +
+    '<a href="' + WEBAPP_URL.replace(/^https:/, "webcal:") + '/calendar.ics">訂閱</a>';
+  daysList.appendChild(calSub);
   var farDate = farPicker.querySelector('#farDate');
   var farGo = farPicker.querySelector('#farGo');
 

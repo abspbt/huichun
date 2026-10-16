@@ -16,6 +16,10 @@
 // POST /  body 為 {date, time, action, password}
 //        action 為 "lock" / "unlock"；time 為 SLOT_TIMES 之一，或 "ALL"（整天）
 //        密碼錯誤回 403
+// GET  /calendar.ics
+//        公開的 iCal 行事曆訂閱。整天都鎖定（五個時段都被鎖）的日期 = 一個「OFF」整天
+//        行程。iPhone「設定 → 行事曆 → 帳號 → 加入帳號 → 其他 → 加入已訂閱的行事曆」
+//        或在 Safari 點 webcal:// 連結訂閱；手機會自己定時重抓，不是即時同步。
 
 // 對外一律回這句。原始錯誤內容可能含內部資訊，不該回給呼叫端（這個端點任何人
 // 都能打）；詳細內容用 console.log 留在 Cloudflare 後台的 Logs / `wrangler tail`。
@@ -240,6 +244,63 @@ async function handleGet(url, env, headers) {
     Object.assign({}, headers, { "Cache-Control": "no-store" }));
 }
 
+// ---- GET /calendar.ics：整天鎖定的日期 → 行事曆上的「OFF」 ----
+
+var CALENDAR_PAST_DAYS = 90; // 過去的 OFF 也留一段，行事曆往回翻才看得到
+
+function icsDate(s) {
+  return s.replace(/-/g, "");
+}
+
+function nextDay(s) {
+  return new Date(Date.parse(s + "T00:00:00Z") + 86400000).toISOString().slice(0, 10);
+}
+
+async function handleCalendar(env) {
+  await ensureReady(env);
+  var from = new Date(Date.now() + 8 * 3600000 - CALENDAR_PAST_DAYS * 86400000).toISOString().slice(0, 10);
+  var placeholders = SLOT_TIMES.map(function () { return "?"; }).join(",");
+  var result = await env.DB.prepare(
+    "SELECT date FROM bookings WHERE date >= ? AND time IN (" + placeholders + ")" +
+    " GROUP BY date HAVING COUNT(*) = ? ORDER BY date"
+  ).bind(from, ...SLOT_TIMES, SLOT_TIMES.length).all();
+
+  var stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  var lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//hui-chun.com//booking//ZH",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "X-WR-CALNAME:回春 OFF",
+    "X-WR-TIMEZONE:Asia/Taipei",
+    "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
+    "X-PUBLISHED-TTL:PT1H"
+  ];
+  (result.results || []).forEach(function (r) {
+    lines.push(
+      "BEGIN:VEVENT",
+      "UID:off-" + icsDate(r.date) + "@hui-chun.com",
+      "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + icsDate(r.date),
+      "DTEND;VALUE=DATE:" + icsDate(nextDay(r.date)),
+      "SUMMARY:OFF",
+      "TRANSP:TRANSPARENT",
+      "END:VEVENT"
+    );
+  });
+  lines.push("END:VCALENDAR");
+
+  return new Response(lines.join("\r\n") + "\r\n", {
+    status: 200,
+    headers: {
+      "Content-Type": "text/calendar;charset=utf-8",
+      "Content-Disposition": "inline; filename=\"huichun-off.ics\"",
+      "Cache-Control": "no-store"
+    }
+  });
+}
+
 // ---- POST：鎖定／解除時段 ----
 
 async function handlePost(request, env, headers) {
@@ -288,6 +349,9 @@ export default {
       var url = new URL(request.url);
       if (request.method === "GET" && url.pathname === "/bookings") {
         return await handleGet(url, env, headers);
+      }
+      if (request.method === "GET" && url.pathname === "/calendar.ics") {
+        return await handleCalendar(env);
       }
       if (request.method === "POST") {
         return await handlePost(request, env, headers);
