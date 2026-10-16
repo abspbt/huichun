@@ -18,7 +18,7 @@
 //        密碼錯誤回 403
 // GET  /calendar.ics
 //        公開的 iCal 行事曆訂閱。整天都鎖定（五個時段都被鎖）的日期 = 一個「OFF」整天
-//        行程。iPhone「設定 → 行事曆 → 帳號 → 加入帳號 → 其他 → 加入已訂閱的行事曆」
+//        行程；只鎖部分時段的日子，每個鎖定的時段 = 一個一小時的「OFF」行程。iPhone「設定 → 行事曆 → 帳號 → 加入帳號 → 其他 → 加入已訂閱的行事曆」
 //        或在 Safari 點 webcal:// 連結訂閱；手機會自己定時重抓，不是即時同步。
 
 // 對外一律回這句。原始錯誤內容可能含內部資訊，不該回給呼叫端（這個端點任何人
@@ -244,9 +244,16 @@ async function handleGet(url, env, headers) {
     Object.assign({}, headers, { "Cache-Control": "no-store" }));
 }
 
-// ---- GET /calendar.ics：整天鎖定的日期 → 行事曆上的「OFF」 ----
+// ---- GET /calendar.ics：鎖定的日期／時段 → 行事曆上的「OFF」 ----
 
 var CALENDAR_PAST_DAYS = 90; // 過去的 OFF 也留一段，行事曆往回翻才看得到
+var SLOT_MINUTES = 60;
+
+// 台北時間（UTC+8，沒有日光節約）的日期＋時段 → iCal 的 UTC 時間，例如 20261021T020000Z
+function icsUtc(date, time, addMinutes) {
+  var t = Date.parse(date + "T" + time + ":00+08:00") + (addMinutes || 0) * 60000;
+  return new Date(t).toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+}
 
 function icsDate(s) {
   return s.replace(/-/g, "");
@@ -259,11 +266,15 @@ function nextDay(s) {
 async function handleCalendar(env) {
   await ensureReady(env);
   var from = new Date(Date.now() + 8 * 3600000 - CALENDAR_PAST_DAYS * 86400000).toISOString().slice(0, 10);
-  var placeholders = SLOT_TIMES.map(function () { return "?"; }).join(",");
   var result = await env.DB.prepare(
-    "SELECT date FROM bookings WHERE date >= ? AND time IN (" + placeholders + ")" +
-    " GROUP BY date HAVING COUNT(*) = ? ORDER BY date"
-  ).bind(from, ...SLOT_TIMES, SLOT_TIMES.length).all();
+    "SELECT date, time FROM bookings WHERE date >= ? ORDER BY date, time"
+  ).bind(from).all();
+
+  var byDate = {};
+  (result.results || []).forEach(function (r) {
+    if (SLOT_TIMES.indexOf(r.time) === -1) return;
+    (byDate[r.date] = byDate[r.date] || []).push(r.time);
+  });
 
   var stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
   var lines = [
@@ -277,17 +288,33 @@ async function handleCalendar(env) {
     "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
     "X-PUBLISHED-TTL:PT1H"
   ];
-  (result.results || []).forEach(function (r) {
-    lines.push(
-      "BEGIN:VEVENT",
-      "UID:off-" + icsDate(r.date) + "@hui-chun.com",
-      "DTSTAMP:" + stamp,
-      "DTSTART;VALUE=DATE:" + icsDate(r.date),
-      "DTEND;VALUE=DATE:" + icsDate(nextDay(r.date)),
-      "SUMMARY:OFF",
-      "TRANSP:TRANSPARENT",
-      "END:VEVENT"
-    );
+  Object.keys(byDate).sort().forEach(function (date) {
+    var times = byDate[date];
+    if (times.length === SLOT_TIMES.length) {
+      lines.push(
+        "BEGIN:VEVENT",
+        "UID:off-" + icsDate(date) + "@hui-chun.com",
+        "DTSTAMP:" + stamp,
+        "DTSTART;VALUE=DATE:" + icsDate(date),
+        "DTEND;VALUE=DATE:" + icsDate(nextDay(date)),
+        "SUMMARY:OFF",
+        "TRANSP:TRANSPARENT",
+        "END:VEVENT"
+      );
+      return;
+    }
+    times.forEach(function (time) {
+      lines.push(
+        "BEGIN:VEVENT",
+        "UID:off-" + icsDate(date) + "-" + time.replace(":", "") + "@hui-chun.com",
+        "DTSTAMP:" + stamp,
+        "DTSTART:" + icsUtc(date, time),
+        "DTEND:" + icsUtc(date, time, SLOT_MINUTES),
+        "SUMMARY:OFF",
+        "TRANSP:TRANSPARENT",
+        "END:VEVENT"
+      );
+    });
   });
   lines.push("END:VCALENDAR");
 
