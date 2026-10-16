@@ -246,7 +246,7 @@ async function handleGet(url, env, headers) {
 
 // ---- GET /calendar.ics：鎖定的日期／時段 → 行事曆上的「OFF」 ----
 
-var CALENDAR_PAST_DAYS = 90; // 過去的 OFF 也留一段，行事曆往回翻才看得到
+var CALENDAR_PAST_DAYS = 0; // 只放今天以後的 OFF；過去的日期不放進行事曆
 var SLOT_MINUTES = 60;
 
 // 台北時間（UTC+8，沒有日光節約）的日期＋時段 → iCal 的 UTC 時間，例如 20261021T020000Z
