@@ -35,6 +35,7 @@ wrangler secret put SPREADSHEET_ID
   - `time` 為五個時段之一，或 `"ALL"`（整天）
   - 密碼錯誤回 HTTP 403
   - 成功回 `{"ok":true}`
+- `GET /ics?title=&start=&end=&desc=`：回一個 `.ics` 行事曆檔，給 `reply.html` 的「加入 Apple 行事曆」按鈕用（iPhone 只有從真正的網址打開 `.ics` 才會跳出加入行事曆）。`start` / `end` 為 UTC，格式 `20261031T030000Z`。不讀寫資料庫。
 - 其他路徑回 404。
 
 CORS 只允許 `https://hui-chun.com`、`https://www.hui-chun.com`、`https://abspbt.github.io` 這幾個網域呼叫。若前端網域不同，記得同步修改 `booking-worker.js` 裡的 `ALLOWED_ORIGINS`。

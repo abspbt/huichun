@@ -13,6 +13,10 @@
 // GET  /bookings?from=YYYY-MM-DD&to=YYYY-MM-DD
 //        公開讀取，回 {"ok":true,"booked":{"2026-10-01":["10:00","13:30"]}}
 //        只有日期＋時段，沒有任何客人資料，跟以前公開的 Google 試算表內容相同。
+// GET  /ics?title=&start=&end=&desc=
+//        回一個 .ics 行事曆檔（text/calendar），給 reply.html 的「加入 Apple 行事曆」用。
+//        iPhone 打開 data: / blob: 的 .ics 沒反應，要從真正的網址下載才會跳出加入行事曆。
+//        start / end 為 UTC，格式 20261031T030000Z。不碰資料庫。
 // POST /  body 為 {date, time, action, password}
 //        action 為 "lock" / "unlock"；time 為 SLOT_TIMES 之一，或 "ALL"（整天）
 //        密碼錯誤回 403
@@ -275,6 +279,46 @@ async function handlePost(request, env, headers) {
   return jsonResponse({ ok: true }, 200, headers);
 }
 
+var ICS_TIME_RE = /^\d{8}T\d{6}Z$/;
+
+function icsEscape(str) {
+  return String(str).slice(0, 200)
+    .replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n").replace(/\r/g, "");
+}
+
+function handleIcs(url, headers) {
+  var start = url.searchParams.get("start") || "";
+  var end = url.searchParams.get("end") || "";
+  if (!ICS_TIME_RE.test(start) || !ICS_TIME_RE.test(end)) {
+    return jsonResponse({ ok: false, message: "時間格式錯誤" }, 400, headers);
+  }
+  var title = url.searchParams.get("title") || "預約";
+  var desc = url.searchParams.get("desc") || "";
+  var stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  var lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Hui Chun Photo//Reply Tool//ZH",
+    "BEGIN:VEVENT",
+    "UID:" + start + "-" + Date.now() + "@hui-chun.com",
+    "DTSTAMP:" + stamp,
+    "DTSTART:" + start,
+    "DTEND:" + end,
+    "SUMMARY:" + icsEscape(title)
+  ];
+  if (desc) lines.push("DESCRIPTION:" + icsEscape(desc));
+  lines.push("END:VEVENT", "END:VCALENDAR");
+  return new Response(lines.join("\r\n") + "\r\n", {
+    status: 200,
+    headers: {
+      "Content-Type": "text/calendar; charset=utf-8",
+      "Content-Disposition": 'attachment; filename="booking.ics"',
+      "Cache-Control": "no-store"
+    }
+  });
+}
+
 export default {
   async fetch(request, env) {
     var origin = request.headers.get("Origin") || "";
@@ -288,6 +332,9 @@ export default {
       var url = new URL(request.url);
       if (request.method === "GET" && url.pathname === "/bookings") {
         return await handleGet(url, env, headers);
+      }
+      if (request.method === "GET" && url.pathname === "/ics") {
+        return handleIcs(url, headers);
       }
       if (request.method === "POST") {
         return await handlePost(request, env, headers);

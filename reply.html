@@ -394,43 +394,20 @@
       return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     }
 
-    function icsEscape(str) {
-      return str.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
-    }
+    // iPhone 打開網頁自己產生的 .ics（data: / blob:）沒反應，所以交給預約系統的 Worker
+    // 產生一個真正的 .ics 網址，打開後 iPhone 會跳出「加入行事曆」
+    const ICS_API = 'https://crimson-dream-d3cf.drum3126.workers.dev/ics';
 
     function addToCalendar() {
       const ev = calEvent();
       if (!ev) return;
-      const ics = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Hui Chun Photo//Reply Tool//ZH',
-        'BEGIN:VEVENT',
-        `UID:${Date.now()}@hui-chun.com`,
-        `DTSTAMP:${icsTime(new Date())}`,
-        `DTSTART:${icsTime(ev.start)}`,
-        `DTEND:${icsTime(ev.end)}`,
-        `SUMMARY:${icsEscape(ev.title)}`,
-        ev.phone ? `DESCRIPTION:${icsEscape('電話：' + ev.phone)}` : '',
-        'END:VEVENT',
-        'END:VCALENDAR'
-      ].filter(Boolean).join('\r\n');
-
-      // iPhone Safari 直接開 data: 網址會跳出「加入行事曆」；其他瀏覽器改成下載 .ics 檔
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isIOS) {
-        window.location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
-      } else {
-        const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${ev.dateVal} ${ev.title}.ics`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      }
+      const params = new URLSearchParams({
+        title: ev.title,
+        start: icsTime(ev.start),
+        end: icsTime(ev.end),
+        desc: ev.phone ? '電話：' + ev.phone : ''
+      });
+      window.location.href = ICS_API + '?' + params.toString();
     }
 
     function updateSec4() {
