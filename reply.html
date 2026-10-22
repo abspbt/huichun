@@ -179,6 +179,10 @@
     </div>
     <div class="controls">
       <div class="control-group">
+        <label>LINE 名稱：</label>
+        <input type="text" id="cal-line" class="input-field" style="margin-bottom:0" placeholder="例：小郁" oninput="updateCal()">
+      </div>
+      <div class="control-group">
         <label>客人稱呼（可直接貼上客人回覆的稱呼和電話）：</label>
         <input type="text" id="cal-name" class="input-field" style="margin-bottom:0" placeholder="例：王小姐" oninput="parseNamePhone()">
       </div>
@@ -372,13 +376,19 @@
       if (!dateVal) return null;
       const name = document.getElementById('cal-name').value.trim() || '客人';
       const phone = document.getElementById('cal-phone').value.trim();
+      const lineName = document.getElementById('cal-line').value.trim();
       const people = COUNT_WORDS.indexOf(sec3CountVal) + 1 || 1;
       const [y, mo, d] = dateVal.split('-').map(Number);
       const [h, mi] = sec3TimeVal.split(':').map(Number);
       // 台北時間 = UTC+8（無夏令時間），一位約 60 分鐘
       const start = new Date(Date.UTC(y, mo - 1, d, h - 8, mi));
       const end = new Date(start.getTime() + people * 60 * 60 * 1000);
-      return { title: `${name}（${sec3CountVal}）`, phone, start, end, dateVal };
+      // 備註格式照原本手寫的：LINE 名稱／LINE／空行／稱呼／電話
+      const notes = [];
+      if (lineName) notes.push(lineName, 'LINE', '');
+      if (name !== '客人') notes.push(name);
+      if (phone) notes.push(phone);
+      return { title: `${name}（${sec3CountVal}）`, notes: notes.join('\n').trim(), start, end, dateVal };
     }
 
     function updateCal() {
@@ -386,7 +396,7 @@
       const box = document.getElementById('cal-preview');
       if (!box) return;
       box.innerText = ev
-        ? `${ev.dateVal} ${sec3TimeVal}\n${ev.title}${ev.phone ? '\n電話：' + ev.phone : ''}`
+        ? `${ev.dateVal} ${sec3TimeVal}\n${ev.title}${ev.notes ? '\n\n' + ev.notes : ''}`
         : '請先在第 3 區選擇預約日期';
     }
 
@@ -405,7 +415,7 @@
         title: ev.title,
         start: icsTime(ev.start),
         end: icsTime(ev.end),
-        desc: ev.phone ? '電話：' + ev.phone : ''
+        desc: ev.notes
       });
       window.location.href = ICS_API + '?' + params.toString();
     }
