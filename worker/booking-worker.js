@@ -287,6 +287,14 @@ function icsEscape(str) {
     .replace(/\r?\n/g, "\\n").replace(/\r/g, "");
 }
 
+// 收到的是 UTC（…Z），轉成台北時間並標上 TZID=Asia/Taipei。
+// 只寫 UTC 的話，iPhone 行事曆會把時區顯示成「GMT」。
+function icsTaipei(utc) {
+  var d = new Date(Date.UTC(+utc.slice(0, 4), +utc.slice(4, 6) - 1, +utc.slice(6, 8),
+    +utc.slice(9, 11) + 8, +utc.slice(11, 13), +utc.slice(13, 15)));
+  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "");
+}
+
 function handleIcs(url, headers) {
   var start = url.searchParams.get("start") || "";
   var end = url.searchParams.get("end") || "";
@@ -300,11 +308,20 @@ function handleIcs(url, headers) {
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Hui Chun Photo//Reply Tool//ZH",
+    "BEGIN:VTIMEZONE",
+    "TZID:Asia/Taipei",
+    "BEGIN:STANDARD",
+    "DTSTART:19700101T000000",
+    "TZOFFSETFROM:+0800",
+    "TZOFFSETTO:+0800",
+    "TZNAME:CST",
+    "END:STANDARD",
+    "END:VTIMEZONE",
     "BEGIN:VEVENT",
     "UID:" + start + "-" + Date.now() + "@hui-chun.com",
     "DTSTAMP:" + stamp,
-    "DTSTART:" + start,
-    "DTEND:" + end,
+    "DTSTART;TZID=Asia/Taipei:" + icsTaipei(start),
+    "DTEND;TZID=Asia/Taipei:" + icsTaipei(end),
     "SUMMARY:" + icsEscape(title)
   ];
   if (desc) lines.push("DESCRIPTION:" + icsEscape(desc));
